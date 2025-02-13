@@ -31,8 +31,7 @@ public class Volunteer : Entity<VolunteerId>
         double experienceYears,
         Phone phone,
         Requisites requisites,
-        SocialNetwork socialNetwork,
-        List<Pet> pets) : base(id)
+        SocialNetwork socialNetwork) : base(id)
     {
         Id = id;
         FullName = fullName;
@@ -42,7 +41,6 @@ public class Volunteer : Entity<VolunteerId>
         Phone = phone;
         Requisites = requisites;
         SocialNetwork = socialNetwork;
-        _pets = pets;
     }
 
     public static Result<Volunteer> Create(VolunteerId id,
@@ -52,8 +50,7 @@ public class Volunteer : Entity<VolunteerId>
         double experienceYears,
         Phone phone,
         Requisites requisites,
-        SocialNetwork socialNetwork,
-        List<Pet> pets)
+        SocialNetwork socialNetwork)
     {
         if (string.IsNullOrWhiteSpace(description)) return Result.Failure<Volunteer>("Description cannot be empty");
         if (experienceYears <= 0) return Result.Failure<Volunteer>("Volunteer\'s experience should be greater than 0");
@@ -66,8 +63,7 @@ public class Volunteer : Entity<VolunteerId>
             experienceYears,
             phone,
             requisites,
-            socialNetwork,
-            pets));
+            socialNetwork));
     }
 
     public Result<Volunteer> AddPet(Pet pet)
