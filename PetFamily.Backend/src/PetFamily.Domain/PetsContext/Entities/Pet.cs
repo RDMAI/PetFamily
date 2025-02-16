@@ -23,6 +23,9 @@ public class Pet : Entity<PetId>
     public Requisites Requisites { get; private set; }
     public DateTime CreationDate = DateTime.Now;
 
+    // EF Core
+    private Pet() { }
+
     private Pet(PetId id,
         string name,
         string description,
