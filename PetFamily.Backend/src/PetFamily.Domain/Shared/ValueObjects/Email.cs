@@ -1,4 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Helpers;
+using System.IO;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
@@ -6,11 +8,12 @@ public record Email
 {
     public string Value { get; }
 
-    public static Result<Email> Create(string value)
+    public static Result<Email, Error> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(value)) return Result.Failure<Email>("Email cannot be empty.");
+        if (string.IsNullOrWhiteSpace(value))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Email");
 
-        return Result.Success(new Email(value));
+        return new Email(value);
     }
 
     private Email(string value)

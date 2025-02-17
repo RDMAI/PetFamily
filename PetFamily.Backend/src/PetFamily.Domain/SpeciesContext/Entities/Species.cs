@@ -1,4 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Helpers;
+using PetFamily.Domain.Shared;
 using PetFamily.Domain.SpeciesContext.ValueObjects;
 
 namespace PetFamily.Domain.SpeciesContext.Entities;
@@ -19,18 +21,20 @@ public class Species : Entity<SpeciesId>
         _breeds = breeds;
     }
 
-    public static Result<Species> Create(SpeciesId id, string name, List<Breed> breeds)
+    public static Result<Species, Error> Create(SpeciesId id, string name, List<Breed> breeds)
     {
-        if (string.IsNullOrWhiteSpace(name)) return Result.Failure<Species>("Species name cannot be empty");
+        if (string.IsNullOrWhiteSpace(name))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Name");
 
-        return Result.Success(new Species(id, name, breeds));
+        return new Species(id, name, breeds);
     }
 
-    public Result<Species> AddBreed(Breed breed)
+    public Result<Species, Error> AddBreed(Breed breed)
     {
-        if (breed is null) return Result.Failure<Species>("Breed cannot be empty");
+        if (breed is null)
+            return ErrorHelper.General.ValueIsNullOrEmpty("Breed");
 
         _breeds.Add(breed);
-        return Result.Success(this);
+        return this;
     }
 }

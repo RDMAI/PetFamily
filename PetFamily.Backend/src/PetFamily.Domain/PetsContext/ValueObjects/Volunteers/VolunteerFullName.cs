@@ -1,4 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Helpers;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.PetsContext.ValueObjects.Volunteers;
 
@@ -10,13 +12,16 @@ public record VolunteerFullName
 
     public override string ToString() => $"{LastName} {FirstName} {FatherName}";
 
-    public static Result<VolunteerFullName> Create(string firstName, string lastName, string fatherName)
+    public static Result<VolunteerFullName, Error> Create(string firstName, string lastName, string fatherName)
     {
-        if (string.IsNullOrWhiteSpace(firstName)) return Result.Failure<VolunteerFullName>("First name cannot be empty.");
-        if (string.IsNullOrWhiteSpace(lastName)) return Result.Failure<VolunteerFullName>("Last name cannot be empty.");
-        if (string.IsNullOrWhiteSpace(fatherName)) return Result.Failure<VolunteerFullName>("Father\'s name cannot be empty.");
+        if (string.IsNullOrWhiteSpace(firstName))
+            return ErrorHelper.General.ValueIsNullOrEmpty("First name");
+        if (string.IsNullOrWhiteSpace(lastName))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Last name");
+        if (string.IsNullOrWhiteSpace(fatherName))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Father\'s name");
 
-        return Result.Success(new VolunteerFullName(firstName, lastName, fatherName));
+        return new VolunteerFullName(firstName, lastName, fatherName);
     }
 
     private VolunteerFullName(string firstName, string lastName, string fatherName)
