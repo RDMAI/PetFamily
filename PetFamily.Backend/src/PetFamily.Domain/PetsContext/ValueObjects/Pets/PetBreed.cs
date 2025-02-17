@@ -9,17 +9,12 @@ public record PetBreed
     public Guid BreedId { get; }
     public Guid SpeciesId { get; }
 
-    public static Result<PetBreed> Create(BreedId breedId, SpeciesId speciesId)
-    {
-        if (breedId is null) return Result.Failure<PetBreed>("BreedId cannot be null");
-        if (speciesId is null) return Result.Failure<PetBreed>("SpeciesId cannot be null");
+    public static Result<PetBreed> Create(Guid breedId, Guid speciesId) =>
+        Result.Success(new PetBreed(breedId, speciesId));
 
-        return Result.Success(new PetBreed(breedId, speciesId));
-    }
-
-    private PetBreed(BreedId breedId, SpeciesId speciesId)
+    private PetBreed(Guid breedId, Guid speciesId)
     {
-        BreedId = breedId.Value;
-        SpeciesId = speciesId.Value;
+        BreedId = breedId;
+        SpeciesId = speciesId;
     }
 }

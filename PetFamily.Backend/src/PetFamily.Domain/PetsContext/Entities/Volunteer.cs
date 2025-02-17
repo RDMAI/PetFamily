@@ -24,6 +24,8 @@ public class Volunteer : Entity<VolunteerId>
     public int PetsSeekingHome => _pets.Where(d => d.Status.Value == PetStatus.Statuses.SeekingHome).Count();
     public int PetsNeedHelp => _pets.Where(d => d.Status.Value == PetStatus.Statuses.NeedsHelp).Count();
 
+    // EF Core
+    private Volunteer() { }
     private Volunteer(VolunteerId id,
         VolunteerFullName fullName,
         Email email,
