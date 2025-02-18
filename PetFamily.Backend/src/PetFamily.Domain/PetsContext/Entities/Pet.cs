@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsContext.ValueObjects.Pets;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
@@ -58,7 +59,7 @@ public class Pet : Entity<PetId>
         Requisites = requisites;
     }
 
-    public static Result<Pet> Create(PetId id,
+    public static Result<Pet, Error> Create(PetId id,
         string name,
         string description,
         PetColor color,
@@ -74,12 +75,16 @@ public class Pet : Entity<PetId>
         PetStatus status,
         Requisites requisites)
     {
-        if (string.IsNullOrWhiteSpace(name)) return Result.Failure<Pet>("Pet name cannot be empty");
-        if (string.IsNullOrWhiteSpace(description)) return Result.Failure<Pet>("Pet description cannot be empty");
-        if (weight <= 0) return Result.Failure<Pet>("Pet weight should be more than zero");
-        if (height <= 0) return Result.Failure<Pet>("Pet height should be more than zero");
+        if (string.IsNullOrWhiteSpace(name))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Name");
+        if (string.IsNullOrWhiteSpace(description))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Description");
+        if (weight <= 0)
+            return ErrorHelper.General.ValueIsInvalid("Weight");
+        if (height <= 0)
+            return ErrorHelper.General.ValueIsInvalid("Height");
 
-        return Result.Success(new Pet(
+        return new Pet(
             id,
             name,
             description,
@@ -94,6 +99,6 @@ public class Pet : Entity<PetId>
             birthDate,
             isVacinated,
             status,
-            requisites));
+            requisites);
     }
 }

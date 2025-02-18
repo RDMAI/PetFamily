@@ -1,22 +1,24 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Helpers;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
 public record Requisites
 {
-    // Реквизиты для помощи (у каждого реквизита будет название и описание, как сделать перевод), поэтому нужно сделать отдельный класс для реквизита.
-    // Это должен быть Value Object
     public string Name { get; }
     public string Description { get; }
     public string Value { get; }
 
-    public static Result<Requisites> Create(string name, string description, string value)
+    public static Result<Requisites, Error> Create(string name, string description, string value)
     {
-        if (string.IsNullOrWhiteSpace(name)) return Result.Failure<Requisites>("City name cannot be empty.");
-        if (string.IsNullOrWhiteSpace(description)) return Result.Failure<Requisites>("Street name cannot be empty.");
-        if (string.IsNullOrWhiteSpace(value)) return Result.Failure<Requisites>("Street name cannot be empty.");
+        if (string.IsNullOrWhiteSpace(name))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Name");
+        if (string.IsNullOrWhiteSpace(description))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Description");
+        if (string.IsNullOrWhiteSpace(value))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Value");
 
-        return Result.Success(new Requisites(name, description, value));
+        return new Requisites(name, description, value);
     }
 
     private Requisites(string name, string description, string value)

@@ -1,4 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Helpers;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.PetsContext.ValueObjects.Pets;
 
@@ -6,11 +8,12 @@ public record PetHealthInfo
 {
     public string Value { get; }
 
-    public static Result<PetHealthInfo> Create(string value)
+    public static Result<PetHealthInfo, Error> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(value)) return Result.Failure<PetHealthInfo>("Health info cannot be empty.");
+        if (string.IsNullOrWhiteSpace(value))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Health information");
 
-        return Result.Success(new PetHealthInfo(value));
+        return new PetHealthInfo(value);
     }
 
     private PetHealthInfo(string value)

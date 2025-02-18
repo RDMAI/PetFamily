@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Helpers;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
@@ -12,15 +13,20 @@ public record Address
 
     //public string AddressAsString => $"{City}, {Street} {HouseNumber}/{HouseSubNumber}, {AppartmentNumber}";
 
-    public static Result<Address> Create(string city, string street, int houseNumber, int? houseSubNumber = null, int? appartmentNumber = null)
+    public static Result<Address, Error> Create(string city, string street, int houseNumber, int? houseSubNumber = null, int? apartmentNumber = null)
     {
-        if (string.IsNullOrWhiteSpace(city)) return Result.Failure<Address>("City name cannot be empty.");
-        if (string.IsNullOrWhiteSpace(street)) return Result.Failure<Address>("Street name cannot be empty.");
-        if (houseNumber <= 0) return Result.Failure<Address>("House number should be more than zero.");
-        if (houseSubNumber != null && houseSubNumber <= 0) return Result.Failure<Address>("House sub number should be more than zero.");
-        if (appartmentNumber != null && appartmentNumber <= 0) return Result.Failure<Address>("Appartment number should be more than zero.");
+        if (string.IsNullOrWhiteSpace(city))
+            return ErrorHelper.General.ValueIsNullOrEmpty("City");
+        if (string.IsNullOrWhiteSpace(street))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Street");
+        if (houseNumber <= 0)
+            return ErrorHelper.General.ValueIsInvalid("House number");
+        if (houseSubNumber != null && houseSubNumber <= 0)
+            return ErrorHelper.General.ValueIsInvalid("House subnumber");
+        if (apartmentNumber != null && apartmentNumber <= 0)
+            return ErrorHelper.General.ValueIsInvalid("Apartment number");
 
-        return Result.Success(new Address(city, street, houseNumber, houseSubNumber, appartmentNumber));
+        return new Address(city, street, houseNumber, houseSubNumber, apartmentNumber);
     }
 
     private Address(string city, string street, int houseNumber, int? houseSubNumber, int? appartmentNumber)

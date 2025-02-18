@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.PetsContext.ValueObjects.Pets;
 
@@ -6,10 +7,8 @@ public record PetStatus
 {
     public Statuses Value { get; }
 
-    public static Result<PetStatus> Create(Statuses value)
-    {
-        return Result.Success(new PetStatus(value));
-    }
+    public static Result<PetStatus, Error> Create(Statuses value)
+        => new PetStatus(value);
 
     private PetStatus(Statuses value)
     {

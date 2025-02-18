@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +13,14 @@ public record SocialNetwork
     public string Name { get; }
     public string Link { get; }
 
-    public static Result<SocialNetwork> Create(string name, string link)
+    public static Result<SocialNetwork, Error> Create(string name, string link)
     {
-        if (string.IsNullOrWhiteSpace(name)) return Result.Failure<SocialNetwork>("Name cannot be empty.");
-        if (string.IsNullOrWhiteSpace(link)) return Result.Failure<SocialNetwork>("Link cannot be empty.");
+        if (string.IsNullOrWhiteSpace(name))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Name");
+        if (string.IsNullOrWhiteSpace(link))
+            return ErrorHelper.General.ValueIsNullOrEmpty("Link");
 
-        return Result.Success(new SocialNetwork(name, link));
+        return new SocialNetwork(name, link);
     }
 
     private SocialNetwork(string name, string link)
