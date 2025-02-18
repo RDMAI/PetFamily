@@ -1,9 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsContext.ValueObjects.Pets;
 using PetFamily.Domain.PetsContext.ValueObjects.Volunteers;
+using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.SpeciesContext.Entities;
-using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace PetFamily.Domain.PetsContext.Entities;
 
@@ -20,9 +21,9 @@ public class Volunteer : Entity<VolunteerId>
     public IReadOnlyList<Pet> Pets => _pets;
     private List<Pet> _pets = [];
 
-    public int PetsFoundHome => _pets.Where(d => d.Status.Value == PetStatus.Statuses.FoundHome).Count();
-    public int PetsSeekingHome => _pets.Where(d => d.Status.Value == PetStatus.Statuses.SeekingHome).Count();
-    public int PetsNeedHelp => _pets.Where(d => d.Status.Value == PetStatus.Statuses.NeedsHelp).Count();
+    public int PetsFoundHome => _pets.Where(d => d.Status.Value == PetStatuses.FoundHome).Count();
+    public int PetsSeekingHome => _pets.Where(d => d.Status.Value == PetStatuses.SeekingHome).Count();
+    public int PetsNeedHelp => _pets.Where(d => d.Status.Value == PetStatuses.NeedsHelp).Count();
 
     // EF Core
     private Volunteer() { }
@@ -45,7 +46,7 @@ public class Volunteer : Entity<VolunteerId>
         SocialNetwork = socialNetwork;
     }
 
-    public static Result<Volunteer> Create(VolunteerId id,
+    public static Result<Volunteer, Error> Create(VolunteerId id,
         VolunteerFullName fullName,
         Email email,
         string description,
@@ -54,10 +55,12 @@ public class Volunteer : Entity<VolunteerId>
         Requisites requisites,
         SocialNetwork socialNetwork)
     {
-        if (string.IsNullOrWhiteSpace(description)) return Result.Failure<Volunteer>("Description cannot be empty");
-        if (experienceYears <= 0) return Result.Failure<Volunteer>("Volunteer\'s experience should be greater than 0");
+        if (string.IsNullOrWhiteSpace(description) || description.Length > Constants.MAX_HIGH_TEXT_LENGTH)
+            return ErrorHelper.General.ValueIsInvalid("Description");
+        if (experienceYears <= 0)
+            return ErrorHelper.General.ValueIsInvalid("Experience");
 
-        return Result.Success(new Volunteer(
+        return new Volunteer(
             id,
             fullName,
             email,
@@ -65,14 +68,15 @@ public class Volunteer : Entity<VolunteerId>
             experienceYears,
             phone,
             requisites,
-            socialNetwork));
+            socialNetwork);
     }
 
-    public Result<Volunteer> AddPet(Pet pet)
+    public Result<Volunteer, Error> AddPet(Pet pet)
     {
-        if (pet is null) return Result.Failure<Volunteer>("Pet cannot be empty");
+        if (pet is null)
+            return ErrorHelper.General.ValueIsNullOrEmpty("Pet");
 
         _pets.Add(pet);
-        return Result.Success(this);
+        return this;
     }
 }

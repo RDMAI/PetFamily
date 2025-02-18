@@ -10,8 +10,8 @@ public record PetColor
 
     public static Result<PetColor, Error> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            return ErrorHelper.General.ValueIsNullOrEmpty("Pet color");
+        if (string.IsNullOrWhiteSpace(value) || value.Length > Constants.MAX_LOW_TEXT_LENGTH)
+            return ErrorHelper.General.ValueIsInvalid("Pet color");
 
         return new PetColor(value);
     }

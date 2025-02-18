@@ -20,8 +20,8 @@ public class Breed : Entity<BreedId>
 
     public static Result<Breed, Error> Create(BreedId id, string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            return ErrorHelper.General.ValueIsNullOrEmpty("Name");
+        if (string.IsNullOrWhiteSpace(name) || name.Length > Constants.MAX_LOW_TEXT_LENGTH)
+            return ErrorHelper.General.ValueIsInvalid("Name");
 
         return new Breed(id, name);
     }

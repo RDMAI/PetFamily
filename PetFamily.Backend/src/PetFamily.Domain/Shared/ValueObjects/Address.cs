@@ -15,10 +15,10 @@ public record Address
 
     public static Result<Address, Error> Create(string city, string street, int houseNumber, int? houseSubNumber = null, int? apartmentNumber = null)
     {
-        if (string.IsNullOrWhiteSpace(city))
-            return ErrorHelper.General.ValueIsNullOrEmpty("City");
-        if (string.IsNullOrWhiteSpace(street))
-            return ErrorHelper.General.ValueIsNullOrEmpty("Street");
+        if (string.IsNullOrWhiteSpace(city) || city.Length > Constants.MAX_LOW_TEXT_LENGTH)
+            return ErrorHelper.General.ValueIsInvalid("City");
+        if (string.IsNullOrWhiteSpace(street) || street.Length > Constants.MAX_LOW_TEXT_LENGTH)
+            return ErrorHelper.General.ValueIsInvalid("Street");
         if (houseNumber <= 0)
             return ErrorHelper.General.ValueIsInvalid("House number");
         if (houseSubNumber != null && houseSubNumber <= 0)

@@ -1,12 +1,4 @@
-﻿using PetFamily.Domain.PetsContext.ValueObjects.Pets;
-using PetFamily.Domain.Shared.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PetFamily.Domain.SpeciesContext.ValueObjects;
+﻿namespace PetFamily.Domain.SpeciesContext.ValueObjects;
 
 public record SpeciesId : IComparable<SpeciesId>
 {

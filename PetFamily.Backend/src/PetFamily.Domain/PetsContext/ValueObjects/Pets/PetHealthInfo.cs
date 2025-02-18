@@ -10,8 +10,8 @@ public record PetHealthInfo
 
     public static Result<PetHealthInfo, Error> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            return ErrorHelper.General.ValueIsNullOrEmpty("Health information");
+        if (string.IsNullOrWhiteSpace(value) || value.Length > Constants.MAX_LOW_TEXT_LENGTH)
+            return ErrorHelper.General.ValueIsInvalid("Health information");
 
         return new PetHealthInfo(value);
     }
