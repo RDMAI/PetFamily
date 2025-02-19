@@ -26,5 +26,10 @@ public static class ErrorHelper
             var label = id == null ? "" : $" for Id: {id}";
             return Error.Validation("record.not.found", $"record not found{label}");
         }
+        public static Error AlreadyExist(string? name = null)
+        {
+            var label = name ?? "value";
+            return Error.Validation("record.exists", $"{label} exists");
+        }
     }
 }

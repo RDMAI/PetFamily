@@ -3,8 +3,8 @@
 namespace PetFamily.Application.Volunteers.Commands;
 public record CreateVolunteerCommand(
     VolunteerDTO VolunteerDTO,
-    RequisitesDTO[] RequisitesList,
-    SocialNetworkDTO[] SocialNetworksList)
+    IEnumerable<RequisitesDTO> RequisitesList,
+    IEnumerable<SocialNetworkDTO> SocialNetworksList)
 {
 
 }
