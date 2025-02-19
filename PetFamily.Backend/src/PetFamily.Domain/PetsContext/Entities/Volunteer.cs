@@ -15,8 +15,8 @@ public class Volunteer : Entity<VolunteerId>
     public string Description { get; private set; }
     public double ExperienceYears { get; private set; }
     public Phone Phone { get; private set; }
-    public Requisites Requisites { get; private set; }
-    public SocialNetwork SocialNetwork { get; private set; }
+    public RequisitesList Requisites { get; private set; }
+    public SocialNetworkList SocialNetworks { get; private set; }
 
     public IReadOnlyList<Pet> Pets => _pets;
     private List<Pet> _pets = [];
@@ -33,8 +33,8 @@ public class Volunteer : Entity<VolunteerId>
         string description,
         double experienceYears,
         Phone phone,
-        Requisites requisites,
-        SocialNetwork socialNetwork) : base(id)
+        RequisitesList requisites,
+        SocialNetworkList socialNetworks) : base(id)
     {
         Id = id;
         FullName = fullName;
@@ -43,7 +43,7 @@ public class Volunteer : Entity<VolunteerId>
         ExperienceYears = experienceYears;
         Phone = phone;
         Requisites = requisites;
-        SocialNetwork = socialNetwork;
+        SocialNetworks = socialNetworks;
     }
 
     public static Result<Volunteer, Error> Create(VolunteerId id,
@@ -52,8 +52,8 @@ public class Volunteer : Entity<VolunteerId>
         string description,
         double experienceYears,
         Phone phone,
-        Requisites requisites,
-        SocialNetwork socialNetwork)
+        RequisitesList requisites,
+        SocialNetworkList socialNetworks)
     {
         if (string.IsNullOrWhiteSpace(description) || description.Length > Constants.MAX_HIGH_TEXT_LENGTH)
             return ErrorHelper.General.ValueIsInvalid("Description");
@@ -68,7 +68,7 @@ public class Volunteer : Entity<VolunteerId>
             experienceYears,
             phone,
             requisites,
-            socialNetwork);
+            socialNetworks);
     }
 
     public Result<Volunteer, Error> AddPet(Pet pet)

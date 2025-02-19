@@ -16,6 +16,11 @@ public static class ErrorHelper
             var label = name ?? "value";
             return Error.Validation("value.is.null.or.empty", $"{label} is null or empty");
         }
+        public static Error ValueIsNull(string? name = null)
+        {
+            var label = name ?? "value";
+            return Error.Validation("value.is.null", $"{label} is null");
+        }
         public static Error NotFound(Guid? id = null)
         {
             var label = id == null ? "" : $" for Id: {id}";
