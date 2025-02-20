@@ -24,35 +24,42 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             .IsRequired()
             .HasMaxLength(Constants.MAX_HIGH_TEXT_LENGTH);
 
-        builder.OwnsOne(d => d.FullName, ib =>
+        builder.ComplexProperty(d => d.FullName, ib =>
         {
-            ib.ToJson();
-
             ib.Property(d1 => d1.FirstName)
                 .IsRequired()
-                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH)
+                .HasColumnName("first_name");
 
             ib.Property(d1 => d1.LastName)
                 .IsRequired()
-                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH)
+                .HasColumnName("last_name");
 
             ib.Property(d1 => d1.FatherName)
                 .IsRequired()
-                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH)
+                .HasColumnName("father_name");
         });
 
-        builder.Property(d => d.Email)
-            .HasConversion(
-                d => d.Value,
-                value => Email.Create(value).Value);
+        builder.ComplexProperty(d => d.Email, ib =>
+        {
+            ib.Property(p => p.Value)
+                .IsRequired()
+                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH)
+                .HasColumnName("email");
+        });
 
         builder.Property(d => d.ExperienceYears)
             .IsRequired();
 
-        builder.Property(d => d.Phone)
-            .HasConversion(
-                d => d.Value,
-                value => Phone.Create(value).Value);
+        builder.ComplexProperty(d => d.Phone, ib =>
+        {
+            ib.Property(p => p.Value)
+                .IsRequired()
+                .HasMaxLength(Phone.MAX_LENGTH)
+                .HasColumnName("phone");
+        });
 
         builder.OwnsOne(d => d.Requisites, ib =>
         {

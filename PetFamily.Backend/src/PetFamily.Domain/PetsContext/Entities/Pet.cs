@@ -21,7 +21,7 @@ public class Pet : Entity<PetId>
     public DateOnly BirthDate { get; private set; }
     public bool IsVacinated { get; private set; }
     public PetStatus Status { get; private set; }  // Pet's status - needs help / seeks home / found home
-    public Requisites Requisites { get; private set; }
+    public RequisitesList Requisites { get; private set; }
     public DateTime CreationDate = DateTime.Now;
 
     // EF Core
@@ -41,7 +41,7 @@ public class Pet : Entity<PetId>
         DateOnly birthDate,
         bool isVacinated,
         PetStatus status,
-        Requisites requisites) : base(id)
+        RequisitesList requisites) : base(id)
     {
         Name = name;
         Description = description;
@@ -73,7 +73,7 @@ public class Pet : Entity<PetId>
         DateOnly birthDate,
         bool isVacinated,
         PetStatus status,
-        Requisites requisites)
+        RequisitesList requisites)
     {
         if (string.IsNullOrWhiteSpace(name) || name.Length > Constants.MAX_LOW_TEXT_LENGTH)
             return ErrorHelper.General.ValueIsInvalid("Name");

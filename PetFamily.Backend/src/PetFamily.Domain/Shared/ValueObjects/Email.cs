@@ -9,8 +9,8 @@ public record Email
 
     public static Result<Email, Error> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))  // add proper email validation
-            return ErrorHelper.General.ValueIsNullOrEmpty("Email");
+        if (string.IsNullOrWhiteSpace(value) || value.Length > Constants.MAX_LOW_TEXT_LENGTH)  // add proper email validation
+            return ErrorHelper.General.ValueIsInvalid("Email");
 
         return new Email(value);
     }
