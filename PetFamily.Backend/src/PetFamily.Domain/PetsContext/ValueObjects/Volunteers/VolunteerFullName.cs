@@ -14,11 +14,11 @@ public record VolunteerFullName
 
     public static Result<VolunteerFullName, Error> Create(string firstName, string lastName, string fatherName)
     {
-        if (string.IsNullOrWhiteSpace(firstName))
+        if (string.IsNullOrWhiteSpace(firstName) || firstName.Length > Constants.MAX_LOW_TEXT_LENGTH)
             return ErrorHelper.General.ValueIsNullOrEmpty("First name");
-        if (string.IsNullOrWhiteSpace(lastName))
+        if (string.IsNullOrWhiteSpace(lastName) || lastName.Length > Constants.MAX_LOW_TEXT_LENGTH)
             return ErrorHelper.General.ValueIsNullOrEmpty("Last name");
-        if (string.IsNullOrWhiteSpace(fatherName))
+        if (string.IsNullOrWhiteSpace(fatherName) || fatherName.Length > Constants.MAX_LOW_TEXT_LENGTH)
             return ErrorHelper.General.ValueIsNullOrEmpty("Father\'s name");
 
         return new VolunteerFullName(firstName, lastName, fatherName);

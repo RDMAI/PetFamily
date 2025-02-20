@@ -23,8 +23,8 @@ public class Species : Entity<SpeciesId>
 
     public static Result<Species, Error> Create(SpeciesId id, string name, List<Breed> breeds)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            return ErrorHelper.General.ValueIsNullOrEmpty("Name");
+        if (string.IsNullOrWhiteSpace(name) || name.Length > Constants.MAX_LOW_TEXT_LENGTH)
+            return ErrorHelper.General.ValueIsInvalid("Name");
 
         return new Species(id, name, breeds);
     }

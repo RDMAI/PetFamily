@@ -20,7 +20,7 @@ public class Pet : Entity<PetId>
     public bool IsCastrated { get; private set; }
     public DateOnly BirthDate { get; private set; }
     public bool IsVacinated { get; private set; }
-    public PetStatus Status { get; private set; }  // Статус помощи - Нуждается в помощи/Ищет дом/Нашел дом
+    public PetStatus Status { get; private set; }  // Pet's status - needs help / seeks home / found home
     public Requisites Requisites { get; private set; }
     public DateTime CreationDate = DateTime.Now;
 
@@ -75,10 +75,10 @@ public class Pet : Entity<PetId>
         PetStatus status,
         Requisites requisites)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            return ErrorHelper.General.ValueIsNullOrEmpty("Name");
-        if (string.IsNullOrWhiteSpace(description))
-            return ErrorHelper.General.ValueIsNullOrEmpty("Description");
+        if (string.IsNullOrWhiteSpace(name) || name.Length > Constants.MAX_LOW_TEXT_LENGTH)
+            return ErrorHelper.General.ValueIsInvalid("Name");
+        if (string.IsNullOrWhiteSpace(description) || description.Length > Constants.MAX_HIGH_TEXT_LENGTH)
+            return ErrorHelper.General.ValueIsInvalid("Description");
         if (weight <= 0)
             return ErrorHelper.General.ValueIsInvalid("Weight");
         if (height <= 0)

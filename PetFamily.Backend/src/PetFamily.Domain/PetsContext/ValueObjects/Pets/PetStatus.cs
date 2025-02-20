@@ -1,24 +1,30 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.PetsContext.ValueObjects.Pets;
 
 public record PetStatus
 {
-    public Statuses Value { get; }
+    public PetStatuses Value { get; }
 
-    public static Result<PetStatus, Error> Create(Statuses value)
-        => new PetStatus(value);
+    public static Result<PetStatus, Error> Create(PetStatuses value)
+    {
+        if (Enum.IsDefined(typeof(PetStatuses), value))
+            return ErrorHelper.General.ValueIsInvalid("Pet status");
 
-    private PetStatus(Statuses value)
+        return new PetStatus(value);
+    }
+
+    private PetStatus(PetStatuses value)
     {
         Value = value;
     }
+}
 
-    public enum Statuses
-    {
-        NeedsHelp = 10,
-        SeekingHome = 20,
-        FoundHome = 30
-    }
+public enum PetStatuses
+{
+    NeedsHelp = 10,
+    SeekingHome = 20,
+    FoundHome = 30
 }

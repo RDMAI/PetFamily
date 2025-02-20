@@ -58,30 +58,36 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
         {
             ib.ToJson();
 
-            ib.Property(d1 => d1.Name)
-                .IsRequired()
-                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+            ib.OwnsMany(r => r.List, rb =>
+            {
+                rb.Property(r1 => r1.Name)
+                    .IsRequired()
+                    .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
 
-            ib.Property(d1 => d1.Value)
-                .IsRequired()
-                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+                rb.Property(r1 => r1.Description)
+                    .IsRequired()
+                    .HasMaxLength(Constants.MAX_HIGH_TEXT_LENGTH);
 
-            ib.Property(d1 => d1.Description)
-                .IsRequired()
-                .HasMaxLength(Constants.MAX_HIGH_TEXT_LENGTH);
+                rb.Property(r1 => r1.Value)
+                    .IsRequired()
+                    .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+            });
         });
 
-        builder.OwnsOne(d => d.SocialNetwork, ib =>
+        builder.OwnsOne(d => d.SocialNetworks, ib =>
         {
             ib.ToJson();
 
-            ib.Property(d1 => d1.Name)
-                .IsRequired()
-                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+            ib.OwnsMany(s => s.List, sb =>
+            {
+                sb.Property(s1 => s1.Name)
+                    .IsRequired()
+                    .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
 
-            ib.Property(d1 => d1.Link)
-                .IsRequired()
-                .HasMaxLength(Constants.MAX_HIGH_TEXT_LENGTH);
+                sb.Property(s1 => s1.Link)
+                    .IsRequired()
+                    .HasMaxLength(Constants.MAX_MID_TEXT_LENGTH);
+            });
         });
 
         builder.HasMany(d => d.Pets)
