@@ -14,14 +14,17 @@ public class SpeciesConfiguration : IEntityTypeConfiguration<Species>
 
         builder.HasKey(d => d.Id);
 
-        builder.Property(d => d.Name)
-            .IsRequired()
-            .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
-
         builder.Property(d => d.Id)
             .HasConversion(
                 id => id.Value,
                 value => SpeciesId.Create(value));
+
+        builder.ComplexProperty(d => d.Name, ib =>
+        {
+            ib.Property(name => name.Value)
+                .IsRequired()
+                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+        });
 
         builder.HasMany(d => d.Breeds)
             .WithOne()

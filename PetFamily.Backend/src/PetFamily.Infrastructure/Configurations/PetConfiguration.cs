@@ -21,42 +21,54 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                 id => id.Value,
                 value => PetId.Create(value));
 
-        builder.Property(d => d.Name)
-            .IsRequired()
-            .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+        builder.ComplexProperty(d => d.Name, ib =>
+        {
+            ib.Property(name => name.Value)
+                .IsRequired()
+                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+        });
 
-        builder.Property(d => d.Description)
-            .IsRequired()
-            .HasMaxLength(Constants.MAX_HIGH_TEXT_LENGTH);
-
+        builder.ComplexProperty(d => d.Description, ib =>
+        {
+            ib.Property(description => description.Value)
+                .IsRequired()
+                .HasMaxLength(Constants.MAX_HIGH_TEXT_LENGTH);
+        });
+            
         builder.ComplexProperty(d => d.Color, ib =>
         {
-            ib.Property(p => p.Value)
+            ib.Property(color => color.Value)
                 .IsRequired()
                 .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH)
                 .HasColumnName("color");
         });
 
-        builder.Property(d => d.Weight)
-            .IsRequired();
+        builder.ComplexProperty(d => d.Weight, ib =>
+        {
+            ib.Property(weight => weight.Value)
+                .IsRequired();
+        });
 
-        builder.Property(d => d.Height)
-            .IsRequired();
+        builder.ComplexProperty(d => d.Height, ib =>
+        {
+            ib.Property(height => height.Value)
+                .IsRequired();
+        });
 
         builder.ComplexProperty(d => d.Breed, ib =>
         {
-            ib.Property(d1 => d1.BreedId)
+            ib.Property(breed => breed.BreedId)
                 .IsRequired()
                 .HasColumnName("breed_id");
 
-            ib.Property(d1 => d1.SpeciesId)
+            ib.Property(breed => breed.SpeciesId)
                 .IsRequired()
                 .HasColumnName("species_id");
         });
 
         builder.ComplexProperty(d => d.HealthInformation, ib =>
         {
-            ib.Property(p => p.Value)
+            ib.Property(health => health.Value)
                 .IsRequired()
                 .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH)
                 .HasColumnName("health_information");
@@ -64,32 +76,32 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
 
         builder.ComplexProperty(d => d.Address, ib =>
         {
-            ib.Property(d1 => d1.City)
+            ib.Property(adress => adress.City)
                 .IsRequired()
                 .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH)
                 .HasColumnName("city");
 
-            ib.Property(d1 => d1.Street)
+            ib.Property(adress => adress.Street)
                 .IsRequired()
                 .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH)
                 .HasColumnName("street");
 
-            ib.Property(d1 => d1.HouseNumber)
+            ib.Property(adress => adress.HouseNumber)
                 .IsRequired()
                 .HasColumnName("house_number");
 
-            ib.Property(d1 => d1.HouseSubNumber)
+            ib.Property(adress => adress.HouseSubNumber)
                 .IsRequired(false)
                 .HasColumnName("house_subnumber");
 
-            ib.Property(d1 => d1.AppartmentNumber)
+            ib.Property(adress => adress.AppartmentNumber)
                 .IsRequired(false)
                 .HasColumnName("appartment_number");
         });
 
         builder.ComplexProperty(d => d.OwnerPhone, ib =>
         {
-            ib.Property(p => p.Value)
+            ib.Property(phone => phone.Value)
                 .IsRequired()
                 .HasMaxLength(Phone.MAX_LENGTH)
                 .HasColumnName("owner_phone");

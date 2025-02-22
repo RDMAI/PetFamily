@@ -5,7 +5,7 @@ public record VolunteerDTO(string FirstName,
     string FatherName,
     string Email,
     string Description,
-    double ExperienceYears,
+    float ExperienceYears,
     string Phone)
 {
 

@@ -3,6 +3,7 @@ using PetFamily.Application.Volunteers.Commands;
 using PetFamily.Application.Volunteers.DTOs;
 using PetFamily.Application.Volunteers.Filters;
 using PetFamily.Application.Volunteers.Interfaces;
+using PetFamily.Application.Volunteers.Validators;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsContext.Entities;
 using PetFamily.Domain.PetsContext.ValueObjects.Volunteers;
@@ -14,66 +15,81 @@ namespace PetFamily.Application.Volunteers.CreateVolunteer
     public class CreateVolunteerHandler
     {
         private readonly IVolunteerRepository _volunteerRepository;
-        public CreateVolunteerHandler(IVolunteerRepository volunteerRepository)
+        private readonly CreateVolunteerCommandValidator _validator;
+        public CreateVolunteerHandler(IVolunteerRepository volunteerRepository,
+            CreateVolunteerCommandValidator validator)
         {
             _volunteerRepository = volunteerRepository;
+            _validator = validator;
         }
 
         public async Task<Result<Guid, Error>> HandleAsync(
             CreateVolunteerCommand command,
             CancellationToken cancellationToken = default)
         {
-            // create and validate entity
+            // command validation
+            var validatorResult = await _validator.ValidateAsync(command, cancellationToken);
+
+            if (!validatorResult.IsValid)
+            {
+                var error = Error.Validation(validatorResult.Errors[0].ErrorCode,
+                    validatorResult.Errors[0].ErrorMessage);
+
+                return error;
+            }
+
+            // creating ValueObjects vor Entity
             VolunteerDTO volunteerDto = command.VolunteerDTO;
             
-            var fullNameResult = VolunteerFullName.Create(volunteerDto.FirstName, volunteerDto.LastName, volunteerDto.FatherName);
-            if (fullNameResult.IsFailure) return fullNameResult.Error;
+            var fullName = VolunteerFullName.Create(volunteerDto.FirstName,
+                volunteerDto.LastName,
+                volunteerDto.FatherName).Value;
 
-            var emailResult = Email.Create(volunteerDto.Email);
-            if (emailResult.IsFailure) return emailResult.Error;
-
-            var phoneResult = Phone.Create(volunteerDto.Phone);
-            if (phoneResult.IsFailure) return phoneResult.Error;
+            var email = Email.Create(volunteerDto.Email).Value;
+            var description = Description.Create(volunteerDto.Description).Value;
+            var phone = Phone.Create(volunteerDto.Phone).Value;
+            var experienceYears = VolunteerExperienceYears.Create(volunteerDto.ExperienceYears).Value;
 
             List<Requisites> requisitesBufferList = [];
             foreach (RequisitesDTO requisites in command.RequisitesList)
             {
-                var requisitesResult = Requisites.Create(requisites.Name, requisites.Description, requisites.Value);
-                if (requisitesResult.IsFailure) return requisitesResult.Error;
-                requisitesBufferList.Add(requisitesResult.Value);
+                requisitesBufferList.Add(Requisites.Create(requisites.Name,
+                    requisites.Description,
+                    requisites.Value).Value);
             }
-            var requisitesListResult = RequisitesList.Create(requisitesBufferList);
+            var requisitesList = RequisitesList.Create(requisitesBufferList).Value;
 
             List<SocialNetwork> socialNetworkBufferList = [];
             foreach (SocialNetworkDTO socialNetwork in command.SocialNetworksList)
             {
-                var socialNetworkResult = SocialNetwork.Create(socialNetwork.Name, socialNetwork.Link);
-                if (socialNetworkResult.IsFailure) return socialNetworkResult.Error;
-                socialNetworkBufferList.Add(socialNetworkResult.Value);
+                socialNetworkBufferList.Add(SocialNetwork.Create(socialNetwork.Name,
+                    socialNetwork.Link).Value);
             }
-            var socialNetworkListResult = SocialNetworkList.Create(socialNetworkBufferList);
+            var socialNetworkList = SocialNetworkList.Create(socialNetworkBufferList).Value;
 
-            var entityResult = Volunteer.Create(VolunteerId.GenerateNew(),
-                fullNameResult.Value,
-                emailResult.Value,
-                volunteerDto.Description,
-                volunteerDto.ExperienceYears,
-                phoneResult.Value,
-                requisitesListResult.Value,
-                socialNetworkListResult.Value
-                );
-            if (entityResult.IsFailure) return entityResult.Error;
+            var entity = new Volunteer(VolunteerId.GenerateNew(),
+                fullName,
+                email,
+                description,
+                experienceYears,
+                phone,
+                requisitesList,
+                socialNetworkList);
 
-            // check if this entity exists
-            var filter = new VolunteerFilter(
-                Email: emailResult.Value,
-                Phone: phoneResult.Value);
-            var existanceResponse = await _volunteerRepository.GetAsync(filter, cancellationToken);
-            if (existanceResponse.IsFailure) return existanceResponse.Error;  // in case of DB error
-            if (existanceResponse.Value.Any()) return Error.Validation("entity.exists", "Volunteer with these phone and email exists");
+            // check if this Entity exists:
+            // with the same email
+            var emailFilter = new VolunteerFilter(Email: email);
+            var emailResponse = await _volunteerRepository.GetAsync(emailFilter, cancellationToken);
+            if (emailResponse.IsFailure) return emailResponse.Error;  // in case of DB error
+            if (emailResponse.Value.Any()) return ErrorHelper.General.AlreadyExist("Volunteer");
+            // with the same email
+            var phoneFilter = new VolunteerFilter(Phone: phone);
+            var phoneResponse = await _volunteerRepository.GetAsync(phoneFilter, cancellationToken);
+            if (phoneResponse.IsFailure) return phoneResponse.Error;  // in case of DB error
+            if (phoneResponse.Value.Any()) return ErrorHelper.General.AlreadyExist("Volunteer");
 
             // handle BL
-            var createResponse = await _volunteerRepository.CreateAsync(entityResult.Value, cancellationToken);
+            var createResponse = await _volunteerRepository.CreateAsync(entity, cancellationToken);
             //if (createResponse.IsFailure) return createResponse.Error;
 
             return createResponse;

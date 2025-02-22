@@ -20,9 +20,12 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
                 id => id.Value,
                 value => VolunteerId.Create(value));
 
-        builder.Property(d => d.Description)
-            .IsRequired()
-            .HasMaxLength(Constants.MAX_HIGH_TEXT_LENGTH);
+        builder.ComplexProperty(d => d.Description, ib =>
+        {
+            ib.Property(description => description.Value)
+                .IsRequired()
+                .HasMaxLength(Constants.MAX_HIGH_TEXT_LENGTH);
+        });
 
         builder.ComplexProperty(d => d.FullName, ib =>
         {
@@ -44,18 +47,21 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
 
         builder.ComplexProperty(d => d.Email, ib =>
         {
-            ib.Property(p => p.Value)
+            ib.Property(email => email.Value)
                 .IsRequired()
                 .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH)
                 .HasColumnName("email");
         });
 
-        builder.Property(d => d.ExperienceYears)
-            .IsRequired();
+        builder.ComplexProperty(d => d.ExperienceYears, ib =>
+        {
+            ib.Property(experienceYears => experienceYears.Value)
+                .IsRequired();
+        });
 
         builder.ComplexProperty(d => d.Phone, ib =>
         {
-            ib.Property(p => p.Value)
+            ib.Property(phone => phone.Value)
                 .IsRequired()
                 .HasMaxLength(Phone.MAX_LENGTH)
                 .HasColumnName("phone");
@@ -85,13 +91,13 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
         {
             ib.ToJson();
 
-            ib.OwnsMany(s => s.List, sb =>
+            ib.OwnsMany(s => s.List, builder =>
             {
-                sb.Property(s1 => s1.Name)
+                builder.Property(s1 => s1.Name)
                     .IsRequired()
                     .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
 
-                sb.Property(s1 => s1.Link)
+                builder.Property(s1 => s1.Link)
                     .IsRequired()
                     .HasMaxLength(Constants.MAX_MID_TEXT_LENGTH);
             });
