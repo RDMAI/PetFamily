@@ -24,7 +24,8 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
         {
             ib.Property(description => description.Value)
                 .IsRequired()
-                .HasMaxLength(Constants.MAX_HIGH_TEXT_LENGTH);
+                .HasMaxLength(Constants.MAX_HIGH_TEXT_LENGTH)
+                .HasColumnName("description");
         });
 
         builder.ComplexProperty(d => d.FullName, ib =>
@@ -56,7 +57,8 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
         builder.ComplexProperty(d => d.ExperienceYears, ib =>
         {
             ib.Property(experienceYears => experienceYears.Value)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnName("experience_years");
         });
 
         builder.ComplexProperty(d => d.Phone, ib =>
@@ -106,5 +108,7 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
         builder.HasMany(d => d.Pets)
             .WithOne()
             .HasForeignKey("volunteer_id");
+
+        builder.Navigation(d => d.Pets).AutoInclude();
     }
 }

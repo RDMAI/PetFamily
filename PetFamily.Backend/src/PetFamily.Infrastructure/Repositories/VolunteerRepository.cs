@@ -1,15 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Volunteers.Filters;
-using PetFamily.Application.Volunteers.Interfaces;
+using PetFamily.Application.PetsManagement.Volunteers.DTOs;
+using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsContext.Entities;
+using PetFamily.Domain.PetsContext.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PetFamily.Infrastructure.Repositories;
 
@@ -17,31 +13,35 @@ public class VolunteerRepository(ApplicationDBContext context) : IVolunteerRepos
 {
     private readonly ApplicationDBContext _context = context;
 
-    public async Task<Result<Volunteer, Error>> GetByIdAsync(
-        Guid Id,
+    public async Task<Result<Volunteer, ErrorList>> GetByIdAsync(
+        VolunteerId Id,
         CancellationToken cancellationToken = default)
     {
-        var entity = await _context.Volunteers.FindAsync(Id, cancellationToken);
-        if (entity is null) return ErrorHelper.General.NotFound(); 
+        var entity = await _context.Volunteers  //.Include(v => v.Pets) autoincluded
+            .FirstOrDefaultAsync(v => v.Id == Id);
+        if (entity is null)
+        {
+            return ErrorHelper.General.NotFound().ToErrorList();
+        }
 
         return entity;
     }
 
-    public async Task<Result<Guid, Error>> CreateAsync(
+    public async Task<Result<VolunteerId, ErrorList>> CreateAsync(
         Volunteer entity,
         CancellationToken cancellationToken = default)
     {
         var entry = await _context.Volunteers.AddAsync(entity, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return entry.Entity.Id.Value;
+        return entry.Entity.Id;
     }
 
-    public async Task<Result<IEnumerable<Volunteer>, Error>> GetAsync(
+    public async Task<Result<IEnumerable<Volunteer>, ErrorList>> GetAsync(
         VolunteerFilter filter,
         CancellationToken cancellationToken = default)
     {
-        IQueryable<Volunteer> entities = _context.Volunteers;
+        IQueryable<Volunteer> entities = _context.Volunteers.Include(v => v.Pets);
 
         // Filtering
         if (filter.FullName != null) entities = entities.Where(d =>

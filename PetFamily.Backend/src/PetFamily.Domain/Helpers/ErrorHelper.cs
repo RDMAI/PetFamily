@@ -9,17 +9,17 @@ public static class ErrorHelper
         public static Error ValueIsInvalid(string? name = null)
         {
             var label = name ?? "value";
-            return Error.Validation("value.is.invalid", $"{label} is invalid");
+            return Error.Validation("value.is.invalid", $"{label} is invalid", name);
         }
         public static Error ValueIsNullOrEmpty(string? name = null)
         {
             var label = name ?? "value";
-            return Error.Validation("value.is.null.or.empty", $"{label} is null or empty");
+            return Error.Validation("value.is.null.or.empty", $"{label} is null or empty", name);
         }
         public static Error ValueIsNull(string? name = null)
         {
             var label = name ?? "value";
-            return Error.Validation("value.is.null", $"{label} is null");
+            return Error.Validation("value.is.null", $"{label} is null", name);
         }
         public static Error NotFound(Guid? id = null)
         {

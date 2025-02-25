@@ -11,9 +11,9 @@ public record SocialNetwork
     public static Result<SocialNetwork, Error> Create(string name, string link)
     {
         if (string.IsNullOrWhiteSpace(name) || name.Length > Constants.MAX_LOW_TEXT_LENGTH)
-            return ErrorHelper.General.ValueIsInvalid("Name");
+            return ErrorHelper.General.ValueIsInvalid("Social Network Name");
         if (string.IsNullOrWhiteSpace(link) || link.Length > Constants.MAX_MID_TEXT_LENGTH)
-            return ErrorHelper.General.ValueIsInvalid("Link");
+            return ErrorHelper.General.ValueIsInvalid("Social Network Link");
 
         return new SocialNetwork(name, link);
     }

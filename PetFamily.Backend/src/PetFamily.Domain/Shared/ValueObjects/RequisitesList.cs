@@ -4,7 +4,8 @@ using PetFamily.Domain.Helpers;
 namespace PetFamily.Domain.Shared.ValueObjects;
 public record RequisitesList
 {
-    public IReadOnlyList<Requisites> List { get; } = [];
+    private readonly List<Requisites> _list = [];
+    public IReadOnlyList<Requisites> List => _list;
 
     public static Result<RequisitesList, Error> Create(IEnumerable<Requisites> value)
     {
@@ -18,6 +19,6 @@ public record RequisitesList
     private RequisitesList(){}
     private RequisitesList(IEnumerable<Requisites> value)
     {
-        List = (IReadOnlyList<Requisites>)value;
+        _list = value.ToList();
     }
 }

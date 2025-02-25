@@ -4,7 +4,8 @@ using PetFamily.Domain.Helpers;
 namespace PetFamily.Domain.Shared.ValueObjects;
 public record SocialNetworkList
 {
-    public IReadOnlyList<SocialNetwork> List { get; } = [];
+    private readonly List<SocialNetwork> _list = [];
+    public IReadOnlyList<SocialNetwork> List => _list;
 
     public static Result<SocialNetworkList, Error> Create(IEnumerable<SocialNetwork> value)
     {
@@ -18,6 +19,6 @@ public record SocialNetworkList
     private SocialNetworkList() { }
     private SocialNetworkList(IEnumerable<SocialNetwork> value)
     {
-        List = (IReadOnlyList<SocialNetwork>)value;
+        _list = value.ToList();
     }
 }

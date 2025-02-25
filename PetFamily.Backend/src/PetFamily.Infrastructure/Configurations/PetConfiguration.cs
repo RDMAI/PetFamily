@@ -25,14 +25,16 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
         {
             ib.Property(name => name.Value)
                 .IsRequired()
-                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+                .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH)
+                .HasColumnName("name");
         });
 
         builder.ComplexProperty(d => d.Description, ib =>
         {
             ib.Property(description => description.Value)
                 .IsRequired()
-                .HasMaxLength(Constants.MAX_HIGH_TEXT_LENGTH);
+                .HasMaxLength(Constants.MAX_HIGH_TEXT_LENGTH)
+                .HasColumnName("description");
         });
             
         builder.ComplexProperty(d => d.Color, ib =>
@@ -46,13 +48,15 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
         builder.ComplexProperty(d => d.Weight, ib =>
         {
             ib.Property(weight => weight.Value)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnName("weight");
         });
 
         builder.ComplexProperty(d => d.Height, ib =>
         {
             ib.Property(height => height.Value)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnName("height");
         });
 
         builder.ComplexProperty(d => d.Breed, ib =>

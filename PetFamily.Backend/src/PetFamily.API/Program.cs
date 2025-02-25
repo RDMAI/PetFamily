@@ -1,4 +1,5 @@
-using PetFamily.Application.Extensions;
+using PetFamily.API.Shared.Extensions;
+using PetFamily.Application.Shared.Extensions;
 using PetFamily.Infrastructure;
 using PetFamily.Infrastructure.Extensions;
 
@@ -11,8 +12,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddInfrastructure()
-    .AddApplication();
+builder.Services
+    .AddInfrastructure()
+    .AddApplication()
+    .AddAPIServices();
 
 var app = builder.Build();
 
