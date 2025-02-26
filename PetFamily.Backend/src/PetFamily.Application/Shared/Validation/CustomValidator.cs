@@ -29,6 +29,20 @@ public static class CustomValidator
         });
     }
 
+    public static IRuleBuilderOptionsConditions<T, TElement> MustBeNotNull<T, TElement>(
+        this IRuleBuilder<T, TElement> ruleBuilder)
+    {
+        return ruleBuilder.Custom((value, context) =>
+        {
+            if (value is not null)
+                return;
+
+            var error = ErrorHelper.General.ValueIsNull();
+
+            context.AddFailure(error.Serialize());
+        });
+    }
+
     /// <summary>
     /// Validates list of DTOs to be valid list of ValueObjects
     /// </summary>

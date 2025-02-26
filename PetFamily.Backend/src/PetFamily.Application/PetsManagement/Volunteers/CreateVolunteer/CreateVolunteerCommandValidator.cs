@@ -11,8 +11,7 @@ public class CreateVolunteerCommandValidator : AbstractValidator<CreateVolunteer
 {
     public CreateVolunteerCommandValidator()
     {
-        RuleFor(c => new
-        {
+        RuleFor(c => new {
             c.FirstName,
             c.LastName,
             c.FatherName
@@ -26,11 +25,10 @@ public class CreateVolunteerCommandValidator : AbstractValidator<CreateVolunteer
         RuleFor(c => c.Phone).MustBeValueObject(Phone.Create);
         RuleFor(c => c.ExperienceYears).MustBeValueObject(VolunteerExperienceYears.Create);
 
+        RuleFor(c => c.RequisitesList).MustBeNotNull();
         RuleForEach(c => c.RequisitesList).MustBeValueObject(CreateRequisitesFromDTO);
+        RuleFor(c => c.SocialNetworksList).MustBeNotNull();
         RuleForEach(c => c.SocialNetworksList).MustBeValueObject(CreateNetworksFromDTO);
-
-        //RuleFor(c => c.RequisitesList).MustBeListOfValueObjects(CreateRequisitesFromDTO);
-        //RuleFor(c => c.SocialNetworksList).MustBeListOfValueObjects(CreateNetworksFromDTO);
     }
 
     private Result<Requisites, Error> CreateRequisitesFromDTO(RequisitesDTO dto)
