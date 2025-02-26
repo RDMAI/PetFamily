@@ -1,33 +1,24 @@
 ﻿using CSharpFunctionalExtensions;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.SpeciesContext.ValueObjects;
 
 namespace PetFamily.Domain.SpeciesContext.Entities;
 
 public class Species : Entity<SpeciesId>
 {
-    public string Name { get; private set; }
-    public IReadOnlyList<Breed> Breeds => _breeds;
-    private List<Breed> _breeds = [];
-
     // EF Core
     private Species() { }
-
-    private Species(SpeciesId id, string name, List<Breed> breeds)
+    public Species(SpeciesId id, SpeciesName name, List<Breed> breeds)
     {
         Id = id;
         Name = name;
         _breeds = breeds;
     }
-
-    public static Result<Species, Error> Create(SpeciesId id, string name, List<Breed> breeds)
-    {
-        if (string.IsNullOrWhiteSpace(name) || name.Length > Constants.MAX_LOW_TEXT_LENGTH)
-            return ErrorHelper.General.ValueIsInvalid("Name");
-
-        return new Species(id, name, breeds);
-    }
+    public SpeciesName Name { get; private set; }
+    public IReadOnlyList<Breed> Breeds => _breeds;
+    private List<Breed> _breeds = [];
 
     public Result<Species, Error> AddBreed(Breed breed)
     {

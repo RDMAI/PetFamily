@@ -12,11 +12,11 @@ public record Requisites
     public static Result<Requisites, Error> Create(string name, string description, string value)
     {
         if (string.IsNullOrWhiteSpace(name) || name.Length > Constants.MAX_LOW_TEXT_LENGTH)
-            return ErrorHelper.General.ValueIsInvalid("Name");
+            return ErrorHelper.General.ValueIsInvalid("Requisites Name");
         if (string.IsNullOrWhiteSpace(description) || description.Length > Constants.MAX_HIGH_TEXT_LENGTH)
-            return ErrorHelper.General.ValueIsInvalid("Description");
+            return ErrorHelper.General.ValueIsInvalid("Requisites Description");
         if (string.IsNullOrWhiteSpace(value) || value.Length > Constants.MAX_LOW_TEXT_LENGTH)
-            return ErrorHelper.General.ValueIsInvalid("Value");
+            return ErrorHelper.General.ValueIsInvalid("Requisites Value");
 
         return new Requisites(name, description, value);
     }
