@@ -1,11 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PetFamily.Infrastructure.Extensions;
 public static class DependencyInjection
@@ -16,5 +13,13 @@ public static class DependencyInjection
             .AddScoped<IVolunteerRepository, VolunteerRepository>();
 
         return services;
+    }
+
+    public static async Task ApplyMigrations(this IHost host)
+    {
+        await using var scope = host.Services.CreateAsyncScope();
+
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+        await dbContext.Database.MigrateAsync();
     }
 }
