@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Domain.Helpers;
@@ -13,11 +14,16 @@ namespace PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer
     {
         private readonly IVolunteerRepository _volunteerRepository;
         private readonly CreateVolunteerCommandValidator _validator;
-        public CreateVolunteerHandler(IVolunteerRepository volunteerRepository,
-            CreateVolunteerCommandValidator validator)
+        private readonly ILogger<CreateVolunteerHandler> _logger;
+
+        public CreateVolunteerHandler(
+            IVolunteerRepository volunteerRepository,
+            CreateVolunteerCommandValidator validator,
+            ILogger<CreateVolunteerHandler> logger)
         {
             _volunteerRepository = volunteerRepository;
             _validator = validator;
+            _logger = logger;
         }
 
         public async Task<Result<VolunteerId, ErrorList>> HandleAsync(
@@ -60,7 +66,9 @@ namespace PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer
             }
             var socialNetworkList = SocialNetworkList.Create(socialNetworkBufferList).Value;
 
-            var entity = new Volunteer(VolunteerId.GenerateNew(),
+            var volunteerId = VolunteerId.GenerateNew();
+
+            var entity = new Volunteer(volunteerId,
                 fullName,
                 email,
                 description,
@@ -84,6 +92,8 @@ namespace PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer
             // handle BL
             var createResponse = await _volunteerRepository.CreateAsync(entity, cancellationToken);
             //if (createResponse.IsFailure) return createResponse.Error;
+
+            _logger.LogInformation("Volunteer created with {Email} and id {Id}", email.Value, volunteerId.Value);
 
             return createResponse;
         }

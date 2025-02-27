@@ -9,7 +9,8 @@ namespace PetFamily.Infrastructure;
 public class ApplicationDBContext : DbContext
 {
     private readonly IConfiguration _configuration;
-    private const string DATABASE = "PostgresDBLocal";  // PostgresDB to connect to docker container
+    // PostgresDB to connect to docker container, PostgresDBLocal for local database
+    private const string DATABASE = "PostgresDB";
 
     public DbSet<Volunteer> Volunteers => Set<Volunteer>();
     public DbSet<Species> Species => Set<Species>();
