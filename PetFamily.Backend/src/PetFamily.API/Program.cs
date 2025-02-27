@@ -1,4 +1,5 @@
 using PetFamily.API.Shared.Extensions;
+using PetFamily.API.Shared.Middlewares;
 using PetFamily.Application.Shared.Extensions;
 using PetFamily.Infrastructure;
 using PetFamily.Infrastructure.Extensions;
@@ -18,6 +19,8 @@ builder.Services
     .AddAPIServices();
 
 var app = builder.Build();
+
+app.UseExceptionMiddleware();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
