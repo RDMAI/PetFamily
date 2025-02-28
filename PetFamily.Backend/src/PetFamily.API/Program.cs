@@ -17,6 +17,9 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
     .CreateLogger();
 
+// to watch serilogs inner errors
+Serilog.Debugging.SelfLog.Enable(Console.Error);
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

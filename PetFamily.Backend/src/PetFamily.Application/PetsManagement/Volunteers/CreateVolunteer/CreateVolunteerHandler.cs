@@ -30,6 +30,9 @@ namespace PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer
             CreateVolunteerCommand command,
             CancellationToken cancellationToken = default)
         {
+            // to test logging
+            //_logger.LogInformation("Validation started (test log)");
+
             // command validation
             var validatorResult = await _validator.ValidateAsync(command, cancellationToken);
 
