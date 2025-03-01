@@ -29,8 +29,8 @@ namespace PetFamily.Infrastructure.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
-                    experience_years = table.Column<double>(type: "double precision", nullable: false),
                     email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    experience_years = table.Column<float>(type: "real", nullable: false),
                     father_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     first_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     last_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
@@ -48,8 +48,8 @@ namespace PetFamily.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    species_id = table.Column<Guid>(type: "uuid", nullable: true)
+                    species_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,10 +66,6 @@ namespace PetFamily.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
-                    weight = table.Column<float>(type: "real", nullable: false),
-                    height = table.Column<float>(type: "real", nullable: false),
                     is_castrated = table.Column<bool>(type: "boolean", nullable: false),
                     birth_date = table.Column<DateOnly>(type: "date", nullable: false),
                     is_vacinated = table.Column<bool>(type: "boolean", nullable: false),
@@ -83,9 +79,13 @@ namespace PetFamily.Infrastructure.Migrations
                     breed_id = table.Column<Guid>(type: "uuid", nullable: false),
                     species_id = table.Column<Guid>(type: "uuid", nullable: false),
                     color = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
                     health_information = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    height = table.Column<float>(type: "real", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     owner_phone = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
                     status = table.Column<int>(type: "integer", nullable: false),
+                    weight = table.Column<float>(type: "real", nullable: false),
                     Requisites = table.Column<string>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>

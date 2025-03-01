@@ -43,6 +43,13 @@ public static class CustomValidator
         });
     }
 
+    public static IRuleBuilderOptions<T, TProperty> WithError<T, TProperty>(
+        this IRuleBuilderOptions<T, TProperty> rule,
+        Error error)
+    {
+        return rule.WithMessage(error.Serialize());
+    }
+
     /// <summary>
     /// Validates list of DTOs to be valid list of ValueObjects
     /// </summary>

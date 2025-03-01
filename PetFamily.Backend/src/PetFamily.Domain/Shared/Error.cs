@@ -20,7 +20,9 @@ public record Error
 
     public string Serialize()
     {
-        return $"{Code}{SEPARATOR}{Message}{SEPARATOR}{Type}";
+        var res = $"{Code}{SEPARATOR}{Message}{SEPARATOR}{Type}";
+        res += InvalidField is null ? "" : $"{SEPARATOR}{InvalidField}";
+        return res;
     }
     public static Error Deserialize(string serialized)
     {
@@ -31,6 +33,9 @@ public record Error
 
         if (Enum.TryParse<ErrorType>(strings[2], out var type) == false)
             throw new ArgumentException("Invalid serialized error format");
+
+        if (strings.Length == 4)  // case where error has invalid field name
+            return new Error(strings[0], strings[1], type, strings[3]);
 
         return new Error(strings[0], strings[1], type);
     }
