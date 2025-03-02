@@ -45,6 +45,21 @@ public class Volunteer : Entity<VolunteerId>
     public int PetsSeekingHome => _pets.Where(d => d.Status.Value == PetStatuses.SeekingHome).Count();
     public int PetsNeedHelp => _pets.Where(d => d.Status.Value == PetStatuses.NeedsHelp).Count();
 
+    public Volunteer UpdateMainInfo(
+        VolunteerFullName fullName,
+        Email email,
+        Description description,
+        VolunteerExperienceYears experienceYears,
+        Phone phone)
+    {
+        FullName = fullName;
+        Email = email;
+        Description = description;
+        ExperienceYears = experienceYears;
+        Phone = phone;
+        return this;
+    }
+
     public Result<Volunteer, Error> AddPet(Pet pet)
     {
         if (pet is null)

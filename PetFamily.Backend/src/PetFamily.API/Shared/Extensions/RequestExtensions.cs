@@ -18,4 +18,17 @@ public static class RequestExtensions
             request.RequisitesList,
             request.SocialNetworksList);
     }
+
+    public static UpdateMainInfoCommand ToCommand(this UpdateMainInfoRequest request, Guid volunteerId)
+    {
+        return new UpdateMainInfoCommand(
+            volunteerId,
+            request.FirstName,
+            request.LastName,
+            request.FatherName,
+            request.Email,
+            request.Description,
+            request.ExperienceYears,
+            request.Phone);
+    }
 }

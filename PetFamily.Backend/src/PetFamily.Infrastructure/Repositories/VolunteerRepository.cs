@@ -25,10 +25,11 @@ public class VolunteerRepository : IVolunteerRepository
     {
         var entity = await _context.Volunteers  //.Include(v => v.Pets) autoincluded
             .FirstOrDefaultAsync(v => v.Id == Id);
+
+        var entries = _context.ChangeTracker.Entries<Volunteer>();
+
         if (entity is null)
-        {
             return ErrorHelper.General.NotFound().ToErrorList();
-        }
 
         return entity;
     }
@@ -39,6 +40,23 @@ public class VolunteerRepository : IVolunteerRepository
     {
         var entry = await _context.Volunteers.AddAsync(entity, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+
+        return entry.Entity.Id;
+    }
+
+    public async Task<Result<VolunteerId, ErrorList>> UpdateAsync(
+        Volunteer entity,
+        CancellationToken cancellationToken = default)
+    {
+        var entries = _context.ChangeTracker.Entries<Volunteer>();
+
+        var entry = await _context.Volunteers.AddAsync(entity, cancellationToken);
+
+        var entriesAfterUpdate = _context.ChangeTracker.Entries<Volunteer>();
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        var entriesAfterSave = _context.ChangeTracker.Entries<Volunteer>();
 
         return entry.Entity.Id;
     }

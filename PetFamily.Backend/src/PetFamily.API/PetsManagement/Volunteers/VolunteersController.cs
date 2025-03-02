@@ -23,4 +23,21 @@ public class VolunteersController : ApplicationController
 
         return CreatedBaseURI(volunteerId.Value);
     }
+
+    [HttpPatch("{id:guid}/main-info")]
+    public async Task<IActionResult> UpdateMainInfo(
+        [FromServices] UpdateMainInfoHandler volunteerHandler,
+        [FromRoute] Guid id,
+        [FromBody] UpdateMainInfoRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var updateCommand = request.ToCommand(id);
+        var result = await volunteerHandler.HandleAsync(updateCommand, cancellationToken);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        var volunteerId = result.Value;
+
+        return Ok(volunteerId.Value);
+    }
 }
