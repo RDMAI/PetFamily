@@ -23,9 +23,7 @@ public class VolunteerRepository : IVolunteerRepository
         CancellationToken cancellationToken = default)
     {
         var entity = await _context.Volunteers  //.Include(v => v.Pets) autoincluded
-            .FirstOrDefaultAsync(v => v.Id == Id);
-
-        //var entries = _context.ChangeTracker.Entries<Volunteer>();
+            .FirstOrDefaultAsync(v => v.Id == Id, cancellationToken);
 
         if (entity is null)
             return ErrorHelper.General.NotFound().ToErrorList();
@@ -47,16 +45,10 @@ public class VolunteerRepository : IVolunteerRepository
         Volunteer entity,
         CancellationToken cancellationToken = default)
     {
-        //var entries = _context.ChangeTracker.Entries<Volunteer>();
-
         // Not needed because the changes is tracked
         //var entry = _context.Volunteers.Update(entity);
 
-        //var entriesAfterUpdate = _context.ChangeTracker.Entries<Volunteer>();
-
         await _context.SaveChangesAsync(cancellationToken);
-
-        //var entriesAfterSave = _context.ChangeTracker.Entries<Volunteer>();
 
         return entity.Id;
     }
