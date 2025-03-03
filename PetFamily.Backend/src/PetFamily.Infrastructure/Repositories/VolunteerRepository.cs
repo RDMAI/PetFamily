@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Domain.Helpers;
@@ -24,11 +23,10 @@ public class VolunteerRepository : IVolunteerRepository
         CancellationToken cancellationToken = default)
     {
         var entity = await _context.Volunteers  //.Include(v => v.Pets) autoincluded
-            .FirstOrDefaultAsync(v => v.Id == Id);
+            .FirstOrDefaultAsync(v => v.Id == Id, cancellationToken);
+
         if (entity is null)
-        {
             return ErrorHelper.General.NotFound().ToErrorList();
-        }
 
         return entity;
     }
@@ -41,6 +39,18 @@ public class VolunteerRepository : IVolunteerRepository
         await _context.SaveChangesAsync(cancellationToken);
 
         return entry.Entity.Id;
+    }
+
+    public async Task<Result<VolunteerId, ErrorList>> UpdateAsync(
+        Volunteer entity,
+        CancellationToken cancellationToken = default)
+    {
+        // Not needed because the changes is tracked
+        //var entry = _context.Volunteers.Update(entity);
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return entity.Id;
     }
 
     public async Task<Result<IEnumerable<Volunteer>, ErrorList>> GetAsync(
