@@ -60,6 +60,13 @@ public class Volunteer : Entity<VolunteerId>
         return this;
     }
 
+    public Volunteer UpdateSocialNetworks(
+        SocialNetworkList socialNetworks)
+    {
+        SocialNetworks = socialNetworks;
+        return this;
+    }
+
     public Result<Volunteer, Error> AddPet(Pet pet)
     {
         if (pet is null)

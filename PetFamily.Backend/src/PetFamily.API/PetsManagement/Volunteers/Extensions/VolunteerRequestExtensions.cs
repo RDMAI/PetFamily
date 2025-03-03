@@ -1,9 +1,10 @@
 ﻿using PetFamily.API.PetsManagement.Volunteers.Requests;
 using PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer;
+using PetFamily.Application.PetsManagement.Volunteers.UpdateSocialNetworks;
 
-namespace PetFamily.API.Shared.Extensions;
+namespace PetFamily.API.PetsManagement.Volunteers.Extensions;
 
-public static class RequestExtensions
+public static class VolunteerRequestExtensions
 {
     public static CreateVolunteerCommand ToCommand(this CreateVolunteerRequest request)
     {
@@ -30,5 +31,12 @@ public static class RequestExtensions
             request.Description,
             request.ExperienceYears,
             request.Phone);
+    }
+
+    public static UpdateSocialNetworksCommand ToCommand(this UpdateSocialNetworksRequest request, Guid volunteerId)
+    {
+        return new UpdateSocialNetworksCommand(
+            volunteerId,
+            request.SocialNetworksList);
     }
 }

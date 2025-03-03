@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Domain.Helpers;
@@ -26,7 +25,7 @@ public class VolunteerRepository : IVolunteerRepository
         var entity = await _context.Volunteers  //.Include(v => v.Pets) autoincluded
             .FirstOrDefaultAsync(v => v.Id == Id);
 
-        var entries = _context.ChangeTracker.Entries<Volunteer>();
+        //var entries = _context.ChangeTracker.Entries<Volunteer>();
 
         if (entity is null)
             return ErrorHelper.General.NotFound().ToErrorList();
@@ -48,17 +47,18 @@ public class VolunteerRepository : IVolunteerRepository
         Volunteer entity,
         CancellationToken cancellationToken = default)
     {
-        var entries = _context.ChangeTracker.Entries<Volunteer>();
+        //var entries = _context.ChangeTracker.Entries<Volunteer>();
 
-        var entry = await _context.Volunteers.AddAsync(entity, cancellationToken);
+        // Not needed because the changes is tracked
+        //var entry = _context.Volunteers.Update(entity);
 
-        var entriesAfterUpdate = _context.ChangeTracker.Entries<Volunteer>();
+        //var entriesAfterUpdate = _context.ChangeTracker.Entries<Volunteer>();
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        var entriesAfterSave = _context.ChangeTracker.Entries<Volunteer>();
+        //var entriesAfterSave = _context.ChangeTracker.Entries<Volunteer>();
 
-        return entry.Entity.Id;
+        return entity.Id;
     }
 
     public async Task<Result<IEnumerable<Volunteer>, ErrorList>> GetAsync(
