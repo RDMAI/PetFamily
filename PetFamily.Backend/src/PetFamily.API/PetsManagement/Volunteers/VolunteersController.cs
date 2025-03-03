@@ -3,6 +3,7 @@ using PetFamily.API.PetsManagement.Volunteers.Extensions;
 using PetFamily.API.PetsManagement.Volunteers.Requests;
 using PetFamily.API.Shared;
 using PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer;
+using PetFamily.Application.PetsManagement.Volunteers.UpdateRequisites;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateSocialNetworks;
 
 namespace PetFamily.API.PetsManagement.Volunteers;
@@ -47,6 +48,23 @@ public class VolunteersController : ApplicationController
         [FromServices] UpdateSocialNetworksHandler volunteerHandler,
         [FromRoute] Guid id,
         [FromBody] UpdateSocialNetworksRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var updateCommand = request.ToCommand(id);
+        var result = await volunteerHandler.HandleAsync(updateCommand, cancellationToken);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        var volunteerId = result.Value;
+
+        return Ok(volunteerId.Value);
+    }
+
+    [HttpPatch("{id:guid}/requisites")]
+    public async Task<IActionResult> UpdateRequisites(
+        [FromServices] UpdateRequisitesHandler volunteerHandler,
+        [FromRoute] Guid id,
+        [FromBody] UpdateRequisitesRequest request,
         CancellationToken cancellationToken = default)
     {
         var updateCommand = request.ToCommand(id);

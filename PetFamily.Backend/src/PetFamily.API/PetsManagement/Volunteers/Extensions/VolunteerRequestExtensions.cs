@@ -1,5 +1,6 @@
 ﻿using PetFamily.API.PetsManagement.Volunteers.Requests;
 using PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer;
+using PetFamily.Application.PetsManagement.Volunteers.UpdateRequisites;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateSocialNetworks;
 
 namespace PetFamily.API.PetsManagement.Volunteers.Extensions;
@@ -38,5 +39,12 @@ public static class VolunteerRequestExtensions
         return new UpdateSocialNetworksCommand(
             volunteerId,
             request.SocialNetworksList);
+    }
+
+    public static UpdateRequisitesCommand ToCommand(this UpdateRequisitesRequest request, Guid volunteerId)
+    {
+        return new UpdateRequisitesCommand(
+            volunteerId,
+            request.RequisitesList);
     }
 }

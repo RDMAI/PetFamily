@@ -67,6 +67,13 @@ public class Volunteer : Entity<VolunteerId>
         return this;
     }
 
+    public Volunteer UpdateRequisites(
+        RequisitesList requisites)
+    {
+        Requisites = requisites;
+        return this;
+    }
+
     public Result<Volunteer, Error> AddPet(Pet pet)
     {
         if (pet is null)
