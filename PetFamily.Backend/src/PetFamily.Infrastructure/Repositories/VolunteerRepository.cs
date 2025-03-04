@@ -13,10 +13,9 @@ public class VolunteerRepository : IVolunteerRepository
 {
     private readonly ApplicationDBContext _context;
 
-    public VolunteerRepository(
-        ApplicationDBContext context)
+    public VolunteerRepository(IDbContextFactory<ApplicationDBContext> dbFactory)
     {
-        _context = context;
+        _context = dbFactory.CreateDbContext();
     }
     public async Task<Result<Volunteer, ErrorList>> GetByIdAsync(
         VolunteerId Id,
@@ -71,5 +70,23 @@ public class VolunteerRepository : IVolunteerRepository
         entities = entities.Skip(0).Take(100);  // add proper pagination later !!!!!
 
         return await entities.ToListAsync(cancellationToken);
+    }
+
+    public async Task<Result<VolunteerId, ErrorList>> HardDeleteAsync(
+        Volunteer entity,
+        CancellationToken cancellationToken = default)
+    {
+        _context.Volunteers.Remove(entity);
+        await _context.SaveChangesAsync(cancellationToken);
+        return entity.Id;
+    }
+
+    public async Task<Result<VolunteerId, ErrorList>> SoftDeleteAsync(
+        Volunteer entity,
+        CancellationToken cancellationToken = default)
+    {
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return entity.Id;
     }
 }

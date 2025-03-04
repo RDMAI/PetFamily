@@ -2,6 +2,7 @@
 using FluentValidation;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.Shared.Validation;
+using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
 
@@ -10,7 +11,14 @@ public class UpdateRequisitesCommandValidator : AbstractValidator<UpdateRequisit
 {
     public UpdateRequisitesCommandValidator()
     {
-        RuleFor(c => c.RequisitesList).MustBeNotNull();
+        RuleFor(c => c.VolunteerId)
+            .NotEmpty()
+            .WithError(ErrorHelper.General.ValueIsNullOrEmpty("VolunteerId"));
+
+        RuleFor(c => c.RequisitesList)
+            .NotEmpty()
+            .WithError(ErrorHelper.General.ValueIsNullOrEmpty("Requisites"));
+
         RuleForEach(c => c.RequisitesList).MustBeValueObject(CreateRequisitesFromDTO);
     }
 

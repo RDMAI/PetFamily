@@ -146,6 +146,13 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             });
         });
 
+        builder.Property(d => d.IsDeleted)
+            .HasColumnName("is_deleted");
+
+        builder.Property(d => d.DeletionDate)
+            .IsRequired(false)
+            .HasColumnName("deletion_date");
+
         builder.Property(d => d.CreationDate)
             .IsRequired();
     }

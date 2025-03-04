@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
+using PetFamily.Infrastructure.BackgroundServices;
 using PetFamily.Infrastructure.Repositories;
 
 namespace PetFamily.Infrastructure.Extensions;
@@ -9,8 +10,10 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        services.AddDbContext<ApplicationDBContext>()
-            .AddScoped<IVolunteerRepository, VolunteerRepository>();
+        services.AddDbContextFactory<ApplicationDBContext>();
+        services.AddScoped<IVolunteerRepository, VolunteerRepository>();
+
+        services.AddHostedService<SoftDeleteCleanerBackgroundService>();
 
         return services;
     }

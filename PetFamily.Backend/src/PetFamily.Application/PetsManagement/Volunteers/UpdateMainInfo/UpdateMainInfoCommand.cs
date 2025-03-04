@@ -1,4 +1,4 @@
-﻿namespace PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer;
+﻿namespace PetFamily.Application.PetsManagement.Volunteers.UpdateMainInfo;
 public record UpdateMainInfoCommand(
     Guid VolunteerId,
     string FirstName,

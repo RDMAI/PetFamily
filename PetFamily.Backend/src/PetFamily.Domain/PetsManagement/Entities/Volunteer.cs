@@ -3,14 +3,16 @@ using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsContext.ValueObjects.Pets;
 using PetFamily.Domain.PetsContext.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Domain.PetsContext.Entities;
 
-public class Volunteer : Entity<VolunteerId>
+public class Volunteer : SoftDeletableEntity<VolunteerId>
 {
     // EF Core
     private Volunteer() { }
+
     public Volunteer(VolunteerId id,
         VolunteerFullName fullName,
         Email email,
@@ -72,6 +74,22 @@ public class Volunteer : Entity<VolunteerId>
     {
         Requisites = requisites;
         return this;
+    }
+
+    public override void Delete()
+    {
+        base.Delete();
+
+        foreach (var pet in _pets)
+            pet.Delete();
+    }
+
+    public override void Restore()
+    {
+        base.Restore();
+
+        foreach (var pet in _pets)
+            pet.Restore();
     }
 
     public Result<Volunteer, Error> AddPet(Pet pet)
