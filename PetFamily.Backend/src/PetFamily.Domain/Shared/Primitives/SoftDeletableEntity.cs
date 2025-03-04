@@ -3,8 +3,6 @@
 namespace PetFamily.Domain.Shared.Primitives;
 public abstract class SoftDeletableEntity<TId> : Entity<TId> where TId : IComparable<TId>
 {
-    public static readonly TimeSpan TIME_TO_RESTORE = TimeSpan.FromDays(30);
-
     // EF Core
     protected SoftDeletableEntity() { }
     protected SoftDeletableEntity(TId id) : base(id) { }
