@@ -1,12 +1,12 @@
-﻿using CSharpFunctionalExtensions;
-using PetFamily.Domain.PetsContext.ValueObjects.Pets;
+﻿using PetFamily.Domain.PetsContext.ValueObjects.Pets;
+using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Domain.PetsContext.Entities;
-public class Pet : Entity<PetId>
+public class Pet : SoftDeletableEntity<PetId>
 {
     // EF Core
-    private Pet() { }
+    private Pet() {}
 
     public Pet(PetId id,
         PetName name,

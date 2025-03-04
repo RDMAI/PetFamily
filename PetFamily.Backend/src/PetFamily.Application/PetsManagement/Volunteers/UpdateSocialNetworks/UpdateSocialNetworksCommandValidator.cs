@@ -11,8 +11,11 @@ public class UpdateSocialNetworksCommandValidator : AbstractValidator<UpdateSoci
 {
     public UpdateSocialNetworksCommandValidator()
     {
+        RuleFor(c => c.VolunteerId)
+            .NotEmpty()
+            .WithError(ErrorHelper.General.ValueIsNullOrEmpty("VolunteerId"));
+
         RuleFor(c => c.SocialNetworksList)
-            .NotNull()
             .NotEmpty()
             .WithError(ErrorHelper.General.ValueIsNullOrEmpty("SocialNetworks"));
         RuleForEach(c => c.SocialNetworksList).MustBeValueObject(CreateNetworksFromDTO);

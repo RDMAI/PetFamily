@@ -19,7 +19,7 @@ public class ExceptionMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError(ex, ex.Message);
 
             var responseError = new ResponseError("server.internal", ex.Message, null);
             var envelope = Envelope.Error([responseError]);

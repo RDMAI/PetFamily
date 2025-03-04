@@ -57,11 +57,11 @@ public class UpdateSocialNetworksHandler
         entity.UpdateSocialNetworks(socialNetworkList);
 
         // handle BL
-        var createResponse = await _volunteerRepository.UpdateAsync(entity, cancellationToken);
+        var response = await _volunteerRepository.UpdateAsync(entity, cancellationToken);
         //if (createResponse.IsFailure) return createResponse.Error;
 
         _logger.LogInformation("Social networks for volunteer with id {Id} was updated", volunteerId.Value);
 
-        return createResponse;
+        return response;
     }
 }

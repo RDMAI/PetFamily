@@ -1,5 +1,6 @@
 ﻿using PetFamily.API.PetsManagement.Volunteers.Requests;
 using PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer;
+using PetFamily.Application.PetsManagement.Volunteers.UpdateMainInfo;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateRequisites;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateSocialNetworks;
 

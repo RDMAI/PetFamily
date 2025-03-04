@@ -1,17 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Domain.Helpers;
-using PetFamily.Domain.PetsContext.Entities;
 using PetFamily.Domain.PetsContext.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
-using System.Numerics;
-using System.Threading;
 
-namespace PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer
+namespace PetFamily.Application.PetsManagement.Volunteers.UpdateMainInfo
 {
     public class UpdateMainInfoHandler
     {
@@ -84,12 +80,12 @@ namespace PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer
                 phone);
 
             // handle BL
-            var createResponse = await _volunteerRepository.UpdateAsync(entity, cancellationToken);
+            var response = await _volunteerRepository.UpdateAsync(entity, cancellationToken);
             //if (createResponse.IsFailure) return createResponse.Error;
 
             _logger.LogInformation("Main info for volunteer with id {Id} was updated", volunteerId.Value);
 
-            return createResponse;
+            return response;
         }
     }
 }
