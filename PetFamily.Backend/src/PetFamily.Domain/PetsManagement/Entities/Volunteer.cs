@@ -1,12 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
 using PetFamily.Domain.Helpers;
-using PetFamily.Domain.PetsContext.ValueObjects.Pets;
-using PetFamily.Domain.PetsContext.ValueObjects.Volunteers;
+using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
+using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
+using System.Collections.Generic;
 
-namespace PetFamily.Domain.PetsContext.Entities;
+namespace PetFamily.Domain.PetsManagement.Entities;
 
 public class Volunteer : SoftDeletableEntity<VolunteerId>
 {
@@ -97,7 +98,79 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         if (pet is null)
             return ErrorHelper.General.ValueIsNullOrEmpty("Pet");
 
+        var serialNumberResult = PetSerialNumber.Create(_pets.Count + 1);
+        if (serialNumberResult.IsFailure)
+            return ErrorHelper.General.MethodNotApplicable(
+                "Cannot move pet. New position is invalid");
+
+        pet.SetSerialNumber(serialNumberResult.Value);
+
         _pets.Add(pet);
         return this;
+    }
+
+    public UnitResult<Error> MovePet(PetId petId, PetSerialNumber newNumber)
+    {
+        if (_pets.Count == 0)
+            return ErrorHelper.General.MethodNotApplicable(
+                "Cannot move pet. List of pets contains only one pet.");
+
+        var petCurrentNumber = _pets.FirstOrDefault(p => p.Id == petId)?.SerialNumber;
+        if (petCurrentNumber is null)
+            return ErrorHelper.General.NotFound(petId.Value);
+
+        if (petCurrentNumber == newNumber)
+            return ErrorHelper.General.MethodNotApplicable(
+                "Cannot move pet. Old and new positions are the same.");
+
+        // defining borders in pets list, where we will move pets
+        (PetSerialNumber first, PetSerialNumber last) =
+            petCurrentNumber > newNumber ?
+            (newNumber, petCurrentNumber) :
+            (petCurrentNumber, newNumber);
+
+        var petsToMove = _pets.Where(p =>
+                p.SerialNumber >= first && p.SerialNumber <= last)
+                .OrderBy(p => p.SerialNumber.Value);
+
+        foreach (var pet in petsToMove)
+        {
+            // moving specified pet to new specified position
+            if (pet.SerialNumber == petCurrentNumber)
+            {
+                pet.SetSerialNumber(newNumber);
+                continue;
+            }
+
+            // getting new positions for the rest of the pets
+            var newValue = pet.SerialNumber.Value;
+            if (petCurrentNumber > newNumber) newValue++;  // moving right
+            else newValue--;  // moving left
+
+            var n = PetSerialNumber.Create(newValue).Value;
+            pet.SetSerialNumber(n);
+        }
+
+        return UnitResult.Success<Error>();
+    }
+
+    public UnitResult<Error> MovePetToStart(PetId petId)
+    {
+        var res = PetSerialNumber.Create(1);
+        if (res.IsFailure)
+            throw new ApplicationException("Could not create PetSerialNumber");
+        var startPosition = res.Value;
+
+        return MovePet(petId, startPosition);
+    }
+
+    public UnitResult<Error> MovePetToEnd(PetId petId)
+    {
+        var res = PetSerialNumber.Create(_pets.Count);
+        if (res.IsFailure)
+            throw new ApplicationException("Could not create PetSerialNumber");
+        var endPosition = res.Value;
+
+        return MovePet(petId, endPosition);
     }
 }

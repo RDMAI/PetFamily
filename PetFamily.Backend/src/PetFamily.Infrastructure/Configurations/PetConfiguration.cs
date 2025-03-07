@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PetFamily.Domain.PetsContext.Entities;
-using PetFamily.Domain.PetsContext.ValueObjects.Pets;
+using PetFamily.Domain.PetsManagement.Entities;
+using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.SpeciesContext.ValueObjects;
@@ -124,6 +124,13 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             ib.Property(p => p.Value)
                 .IsRequired()
                 .HasColumnName("status");
+        });
+
+        builder.ComplexProperty(d => d.SerialNumber, ib =>
+        {
+            ib.Property(p => p.Value)
+                .IsRequired()
+                .HasColumnName("serial_number");
         });
 
         builder.OwnsOne(d => d.Requisites, ib =>

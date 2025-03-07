@@ -1,8 +1,10 @@
-﻿using PetFamily.Domain.PetsContext.ValueObjects.Pets;
+﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
+using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
 
-namespace PetFamily.Domain.PetsContext.Entities;
+namespace PetFamily.Domain.PetsManagement.Entities;
 public class Pet : SoftDeletableEntity<PetId>
 {
     // EF Core
@@ -56,4 +58,18 @@ public class Pet : SoftDeletableEntity<PetId>
     public PetStatus Status { get; private set; }  // Pet's status - needs help / seeks home / found home
     public RequisitesList Requisites { get; private set; }
     public DateTime CreationDate = DateTime.Now;
+
+    public PetSerialNumber SerialNumber { get; private set; }
+
+    public void SetSerialNumber(PetSerialNumber serialNumber)
+    {
+        SerialNumber = serialNumber;
+    }
+
+    // for testing
+    public override string ToString()
+    {
+        return Name.Value + " " + Id.Value.ToString();
+        //return base.ToString();
+    }
 }
