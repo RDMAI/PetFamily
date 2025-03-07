@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Domain.Helpers;
-using PetFamily.Domain.PetsContext.Entities;
-using PetFamily.Domain.PetsContext.ValueObjects.Volunteers;
+using PetFamily.Domain.PetsManagement.Entities;
+using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Infrastructure.Repositories;
@@ -17,6 +17,7 @@ public class VolunteerRepository : IVolunteerRepository
     {
         _context = dbFactory.CreateDbContext();
     }
+
     public async Task<Result<Volunteer, ErrorList>> GetByIdAsync(
         VolunteerId Id,
         CancellationToken cancellationToken = default)

@@ -2,7 +2,7 @@
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Domain.PetsContext.ValueObjects.Volunteers;
+namespace PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 public record VolunteerExperienceYears
 {
     public float Value { get; }

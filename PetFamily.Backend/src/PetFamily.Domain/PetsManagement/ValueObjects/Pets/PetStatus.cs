@@ -2,7 +2,7 @@
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Domain.PetsContext.ValueObjects.Pets;
+namespace PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 
 public record PetStatus
 {
@@ -10,7 +10,7 @@ public record PetStatus
 
     public static Result<PetStatus, Error> Create(PetStatuses value)
     {
-        if (Enum.IsDefined(typeof(PetStatuses), value))
+        if (!Enum.IsDefined(typeof(PetStatuses), value))
             return ErrorHelper.General.ValueIsInvalid("Pet status");
 
         return new PetStatus(value);

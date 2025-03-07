@@ -4,7 +4,7 @@ namespace PetFamily.Domain.Shared.ValueObjects;
 
 public record Phone
 {
-    public const int MAX_LENGTH = 10;
+    public const int MAX_LENGTH = 11;
 
     public string Value { get; }
 

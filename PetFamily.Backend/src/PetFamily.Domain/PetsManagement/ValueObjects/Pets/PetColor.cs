@@ -2,7 +2,7 @@
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Domain.PetsContext.ValueObjects.Pets;
+namespace PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 
 public record PetColor
 {

@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
-using PetFamily.Domain.PetsContext.ValueObjects.Volunteers;
+using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.PetsManagement.Volunteers.DeleteVolunteer;
