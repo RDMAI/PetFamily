@@ -1,7 +1,7 @@
-﻿using PetFamily.Domain.PetsContext.ValueObjects.Pets;
+﻿using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.Shared.ValueObjects;
 
-namespace PetFamily.Domain.PetsContext.ValueObjects.Volunteers;
+namespace PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 
 public record VolunteerId : IComparable<VolunteerId>
 {

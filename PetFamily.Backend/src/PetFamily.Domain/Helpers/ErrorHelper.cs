@@ -6,6 +6,13 @@ public static class ErrorHelper
 {
     public static class General
     {
+        public static Error MethodNotApplicable(string? mes = null)
+        {
+            return Error.Failure(
+                "method.not.applicable",
+                mes ?? "Called method is not applicable");
+        }
+
         public static Error ValueIsInvalid(string? name = null)
         {
             var label = name ?? "value";
