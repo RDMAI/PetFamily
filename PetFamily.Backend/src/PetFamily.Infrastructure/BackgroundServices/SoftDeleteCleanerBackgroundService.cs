@@ -2,14 +2,9 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PetFamily.Infrastructure.Options;
 
 namespace PetFamily.Infrastructure.BackgroundServices;
-
-public class SoftDeleteCleanerOptions
-{
-    public TimeSpan CheckPeriod { get; set; } = TimeSpan.FromHours(24);
-    public TimeSpan TimeToRestore { get; set; } = TimeSpan.FromDays(30);
-}
 
 public class SoftDeleteCleanerBackgroundService : BackgroundService
 {
@@ -28,8 +23,8 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
         _logger = logger;
         if (options != null)
         {
-            _checkPeriod = options.Value.CheckPeriod;
-            _timeToRestore = options.Value.TimeToRestore;
+            _checkPeriod = TimeSpan.FromHours(options.Value.CheckPeriodHours);
+            _timeToRestore = TimeSpan.FromHours(options.Value.TimeToRestoreHours);
         }
     }
 
