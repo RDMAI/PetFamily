@@ -1,5 +1,6 @@
 ﻿using PetFamily.API.PetsManagement.Volunteers.Requests;
 using PetFamily.Application.PetsManagement.Pets.AddPet;
+using PetFamily.Application.PetsManagement.Pets.MovePet;
 using PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateMainInfo;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateRequisites;
@@ -57,5 +58,13 @@ public static class VolunteerRequestExtensions
             request.Pet,
             request.Address,
             request.RequisitesList);
+    }
+
+    public static MovePetCommand ToCommand(this MovePetRequest request, Guid volunteerId, Guid petId)
+    {
+        return new MovePetCommand(
+            volunteerId,
+            petId,
+            request.NewSerialNumber);
     }
 }

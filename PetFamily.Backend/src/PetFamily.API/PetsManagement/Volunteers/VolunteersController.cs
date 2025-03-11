@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CSharpFunctionalExtensions;
+using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.PetsManagement.Volunteers.Extensions;
 using PetFamily.API.PetsManagement.Volunteers.Requests;
 using PetFamily.API.Shared;
 using PetFamily.Application.PetsManagement.Pets.AddPet;
+using PetFamily.Application.PetsManagement.Pets.MovePet;
 using PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer;
 using PetFamily.Application.PetsManagement.Volunteers.DeleteVolunteer;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateMainInfo;
@@ -96,7 +98,7 @@ public class VolunteersController : ApplicationController
         return Ok(volunteerId.Value);
     }
 
-    [HttpPost("{id:guid}/Pet")]
+    [HttpPost("{id:guid}/Pets")]
     public async Task<IActionResult> AddPet(
         [FromServices] AddPetHandler petHandler,
         [FromRoute] Guid id,
@@ -104,6 +106,32 @@ public class VolunteersController : ApplicationController
         CancellationToken cancellationToken = default)
     {
         var addPetCommand = request.ToCommand(id);
-        var result = await petHandler.HandleAsync();
+        var result = await petHandler.HandleAsync(addPetCommand, cancellationToken);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        var PetId = result.Value;
+
+        var getUri = Request.Path + $"/{id}/Pets/{PetId}";
+
+        return Created(getUri, PetId);
+    }
+
+    [HttpPatch("{volunteerId:guid}/Pet/{petId:guid}/SerialNumber")]
+    public async Task<IActionResult> MovePet(
+        [FromServices] MovePetHandler petHandler,
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromBody] MovePetRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var movePetCommand = request.ToCommand(volunteerId, petId);
+        var result = await petHandler.HandleAsync(movePetCommand);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        var resultPetId = result.Value;
+
+        return Ok(resultPetId.Value);
     }
 }

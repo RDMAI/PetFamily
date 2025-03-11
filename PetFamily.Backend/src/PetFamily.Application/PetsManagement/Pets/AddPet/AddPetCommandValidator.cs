@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Validation;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
@@ -42,8 +43,17 @@ public class AddPetCommandValidator : AbstractValidator<AddPetCommand>
                 a.HouseNumber,
                 a.HouseSubNumber,
                 a.AppartmentNumber));
+
+        RuleFor(c => c.RequisitesList)
+            .NotEmpty()
+            .WithError(ErrorHelper.General.ValueIsNullOrEmpty("Requisites"));
+
+        RuleForEach(c => c.RequisitesList).MustBeValueObject(CreateRequisitesFromDTO);
     }
 
     private Result<PetStatus, Error> CreatePetStatusFromDTO(int status)
         => PetStatus.Create((PetStatuses)(status));
+
+    private Result<Requisites, Error> CreateRequisitesFromDTO(RequisitesDTO dto)
+        => Requisites.Create(dto.Name, dto.Description, dto.Value);
 }
