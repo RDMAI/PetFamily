@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
+using PetFamily.Application.Shared.DTOs;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsManagement.Entities;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;

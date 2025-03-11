@@ -1,4 +1,5 @@
 ﻿using PetFamily.API.PetsManagement.Volunteers.Requests;
+using PetFamily.Application.PetsManagement.Pets.AddPet;
 using PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateMainInfo;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateRequisites;
@@ -46,6 +47,15 @@ public static class VolunteerRequestExtensions
     {
         return new UpdateRequisitesCommand(
             volunteerId,
+            request.RequisitesList);
+    }
+
+    public static AddPetCommand ToCommand(this AddPetRequest request, Guid volunteerId)
+    {
+        return new AddPetCommand(
+            volunteerId,
+            request.Pet,
+            request.Address,
             request.RequisitesList);
     }
 }

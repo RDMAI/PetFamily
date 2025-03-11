@@ -4,8 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Minio;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
+using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Infrastructure.BackgroundServices;
 using PetFamily.Infrastructure.Options;
+using PetFamily.Infrastructure.Providers;
 using PetFamily.Infrastructure.Repositories;
 
 namespace PetFamily.Infrastructure.Extensions;
@@ -50,7 +52,11 @@ public static class DependencyInjection
             client.WithEndpoint(options.Endpoint);
             client.WithCredentials(options.Login, options.Password);
             client.WithSSL(options.WithSSL);
+
+            client.Build();
         });
+
+        services.AddScoped<IFileProvider, MinioProvider>();
 
         return services;
     }

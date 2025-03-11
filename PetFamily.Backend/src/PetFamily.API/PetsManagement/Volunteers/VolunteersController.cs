@@ -2,6 +2,7 @@
 using PetFamily.API.PetsManagement.Volunteers.Extensions;
 using PetFamily.API.PetsManagement.Volunteers.Requests;
 using PetFamily.API.Shared;
+using PetFamily.Application.PetsManagement.Pets.AddPet;
 using PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer;
 using PetFamily.Application.PetsManagement.Volunteers.DeleteVolunteer;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateMainInfo;
@@ -93,5 +94,16 @@ public class VolunteersController : ApplicationController
         var volunteerId = result.Value;
 
         return Ok(volunteerId.Value);
+    }
+
+    [HttpPost("{id:guid}/Pet")]
+    public async Task<IActionResult> AddPet(
+        [FromServices] AddPetHandler petHandler,
+        [FromRoute] Guid id,
+        [FromBody] AddPetRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var addPetCommand = request.ToCommand(id);
+        var result = await petHandler.HandleAsync();
     }
 }

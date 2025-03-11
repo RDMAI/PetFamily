@@ -66,6 +66,12 @@ public class Pet : SoftDeletableEntity<PetId>
         SerialNumber = serialNumber;
     }
 
+    public Pet UpdateRequisites(RequisitesList requisites)
+    {
+        Requisites = requisites;
+        return this;
+    }
+
     // for testing
     public override string ToString()
     {

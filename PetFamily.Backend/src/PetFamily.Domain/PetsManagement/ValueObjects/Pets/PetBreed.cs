@@ -1,25 +1,26 @@
 ﻿using CSharpFunctionalExtensions;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
+using PetFamily.Domain.SpeciesContext.ValueObjects;
 
 namespace PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 
 public record PetBreed
 {
-    public Guid BreedId { get; }
-    public Guid SpeciesId { get; }
+    public BreedId BreedId { get; }
+    public SpeciesId SpeciesId { get; }
 
-    public static Result<PetBreed, Error> Create(Guid breedId, Guid speciesId)
+    public static Result<PetBreed, Error> Create(BreedId breedId, SpeciesId speciesId)
     {
-        if (breedId == Guid.Empty)
+        if (breedId == BreedId.Empty())
             return ErrorHelper.General.ValueIsInvalid("Breed Id");
-        if (speciesId == Guid.Empty)
+        if (speciesId == SpeciesId.Empty())
             return ErrorHelper.General.ValueIsInvalid("Species Id");
 
         return new PetBreed(breedId, speciesId);
     }
 
-    private PetBreed(Guid breedId, Guid speciesId)
+    private PetBreed(BreedId breedId, SpeciesId speciesId)
     {
         BreedId = breedId;
         SpeciesId = speciesId;

@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.PetsManagement.Volunteers.DTOs;
+﻿using PetFamily.Application.Shared.DTOs;
 
 namespace PetFamily.API.PetsManagement.Volunteers.Requests;
 

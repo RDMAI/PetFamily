@@ -2,6 +2,7 @@
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared.ValueObjects;
+using PetFamily.Domain.SpeciesContext.ValueObjects;
 
 namespace PetFamily.Tests.Helpers;
 public static class EntitiesHelper
@@ -55,7 +56,7 @@ public static class EntitiesHelper
         var weight = PetWeight.Create(10).Value;
         var height = PetHeight.Create(30).Value;
 
-        var breed = PetBreed.Create(Guid.NewGuid(), Guid.NewGuid()).Value;
+        var breed = PetBreed.Create(BreedId.GenerateNew(), SpeciesId.GenerateNew()).Value;
 
         var healthInfo = PetHealthInfo.Create("Healthy").Value;
 
