@@ -7,6 +7,7 @@ using PetFamily.Domain.PetsManagement.Entities;
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.SpeciesContext.ValueObjects;
 
@@ -83,7 +84,6 @@ public class AddPetHandler
                 requisites.Description,
                 requisites.Value).Value);
         }
-        var requisitesList = RequisitesList.Create(requisitesBufferList).Value;
 
         var pet = new Pet(petId,
             petName,
@@ -99,7 +99,7 @@ public class AddPetHandler
             command.Pet.BirthDate,
             command.Pet.IsVacinated,
             petStatus,
-            requisitesList);
+            (ValueObjectList<Requisites>)requisitesBufferList);
 
         var domainResult = volunteer.AddPet(pet);
         if (domainResult.IsFailure)

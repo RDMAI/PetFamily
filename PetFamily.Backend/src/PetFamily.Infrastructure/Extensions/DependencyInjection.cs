@@ -5,7 +5,9 @@ using Microsoft.Extensions.Hosting;
 using Minio;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Application.Shared.Interfaces;
+using PetFamily.Application.SpeciesManagement.Interfaces;
 using PetFamily.Infrastructure.BackgroundServices;
+using PetFamily.Infrastructure.EFHelpers;
 using PetFamily.Infrastructure.Options;
 using PetFamily.Infrastructure.Providers;
 using PetFamily.Infrastructure.Repositories;
@@ -15,8 +17,15 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        // for bg services and ws connections
         services.AddDbContextFactory<ApplicationDBContext>();
+
+        // scopped dbcontext = different context for each web request
+        services.AddDbContext<ApplicationDBContext>();
+        services.AddScoped<IUnitOfWork, EFUnitOfWork>();
+
         services.AddScoped<IVolunteerRepository, VolunteerRepository>();
+        services.AddScoped<ISpeciesRepository, SpeciesRepository>();
 
         services.AddSoftDeleteCleaner(configuration);
 

@@ -1,11 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.SpeciesManagement.DTOs;
 using PetFamily.Application.SpeciesManagement.Interfaces;
 using PetFamily.Domain.Helpers;
-using PetFamily.Domain.PetsManagement.Entities;
-using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.SpeciesContext.Entities;
 using PetFamily.Domain.SpeciesContext.ValueObjects;
@@ -16,9 +13,9 @@ public class SpeciesRepository : ISpeciesRepository
 {
     private readonly ApplicationDBContext _context;
 
-    public SpeciesRepository(IDbContextFactory<ApplicationDBContext> dbFactory)
+    public SpeciesRepository(ApplicationDBContext context)
     {
-        _context = dbFactory.CreateDbContext();
+        _context = context;
     }
 
     public async Task<Result<IEnumerable<Species>, ErrorList>> GetAsync(

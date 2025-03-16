@@ -7,6 +7,7 @@ using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsManagement.Entities;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer
@@ -60,7 +61,6 @@ namespace PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer
                     requisites.Description,
                     requisites.Value).Value);
             }
-            var requisitesList = RequisitesList.Create(requisitesBufferList).Value;
 
             List<SocialNetwork> socialNetworkBufferList = [];
             foreach (SocialNetworkDTO socialNetwork in command.SocialNetworksList)
@@ -68,7 +68,6 @@ namespace PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer
                 socialNetworkBufferList.Add(SocialNetwork.Create(socialNetwork.Name,
                     socialNetwork.Link).Value);
             }
-            var socialNetworkList = SocialNetworkList.Create(socialNetworkBufferList).Value;
 
             var volunteerId = VolunteerId.GenerateNew();
 
@@ -78,8 +77,8 @@ namespace PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer
                 description,
                 experienceYears,
                 phone,
-                requisitesList,
-                socialNetworkList);
+                (ValueObjectList<Requisites>)requisitesBufferList,
+                (ValueObjectList<SocialNetwork>)socialNetworkBufferList);
 
             // check if this Entity exists:
             // with the same email

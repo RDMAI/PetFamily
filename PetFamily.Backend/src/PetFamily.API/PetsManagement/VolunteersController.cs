@@ -1,17 +1,21 @@
-﻿using CSharpFunctionalExtensions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using PetFamily.API.PetsManagement.Pets.Extensions;
+using PetFamily.API.PetsManagement.Pets.Requests;
 using PetFamily.API.PetsManagement.Volunteers.Extensions;
 using PetFamily.API.PetsManagement.Volunteers.Requests;
 using PetFamily.API.Shared;
+using PetFamily.API.Shared.Processors;
+using PetFamily.API.Shared.Requests;
 using PetFamily.Application.PetsManagement.Pets.AddPet;
 using PetFamily.Application.PetsManagement.Pets.MovePet;
+using PetFamily.Application.PetsManagement.Pets.UploadPetPhotos;
 using PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer;
 using PetFamily.Application.PetsManagement.Volunteers.DeleteVolunteer;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateMainInfo;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateRequisites;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateSocialNetworks;
 
-namespace PetFamily.API.PetsManagement.Volunteers;
+namespace PetFamily.API.PetsManagement;
 
 public class VolunteersController : ApplicationController
 {
@@ -134,4 +138,66 @@ public class VolunteersController : ApplicationController
 
         return Ok(resultPetId.Value);
     }
+
+    [HttpPost("{volunteerId:guid}/Pet/{petId:guid}/Photos")]
+    public async Task<IActionResult> UploadPetPhotos(
+        [FromServices] UploadPetPhotosHandler petHandler,
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromForm] UploadFilesRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        await using var fileProcessor = new FormFileProcessor();
+        var fileDTOs = fileProcessor.Process(request.Files);
+
+        var uploadCommand = new UploadPetPhotosCommand(volunteerId, petId, fileDTOs);
+
+        var result = await petHandler.HandleAsync(
+            uploadCommand,
+            cancellationToken);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        return CreatedBaseURI(result.Value);
+    }
+
+    //[HttpGet("{volunteerId:guid}/Pet/{petId:guid}/Photos/{fileName:string}")]
+    //public async Task<IActionResult> GetPetPhotos(
+    //    [FromServices] ,
+    //    [FromRoute] Guid volunteerId,
+    //    [FromRoute] Guid petId,
+    //    [FromRoute] string fileName,
+    //    CancellationToken cancellationToken = default)
+    //{
+    //    var bucketName = "photos";
+
+    //    var result = await fileProvider.GetFileAsync(
+    //        bucketName,
+    //        FileName,
+    //        cancellationToken);
+
+    //    if (result.IsFailure) return Error(result.Error);
+
+    //    return Ok(result.Value);
+    //}
+
+    //[HttpDelete("{volunteerId:guid}/Pet/{petId:guid}/Photos/{fileName:string}")]
+    //public async Task<IActionResult> DeletePetPhotos(
+    //    [FromServices] ,
+    //    [FromRoute] Guid volunteerId,
+    //    [FromRoute] Guid petId,
+    //    [FromRoute] string fileName,
+    //    CancellationToken cancellationToken = default)
+    //{
+    //    var bucketName = "photos";
+
+    //    var result = await fileProvider.DeleteFileAsync(
+    //        bucketName,
+    //        FileName,
+    //        cancellationToken);
+
+    //    if (result.IsFailure) return Error(result.Error);
+
+    //    return Ok(result.Value);
+    //}
 }

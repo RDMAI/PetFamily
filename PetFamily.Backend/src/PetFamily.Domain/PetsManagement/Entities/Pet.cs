@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
-using PetFamily.Domain.Shared;
+﻿using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
 
@@ -24,7 +22,7 @@ public class Pet : SoftDeletableEntity<PetId>
         DateOnly birthDate,
         bool isVacinated,
         PetStatus status,
-        RequisitesList requisites) : base(id)
+        ValueObjectList<Requisites> requisites) : base(id)
     {
         Name = name;
         Description = description;
@@ -44,7 +42,6 @@ public class Pet : SoftDeletableEntity<PetId>
 
     public PetName Name { get; private set; }
     public Description Description { get; private set; }
-    //public Photo? Photo { get; private set; }
     public PetColor Color { get; private set; }
     public PetWeight Weight { get; private set; }
     public PetHeight Height { get; private set; }
@@ -56,7 +53,8 @@ public class Pet : SoftDeletableEntity<PetId>
     public DateOnly BirthDate { get; private set; }
     public bool IsVacinated { get; private set; }
     public PetStatus Status { get; private set; }  // Pet's status - needs help / seeks home / found home
-    public RequisitesList Requisites { get; private set; }
+    public ValueObjectList<FileVO> Photos { get; private set; }
+    public ValueObjectList<Requisites> Requisites { get; private set; }
     public DateTime CreationDate = DateTime.Now;
 
     public PetSerialNumber SerialNumber { get; private set; }
@@ -66,7 +64,13 @@ public class Pet : SoftDeletableEntity<PetId>
         SerialNumber = serialNumber;
     }
 
-    public Pet UpdateRequisites(RequisitesList requisites)
+    public Pet UpdatePhotos(ValueObjectList<FileVO> photos)
+    {
+        Photos = photos;
+        return this;
+    }
+
+    public Pet UpdateRequisites(ValueObjectList<Requisites> requisites)
     {
         Requisites = requisites;
         return this;

@@ -62,10 +62,16 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
         builder.ComplexProperty(d => d.Breed, ib =>
         {
             ib.Property(breed => breed.BreedId)
+                .HasConversion(
+                    id => id.Value,
+                    value => BreedId.Create(value))
                 .IsRequired()
                 .HasColumnName("breed_id");
 
             ib.Property(breed => breed.SpeciesId)
+                .HasConversion(
+                    id => id.Value,
+                    value => SpeciesId.Create(value))
                 .IsRequired()
                 .HasColumnName("species_id");
         });
@@ -133,11 +139,26 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                 .HasColumnName("serial_number");
         });
 
+        builder.OwnsOne(d => d.Photos, ib =>
+        {
+            ib.ToJson();
+
+            ib.OwnsMany(r => r.Values, rb =>
+            {
+                rb.Property(r1 => r1.Name)
+                    .IsRequired()
+                    .HasMaxLength(Constants.MAX_LOW_TEXT_LENGTH);
+
+                rb.Property(r1 => r1.PathToStorage)
+                    .IsRequired();
+            });
+        });
+
         builder.OwnsOne(d => d.Requisites, ib =>
         {
             ib.ToJson();
 
-            ib.OwnsMany(r => r.List, rb =>
+            ib.OwnsMany(r => r.Values, rb =>
             {
                 rb.Property(r1 => r1.Name)
                     .IsRequired()
@@ -161,6 +182,9 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             .HasColumnName("deletion_date");
 
         builder.Property(d => d.CreationDate)
-            .IsRequired();
+            .HasConversion(
+                src => src.Kind == DateTimeKind.Utc ? src : DateTime.SpecifyKind(src, DateTimeKind.Utc),
+                dst => dst.Kind == DateTimeKind.Utc ? dst : DateTime.SpecifyKind(dst, DateTimeKind.Utc)
+            ).IsRequired();
     }
 }

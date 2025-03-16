@@ -4,6 +4,7 @@ using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Application.PetsManagement.Volunteers.UpdateSocialNetworks;
@@ -50,11 +51,11 @@ public class UpdateSocialNetworksHandler
             socialNetworkBufferList.Add(SocialNetwork.Create(socialNetwork.Name,
                 socialNetwork.Link).Value);
         }
-        var socialNetworkList = SocialNetworkList.Create(socialNetworkBufferList).Value;
 
         // update entity
         var entity = entityResult.Value;
-        entity.UpdateSocialNetworks(socialNetworkList);
+        entity.UpdateSocialNetworks(
+            (ValueObjectList<SocialNetwork>)socialNetworkBufferList);
 
         // handle BL
         var response = await _volunteerRepository.UpdateAsync(entity, cancellationToken);

@@ -13,9 +13,9 @@ public class VolunteerRepository : IVolunteerRepository
 {
     private readonly ApplicationDBContext _context;
 
-    public VolunteerRepository(IDbContextFactory<ApplicationDBContext> dbFactory)
+    public VolunteerRepository(ApplicationDBContext context)
     {
-        _context = dbFactory.CreateDbContext();
+        _context = context;
     }
 
     public async Task<Result<Volunteer, ErrorList>> GetByIdAsync(

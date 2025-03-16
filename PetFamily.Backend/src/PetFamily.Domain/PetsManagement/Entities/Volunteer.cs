@@ -6,6 +6,7 @@ using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PetFamily.Domain.PetsManagement.Entities;
 
@@ -20,8 +21,8 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         Description description,
         VolunteerExperienceYears experienceYears,
         Phone phone,
-        RequisitesList requisites,
-        SocialNetworkList socialNetworks) : base(id)
+        ValueObjectList<Requisites> requisites,
+        ValueObjectList<SocialNetwork> socialNetworks) : base(id)
     {
         Id = id;
         FullName = fullName;
@@ -38,8 +39,8 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
     public Description Description { get; private set; }
     public VolunteerExperienceYears ExperienceYears { get; private set; }
     public Phone Phone { get; private set; }
-    public RequisitesList Requisites { get; private set; }
-    public SocialNetworkList SocialNetworks { get; private set; }
+    public ValueObjectList<Requisites> Requisites { get; private set; }
+    public ValueObjectList<SocialNetwork> SocialNetworks { get; private set; }
 
     public IReadOnlyList<Pet> Pets => _pets;
     private List<Pet> _pets = [];
@@ -64,14 +65,14 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
     }
 
     public Volunteer UpdateSocialNetworks(
-        SocialNetworkList socialNetworks)
+        ValueObjectList<SocialNetwork> socialNetworks)
     {
         SocialNetworks = socialNetworks;
         return this;
     }
 
     public Volunteer UpdateRequisites(
-        RequisitesList requisites)
+        ValueObjectList<Requisites> requisites)
     {
         Requisites = requisites;
         return this;
@@ -111,7 +112,7 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
 
     public UnitResult<Error> MovePet(PetId petId, PetSerialNumber newNumber)
     {
-        if (_pets.Count == 0)
+        if (_pets.Count == 1)
             return ErrorHelper.General.MethodNotApplicable(
                 "Cannot move pet. List of pets contains only one pet.");
 
@@ -172,5 +173,25 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         var endPosition = res.Value;
 
         return MovePet(petId, endPosition);
+    }
+
+    public UnitResult<Error> AddPhotosToPet(PetId petId, IEnumerable<FileVO> photos)
+    {
+        if (_pets.Count == 0)
+            return ErrorHelper.General.MethodNotApplicable(
+                "Volunteer does not have any pets");
+
+        var pet = _pets.FirstOrDefault(p => p.Id == petId);
+        if (pet == null)
+            return ErrorHelper.General.NotFound(petId.Value);
+
+        // creating new objects to overcome ef core's tracking
+        var petPhotos = pet.Photos.Values
+            .Select(p => FileVO.Create(p.Name, p.PathToStorage).Value);
+
+        var petPhotosVO = new ValueObjectList<FileVO>(petPhotos.Concat(photos));
+        pet.UpdatePhotos(petPhotosVO);
+
+        return UnitResult.Success<Error>();
     }
 }

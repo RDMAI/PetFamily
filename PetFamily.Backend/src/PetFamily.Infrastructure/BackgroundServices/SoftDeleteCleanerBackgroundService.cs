@@ -8,7 +8,7 @@ namespace PetFamily.Infrastructure.BackgroundServices;
 
 public class SoftDeleteCleanerBackgroundService : BackgroundService
 {
-    private readonly ApplicationDBContext _context;
+    private readonly IDbContextFactory<ApplicationDBContext> _dbFactory;
     private readonly ILogger<SoftDeleteCleanerBackgroundService> _logger;
 
     private readonly TimeSpan _checkPeriod;
@@ -19,7 +19,7 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
         ILogger<SoftDeleteCleanerBackgroundService> logger,
         IOptions<SoftDeleteCleanerOptions> options)
     {
-        _context = dbFactory.CreateDbContext();
+        _dbFactory = dbFactory;
         _logger = logger;
         if (options != null)
         {
@@ -40,14 +40,16 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
         {
             try
             {
-                var deletedVolunteers = _context.Volunteers
+                using var context = _dbFactory.CreateDbContext();
+
+                var deletedVolunteers = context.Volunteers
                     .Where(v => v.IsDeleted &&
                         DateTime.UtcNow - v.DeletionDate!.Value >= _timeToRestore);
 
                 // this will also cascade delete related pets
-                _context.Volunteers.RemoveRange(deletedVolunteers);
+                context.Volunteers.RemoveRange(deletedVolunteers);
 
-                await _context.SaveChangesAsync(stoppingToken);
+                await context.SaveChangesAsync(stoppingToken);
 
                 _logger.LogInformation("SoftDeleteCleanerBackgroundService executed successfully");
             }
