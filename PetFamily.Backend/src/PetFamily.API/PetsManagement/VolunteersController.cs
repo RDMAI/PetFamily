@@ -103,7 +103,7 @@ public class VolunteersController : ApplicationController
         return Ok(volunteerId.Value);
     }
 
-    [HttpPost("{id:guid}/Pets")]
+    [HttpPost("{id:guid}/pets")]
     public async Task<IActionResult> AddPet(
         [FromServices] AddPetHandler petHandler,
         [FromRoute] Guid id,
@@ -122,7 +122,7 @@ public class VolunteersController : ApplicationController
         return Created(getUri, PetId);
     }
 
-    [HttpPatch("{volunteerId:guid}/Pet/{petId:guid}/SerialNumber")]
+    [HttpPatch("{volunteerId:guid}/pet/{petId:guid}/serial-number")]
     public async Task<IActionResult> MovePet(
         [FromServices] MovePetHandler petHandler,
         [FromRoute] Guid volunteerId,
@@ -140,7 +140,7 @@ public class VolunteersController : ApplicationController
         return Ok(resultPetId.Value);
     }
 
-    [HttpPost("{volunteerId:guid}/Pet/{petId:guid}/Photos")]
+    [HttpPost("{volunteerId:guid}/pet/{petId:guid}/photos")]
     public async Task<IActionResult> UploadPetPhotos(
         [FromServices] UploadPetPhotosHandler petHandler,
         [FromRoute] Guid volunteerId,
@@ -165,7 +165,7 @@ public class VolunteersController : ApplicationController
         return CreatedBaseURI(result.Value);
     }
 
-    [HttpDelete("{volunteerId:guid}/Pet/{petId:guid}/Photos")]
+    [HttpDelete("{volunteerId:guid}/pet/{petId:guid}/photos")]
     public async Task<IActionResult> DeletePetPhotos(
         [FromServices] DeletePetPhotosHandler petHandler,
         [FromRoute] Guid volunteerId,
@@ -187,7 +187,7 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
-    [HttpGet("{volunteerId:guid}/Pet/{petId:guid}/Photos")]
+    [HttpGet("{volunteerId:guid}/pet/{petId:guid}/photos")]
     public async Task<IActionResult> GetAllPetPhotos(
         [FromServices] GetPetPhotosHandler petHandler,
         [FromRoute] Guid volunteerId,

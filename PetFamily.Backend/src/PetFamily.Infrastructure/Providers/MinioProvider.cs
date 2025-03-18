@@ -14,6 +14,10 @@ public class MinioProvider : IFileProvider
     private readonly IMinioClient _client;
     private readonly ILogger<MinioProvider> _logger;
 
+    public const int MAX_PARALLEL_UPLOADS_THREADS = 3;
+    public const int MAX_PARALLEL_DELETE_THREADS = 3;
+    public const int MAX_PARALLEL_GET_THREADS = 6;
+
     public MinioProvider(IMinioClient client, ILogger<MinioProvider> logger)
     {
         _client = client;
@@ -24,7 +28,7 @@ public class MinioProvider : IFileProvider
         IEnumerable<FileData> files,
         CancellationToken cancellationToken = default)
     {
-        var sem = new SemaphoreSlim(3);
+        var sem = new SemaphoreSlim(MAX_PARALLEL_UPLOADS_THREADS);
 
         List<Task> tasks = [];
         foreach (var file in files)
@@ -70,9 +74,12 @@ public class MinioProvider : IFileProvider
         string bucketName,
         CancellationToken cancellationToken = default)
     {
+        var sem = new SemaphoreSlim(MAX_PARALLEL_DELETE_THREADS);
+
         List<Task> tasks = [];
         foreach (var path in filePaths)
         {
+            await sem.WaitAsync(cancellationToken);
             try
             {
                 var args = new RemoveObjectArgs()
@@ -96,6 +103,10 @@ public class MinioProvider : IFileProvider
 
                 return ErrorHelper.Files.DeleteFailure().ToErrorList();
             }
+            finally
+            {
+                sem.Release();
+            }
         }
         await Task.WhenAll(tasks);
 
@@ -107,11 +118,14 @@ public class MinioProvider : IFileProvider
         IEnumerable<FileVO> files,
         CancellationToken cancellationToken = default)
     {
+        var sem = new SemaphoreSlim(MAX_PARALLEL_GET_THREADS);
+
         List<Task> tasks = [];
         List<string> presignedURLS = [];
 
         foreach (var file in files)
         {
+            await sem.WaitAsync(cancellationToken);
             try
             {
                 var args = new PresignedGetObjectArgs()
@@ -137,6 +151,10 @@ public class MinioProvider : IFileProvider
                     bucketName);
 
                 return ErrorHelper.Files.GetFailure().ToErrorList();
+            }
+            finally
+            {
+                sem.Release();
             }
         }
 
