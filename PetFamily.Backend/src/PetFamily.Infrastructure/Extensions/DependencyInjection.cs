@@ -2,8 +2,14 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Minio;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
+using PetFamily.Application.Shared.Interfaces;
+using PetFamily.Application.SpeciesManagement.Interfaces;
 using PetFamily.Infrastructure.BackgroundServices;
+using PetFamily.Infrastructure.EFHelpers;
+using PetFamily.Infrastructure.Options;
+using PetFamily.Infrastructure.Providers;
 using PetFamily.Infrastructure.Repositories;
 
 namespace PetFamily.Infrastructure.Extensions;
@@ -11,32 +17,55 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        // for bg services and ws connections
         services.AddDbContextFactory<ApplicationDBContext>();
+
+        // scopped dbcontext = different context for each web request
+        services.AddDbContext<ApplicationDBContext>();
+        services.AddScoped<IUnitOfWork, EFUnitOfWork>();
+
         services.AddScoped<IVolunteerRepository, VolunteerRepository>();
+        services.AddScoped<ISpeciesRepository, SpeciesRepository>();
 
         services.AddSoftDeleteCleaner(configuration);
+
+        services.AddConfiguredMinio(configuration);
 
         return services;
     }
 
-    private static IServiceCollection AddSoftDeleteCleaner(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddSoftDeleteCleaner(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        // getting configurations
-        if (!float.TryParse(configuration["SoftDeleteCleaner:CheckPeriodHours"], out var checkPeriodHours))
-            throw new ApplicationException("CheckPeriodHours is not configured");
+        var configs = configuration.GetSection("SoftDeleteCleaner");
 
-        if (!float.TryParse(configuration["SoftDeleteCleaner:TimeToRestoreHours"], out var timeToRestore))
-            throw new ApplicationException("TimeToRestoreHours is not configured");
+        services.Configure<SoftDeleteCleanerOptions>(configs);
+        services.AddHostedService<SoftDeleteCleanerBackgroundService>();
 
-        // adding options to services
-        services.Configure<SoftDeleteCleanerOptions>(o =>
+        return services;
+    }
+
+    private static IServiceCollection AddConfiguredMinio(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var configs = configuration.GetSection("Minio");
+
+        //services.Configure<MinioOptions>(configs);
+        var options = configs.Get<MinioOptions>()
+                ?? throw new ApplicationException("Minio is not configured");
+
+        services.AddMinio(client =>
         {
-            o.CheckPeriod = TimeSpan.FromHours(checkPeriodHours);
-            o.TimeToRestore = TimeSpan.FromHours(timeToRestore);
+            client.WithEndpoint(options.Endpoint);
+            client.WithCredentials(options.Login, options.Password);
+            client.WithSSL(options.WithSSL);
+
+            client.Build();
         });
 
-        // registering bg service with created options
-        services.AddHostedService<SoftDeleteCleanerBackgroundService>();
+        services.AddScoped<IFileProvider, MinioProvider>();
 
         return services;
     }
@@ -47,5 +76,13 @@ public static class DependencyInjection
 
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
         await dbContext.Database.MigrateAsync();
+    }
+
+    public static async Task CreateFileStorageStructure(this IHost host)
+    {
+        await using var scope = host.Services.CreateAsyncScope();
+
+        var fileProvider = scope.ServiceProvider.GetRequiredService<IFileProvider>();
+        await fileProvider.CreateRequiredBuckets();
     }
 }

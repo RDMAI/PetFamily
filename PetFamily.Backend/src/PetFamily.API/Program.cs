@@ -41,6 +41,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 
     await app.ApplyMigrations();
+    await app.CreateFileStorageStructure();
 }
 
 app.UseSerilogRequestLogging();

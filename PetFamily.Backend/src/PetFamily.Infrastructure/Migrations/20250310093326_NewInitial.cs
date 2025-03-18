@@ -34,7 +34,9 @@ namespace PetFamily.Infrastructure.Migrations
                     father_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     first_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     last_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    phone = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    phone = table.Column<string>(type: "character varying(11)", maxLength: 11, nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deletion_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Requisites = table.Column<string>(type: "jsonb", nullable: false),
                     SocialNetworks = table.Column<string>(type: "jsonb", nullable: false)
                 },
@@ -83,9 +85,12 @@ namespace PetFamily.Infrastructure.Migrations
                     health_information = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     height = table.Column<float>(type: "real", nullable: false),
                     name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    owner_phone = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    owner_phone = table.Column<string>(type: "character varying(11)", maxLength: 11, nullable: false),
+                    serial_number = table.Column<int>(type: "integer", nullable: false),
                     status = table.Column<int>(type: "integer", nullable: false),
                     weight = table.Column<float>(type: "real", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deletion_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Requisites = table.Column<string>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
@@ -95,7 +100,8 @@ namespace PetFamily.Infrastructure.Migrations
                         name: "fk_pets_volunteers_volunteer_id",
                         column: x => x.volunteer_id,
                         principalTable: "Volunteers",
-                        principalColumn: "id");
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

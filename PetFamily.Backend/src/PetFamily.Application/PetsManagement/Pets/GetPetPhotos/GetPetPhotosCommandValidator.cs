@@ -1,0 +1,18 @@
+﻿using FluentValidation;
+using PetFamily.Application.Shared.Validation;
+using PetFamily.Domain.Helpers;
+
+namespace PetFamily.Application.PetsManagement.Pets.UploadPetPhotos;
+public class GetPetPhotosCommandValidator : AbstractValidator<GetPetPhotosCommand>
+{
+    public GetPetPhotosCommandValidator()
+    {
+        RuleFor(c => c.VolunteerId)
+            .NotEmpty()
+            .WithError(ErrorHelper.General.ValueIsNullOrEmpty("VolunteerId"));
+
+        RuleFor(c => c.PetId)
+            .NotEmpty()
+            .WithError(ErrorHelper.General.ValueIsNullOrEmpty("PetId"));
+    }
+}

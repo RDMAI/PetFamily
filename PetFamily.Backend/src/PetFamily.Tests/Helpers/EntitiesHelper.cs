@@ -1,9 +1,11 @@
 ﻿using PetFamily.Domain.PetsManagement.Entities;
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
+using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
+using PetFamily.Domain.SpeciesContext.ValueObjects;
 
-namespace PetFamily.Tests.Helpers;
+namespace PetFamily.Domain.UnitTests.Helpers;
 public static class EntitiesHelper
 {
     /// <summary>
@@ -24,11 +26,11 @@ public static class EntitiesHelper
 
         IEnumerable<Requisites> requisitesEnumerable = [
             Requisites.Create("SPB", "Test SPB description", phone.Value).Value];
-        var requisitesVO = RequisitesList.Create(requisitesEnumerable).Value;
+        var requisitesVO = new ValueObjectList<Requisites>(requisitesEnumerable);
 
         IEnumerable<SocialNetwork> socialNetworksEnumerable = [
             SocialNetwork.Create("VK", "https://vk.com/id000000000").Value];
-        var socialNetworksVO = SocialNetworkList.Create(socialNetworksEnumerable).Value;
+        var socialNetworksVO = new ValueObjectList<SocialNetwork>(socialNetworksEnumerable);
 
         return new Volunteer(volunteerId,
             fullName,
@@ -55,7 +57,7 @@ public static class EntitiesHelper
         var weight = PetWeight.Create(10).Value;
         var height = PetHeight.Create(30).Value;
 
-        var breed = PetBreed.Create(Guid.NewGuid(), Guid.NewGuid()).Value;
+        var breed = PetBreed.Create(BreedId.GenerateNew(), SpeciesId.GenerateNew()).Value;
 
         var healthInfo = PetHealthInfo.Create("Healthy").Value;
 
@@ -73,8 +75,7 @@ public static class EntitiesHelper
 
         IEnumerable<Requisites> requisitesEnumerable = [
             Requisites.Create("SPB", "Test SPB description", phone.Value).Value];
-        var requisitesVO = RequisitesList.Create(requisitesEnumerable).Value;
-
+        var requisitesVO = new ValueObjectList<Requisites>(requisitesEnumerable);
 
         return new Pet(petId,
             name,

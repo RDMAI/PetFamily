@@ -30,5 +30,7 @@ public class SpeciesConfiguration : IEntityTypeConfiguration<Species>
         builder.HasMany(d => d.Breeds)
             .WithOne()
             .HasForeignKey("species_id");
+
+        builder.Navigation(d => d.Breeds).AutoInclude();
     }
 }

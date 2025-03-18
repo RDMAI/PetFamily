@@ -1,8 +1,8 @@
 using PetFamily.Domain.PetsManagement.Entities;
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
-using PetFamily.Tests.Helpers;
+using PetFamily.Domain.UnitTests.Helpers;
 
-namespace PetFamily.Tests.Domain;
+namespace PetFamily.Domain.UnitTests;
 
 public class PetTests
 {

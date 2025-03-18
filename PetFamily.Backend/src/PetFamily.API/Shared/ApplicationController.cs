@@ -30,6 +30,14 @@ public abstract class ApplicationController : Controller
     }
 
     [NonAction]
+    public override CreatedResult Created(string? uri, object? value)
+    {
+        var envelope = Envelope.Ok(value);
+
+        return base.Created(uri, envelope);
+    }
+
+    [NonAction]
     public ActionResult Error(ErrorList errors)
     {
         if (errors == null || !errors.Any())

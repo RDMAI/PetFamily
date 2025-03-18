@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
+using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Validation;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;

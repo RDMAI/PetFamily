@@ -1,4 +1,5 @@
 ﻿using PetFamily.Application.PetsManagement.Volunteers.DTOs;
+using PetFamily.Application.Shared.DTOs;
 
 namespace PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer;
 public record CreateVolunteerCommand(

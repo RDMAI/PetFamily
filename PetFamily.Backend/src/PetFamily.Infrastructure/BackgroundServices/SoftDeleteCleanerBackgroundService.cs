@@ -2,18 +2,13 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PetFamily.Infrastructure.Options;
 
 namespace PetFamily.Infrastructure.BackgroundServices;
 
-public class SoftDeleteCleanerOptions
-{
-    public TimeSpan CheckPeriod { get; set; } = TimeSpan.FromHours(24);
-    public TimeSpan TimeToRestore { get; set; } = TimeSpan.FromDays(30);
-}
-
 public class SoftDeleteCleanerBackgroundService : BackgroundService
 {
-    private readonly ApplicationDBContext _context;
+    private readonly IDbContextFactory<ApplicationDBContext> _dbFactory;
     private readonly ILogger<SoftDeleteCleanerBackgroundService> _logger;
 
     private readonly TimeSpan _checkPeriod;
@@ -24,12 +19,12 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
         ILogger<SoftDeleteCleanerBackgroundService> logger,
         IOptions<SoftDeleteCleanerOptions> options)
     {
-        _context = dbFactory.CreateDbContext();
+        _dbFactory = dbFactory;
         _logger = logger;
         if (options != null)
         {
-            _checkPeriod = options.Value.CheckPeriod;
-            _timeToRestore = options.Value.TimeToRestore;
+            _checkPeriod = TimeSpan.FromHours(options.Value.CheckPeriodHours);
+            _timeToRestore = TimeSpan.FromHours(options.Value.TimeToRestoreHours);
         }
     }
 
@@ -45,14 +40,16 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
         {
             try
             {
-                var deletedVolunteers = _context.Volunteers
+                using var context = _dbFactory.CreateDbContext();
+
+                var deletedVolunteers = context.Volunteers
                     .Where(v => v.IsDeleted &&
                         DateTime.UtcNow - v.DeletionDate!.Value >= _timeToRestore);
 
                 // this will also cascade delete related pets
-                _context.Volunteers.RemoveRange(deletedVolunteers);
+                context.Volunteers.RemoveRange(deletedVolunteers);
 
-                await _context.SaveChangesAsync(stoppingToken);
+                await context.SaveChangesAsync(stoppingToken);
 
                 _logger.LogInformation("SoftDeleteCleanerBackgroundService executed successfully");
             }

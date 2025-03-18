@@ -39,4 +39,26 @@ public static class ErrorHelper
             return Error.Validation("record.exists", $"{label} exists");
         }
     }
+
+    public static class Files
+    {
+        public static Error DeleteFailure(string? message = null)
+        {
+            return Error.Validation(
+                "file.delete.failure",
+                message ?? $"Failed to delete file from filestorage");
+        }
+        public static Error UploadFailure(string? message = null)
+        {
+            return Error.Validation(
+                "file.upload.failure",
+                message ?? $"Failed to upload file to filestorage");
+        }
+        public static Error GetFailure(string? message = null)
+        {
+            return Error.Validation(
+                "file.get.failure",
+                message ?? $"Failed to get file to filestorage");
+        }
+    }
 }
