@@ -15,7 +15,9 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FFD624E7-61D1-42DF-8AAA-BDCB5369615E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetFamily.Tests", "src\PetFamily.Tests\PetFamily.Tests.csproj", "{392395AB-D562-45B8-8E25-398953B69F1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetFamily.Domain.UnitTests", "src\PetFamily.Tests\PetFamily.Domain.UnitTests.csproj", "{392395AB-D562-45B8-8E25-398953B69F1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Application.UnitTests", "src\PetFamily.Application.UnitTests\PetFamily.Application.UnitTests.csproj", "{60D9BE3F-71FE-430A-BA3D-9F69D533D77C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{392395AB-D562-45B8-8E25-398953B69F1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{392395AB-D562-45B8-8E25-398953B69F1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{392395AB-D562-45B8-8E25-398953B69F1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60D9BE3F-71FE-430A-BA3D-9F69D533D77C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60D9BE3F-71FE-430A-BA3D-9F69D533D77C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60D9BE3F-71FE-430A-BA3D-9F69D533D77C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60D9BE3F-71FE-430A-BA3D-9F69D533D77C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +63,7 @@ Global
 		{CE528488-0A69-4D09-A252-327475C68A50} = {FFD624E7-61D1-42DF-8AAA-BDCB5369615E}
 		{D4F5CFCC-469C-4392-9E44-15C6C2B2F491} = {FFD624E7-61D1-42DF-8AAA-BDCB5369615E}
 		{392395AB-D562-45B8-8E25-398953B69F1D} = {FFD624E7-61D1-42DF-8AAA-BDCB5369615E}
+		{60D9BE3F-71FE-430A-BA3D-9F69D533D77C} = {FFD624E7-61D1-42DF-8AAA-BDCB5369615E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7EC48625-8EF5-4E13-8A0E-A3C0C22AE9A3}

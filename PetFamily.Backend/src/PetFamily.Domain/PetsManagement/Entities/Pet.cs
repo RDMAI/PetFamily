@@ -53,7 +53,7 @@ public class Pet : SoftDeletableEntity<PetId>
     public DateOnly BirthDate { get; private set; }
     public bool IsVacinated { get; private set; }
     public PetStatus Status { get; private set; }  // Pet's status - needs help / seeks home / found home
-    public ValueObjectList<FileVO> Photos { get; private set; }
+    public ValueObjectList<FileVO> Photos { get; private set; } = new([]);
     public ValueObjectList<Requisites> Requisites { get; private set; }
     public DateTime CreationDate = DateTime.Now;
 

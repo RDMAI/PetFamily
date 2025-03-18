@@ -5,7 +5,8 @@ using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.SpeciesContext.ValueObjects;
 
-namespace PetFamily.Domain.UnitTests.Helpers;
+namespace PetFamily.Application.UnitTests.Helpers;
+
 public static class EntitiesHelper
 {
     /// <summary>

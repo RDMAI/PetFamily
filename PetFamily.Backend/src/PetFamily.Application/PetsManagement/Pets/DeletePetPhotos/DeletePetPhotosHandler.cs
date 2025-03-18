@@ -1,40 +1,37 @@
 ﻿using CSharpFunctionalExtensions;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
-using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Application.PetsManagement.Pets.UploadPetPhotos;
-public class UploadPetPhotosHandler
+public class DeletePetPhotosHandler
 {
     private readonly IVolunteerRepository _volunteerRepository;
     private readonly IFileProvider _fileProvider;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IValidator<UploadPetPhotosCommand> _validator;
-    private readonly ILogger<UploadPetPhotosHandler> _logger;
+    private readonly IUnitOfWork _transactionHelper;
+    private readonly DeletePetPhotosCommandValidator _validator;
+    private readonly ILogger<DeletePetPhotosHandler> _logger;
 
-    public UploadPetPhotosHandler(
+    public DeletePetPhotosHandler(
         IVolunteerRepository volunteerRepository,
         IFileProvider fileProvider,
-        IUnitOfWork unitOfWork,
-        IValidator<UploadPetPhotosCommand> validator,
-        ILogger<UploadPetPhotosHandler> logger)
+        IUnitOfWork transactionHelper,
+        DeletePetPhotosCommandValidator validator,
+        ILogger<DeletePetPhotosHandler> logger)
     {
         _volunteerRepository = volunteerRepository;
         _fileProvider = fileProvider;
-        _unitOfWork = unitOfWork;
+        _transactionHelper = transactionHelper;
         _validator = validator;
         _logger = logger;
     }
 
     public async Task<Result<PetId, ErrorList>> HandleAsync(
-        UploadPetPhotosCommand command,
+        DeletePetPhotosCommand command,
         CancellationToken cancellationToken = default)
     {
         // command validation
@@ -56,26 +53,12 @@ public class UploadPetPhotosHandler
 
         var petId = PetId.Create(command.PetId);
 
-        // create lists of photos to store in file storage and in database
-        IEnumerable<FileVO> photosToDatabase = [];
-        IEnumerable<FileData> photosToStorage = [];
-        foreach (var file in command.Photos)
-        {
-            var storageName = Guid.NewGuid().ToString() + "_" + file.Name;
-
-            photosToDatabase = photosToDatabase.Append(FileVO.Create(storageName, file.Name).Value);
-            photosToStorage = photosToStorage.Append(new FileData(
-                file.ContentStream,
-                storageName,
-                Constants.BucketNames.PET_PHOTOS));
-        }
-
         // handling BL
-        var transaction = await _unitOfWork.BeginTransaction(cancellationToken);
+        var transaction = await _transactionHelper.BeginTransaction(cancellationToken);
         try
         {
-            // save photos' paths to DB
-            volunteer.AddPhotosToPet(petId, photosToDatabase);
+            // delete photos' paths from DB
+            volunteer.DeletePhotosFromPet(petId, command.PhotoPaths);
             var dbResult = await _volunteerRepository.UpdateAsync(volunteer, cancellationToken);
             if (dbResult.IsFailure)
             {
@@ -83,8 +66,11 @@ public class UploadPetPhotosHandler
                 return dbResult.Error;
             }
 
-            // save photos to file storage
-            var fileStorageResult = await _fileProvider.UploadFilesAsync(photosToStorage, cancellationToken);
+            // delete photos from file storage
+            var fileStorageResult = await _fileProvider.DeleteFilesAsync(
+                command.PhotoPaths,
+                Constants.BucketNames.PET_PHOTOS,
+                cancellationToken);
             if (fileStorageResult.IsFailure)
             {
                 transaction.Rollback();
@@ -98,11 +84,11 @@ public class UploadPetPhotosHandler
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                "Cannot add photos to pet with id = {id}. Rolling back transaction.",
+                "Cannot delete photos from pet with id = {id}. Rolling back transaction.",
                 command.PetId);
             transaction.Rollback();
 
-            return ErrorHelper.Files.UploadFailure("Cannot add photos to pet.").ToErrorList();
+            return ErrorHelper.Files.DeleteFailure("Cannot delete photos from pet.").ToErrorList();
         }
     }
 }

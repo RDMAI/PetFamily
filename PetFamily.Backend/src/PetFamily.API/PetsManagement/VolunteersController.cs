@@ -14,6 +14,7 @@ using PetFamily.Application.PetsManagement.Volunteers.DeleteVolunteer;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateMainInfo;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateRequisites;
 using PetFamily.Application.PetsManagement.Volunteers.UpdateSocialNetworks;
+using PetFamily.Domain.Helpers;
 
 namespace PetFamily.API.PetsManagement;
 
@@ -147,6 +148,9 @@ public class VolunteersController : ApplicationController
         [FromForm] UploadFilesRequest request,
         CancellationToken cancellationToken = default)
     {
+        if (request.Files is null)
+            return Error(ErrorHelper.General.ValueIsNull("FilesList"));
+
         await using var fileProcessor = new FormFileProcessor();
         var fileDTOs = fileProcessor.Process(request.Files);
 
@@ -161,43 +165,44 @@ public class VolunteersController : ApplicationController
         return CreatedBaseURI(result.Value);
     }
 
-    //[HttpGet("{volunteerId:guid}/Pet/{petId:guid}/Photos/{fileName:string}")]
-    //public async Task<IActionResult> GetPetPhotos(
-    //    [FromServices] ,
-    //    [FromRoute] Guid volunteerId,
-    //    [FromRoute] Guid petId,
-    //    [FromRoute] string fileName,
-    //    CancellationToken cancellationToken = default)
-    //{
-    //    var bucketName = "photos";
+    [HttpDelete("{volunteerId:guid}/Pet/{petId:guid}/Photos")]
+    public async Task<IActionResult> DeletePetPhotos(
+        [FromServices] DeletePetPhotosHandler petHandler,
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromBody] DeleteFilesRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var deleteCommand = new DeletePetPhotosCommand(
+            volunteerId,
+            petId,
+            request.FilePaths);
 
-    //    var result = await fileProvider.GetFileAsync(
-    //        bucketName,
-    //        FileName,
-    //        cancellationToken);
+        var result = await petHandler.HandleAsync(
+            deleteCommand,
+            cancellationToken);
 
-    //    if (result.IsFailure) return Error(result.Error);
+        if (result.IsFailure) return Error(result.Error);
 
-    //    return Ok(result.Value);
-    //}
+        return Ok(result.Value);
+    }
 
-    //[HttpDelete("{volunteerId:guid}/Pet/{petId:guid}/Photos/{fileName:string}")]
-    //public async Task<IActionResult> DeletePetPhotos(
-    //    [FromServices] ,
-    //    [FromRoute] Guid volunteerId,
-    //    [FromRoute] Guid petId,
-    //    [FromRoute] string fileName,
-    //    CancellationToken cancellationToken = default)
-    //{
-    //    var bucketName = "photos";
+    [HttpGet("{volunteerId:guid}/Pet/{petId:guid}/Photos")]
+    public async Task<IActionResult> GetAllPetPhotos(
+        [FromServices] GetPetPhotosHandler petHandler,
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        //[FromRoute] GetFilesRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var getCommand = new GetPetPhotosCommand(volunteerId, petId);
 
-    //    var result = await fileProvider.DeleteFileAsync(
-    //        bucketName,
-    //        FileName,
-    //        cancellationToken);
+        var result = await petHandler.HandleAsync(
+            getCommand,
+            cancellationToken);
 
-    //    if (result.IsFailure) return Error(result.Error);
+        if (result.IsFailure) return Error(result.Error);
 
-    //    return Ok(result.Value);
-    //}
+        return Ok(result.Value);
+    }
 }

@@ -77,4 +77,12 @@ public static class DependencyInjection
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
         await dbContext.Database.MigrateAsync();
     }
+
+    public static async Task CreateFileStorageStructure(this IHost host)
+    {
+        await using var scope = host.Services.CreateAsyncScope();
+
+        var fileProvider = scope.ServiceProvider.GetRequiredService<IFileProvider>();
+        await fileProvider.CreateRequiredBuckets();
+    }
 }

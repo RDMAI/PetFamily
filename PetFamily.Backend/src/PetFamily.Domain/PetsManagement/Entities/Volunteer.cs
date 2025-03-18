@@ -5,8 +5,6 @@ using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace PetFamily.Domain.PetsManagement.Entities;
 
@@ -187,9 +185,33 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
 
         // creating new objects to overcome ef core's tracking
         var petPhotos = pet.Photos.Values
-            .Select(p => FileVO.Create(p.Name, p.PathToStorage).Value);
+            .Select(p => FileVO.Create(p.Name, p.PathToStorage).Value)
+            .ToList();
+        petPhotos.AddRange(photos);
 
-        var petPhotosVO = new ValueObjectList<FileVO>(petPhotos.Concat(photos));
+        var petPhotosVO = new ValueObjectList<FileVO>(petPhotos);
+        pet.UpdatePhotos(petPhotosVO);
+
+        return UnitResult.Success<Error>();
+    }
+
+    public UnitResult<Error> DeletePhotosFromPet(PetId petId, IEnumerable<string> photos)
+    {
+        if (_pets.Count == 0)
+            return ErrorHelper.General.MethodNotApplicable(
+                "Volunteer does not have any pets");
+
+        var pet = _pets.FirstOrDefault(p => p.Id == petId);
+        if (pet == null)
+            return ErrorHelper.General.NotFound(petId.Value);
+
+        // creating new objects to overcome ef core's tracking
+        var petPhotos = pet.Photos.Values
+            .Select(p => FileVO.Create(p.Name, p.PathToStorage).Value)
+            .ToList();
+        petPhotos.RemoveAll(f => photos.Contains(f.PathToStorage));
+
+        var petPhotosVO = new ValueObjectList<FileVO>(petPhotos);
         pet.UpdatePhotos(petPhotosVO);
 
         return UnitResult.Success<Error>();

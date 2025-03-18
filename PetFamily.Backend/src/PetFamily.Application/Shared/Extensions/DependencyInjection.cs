@@ -23,6 +23,8 @@ public static class DependencyInjection
         services.AddScoped<AddPetHandler>();
         services.AddScoped<MovePetHandler>();
         services.AddScoped<UploadPetPhotosHandler>();
+        services.AddScoped<DeletePetPhotosHandler>();
+        services.AddScoped<GetPetPhotosHandler>();
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 

@@ -8,6 +8,9 @@ public class FormFileProcessor : IAsyncDisposable
 
     public List<FileDTO> Process(IFormFileCollection files)
     {
+        if (files is null)
+            throw new ArgumentNullException("Files list is empty.");
+
         foreach (var file in files)
         {
             var stream = file.OpenReadStream();

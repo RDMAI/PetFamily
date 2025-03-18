@@ -4,7 +4,9 @@ using Minio;
 using Minio.DataModel.Args;
 using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;
+using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Infrastructure.Providers;
 public class MinioProvider : IFileProvider
@@ -22,18 +24,8 @@ public class MinioProvider : IFileProvider
         IEnumerable<FileData> files,
         CancellationToken cancellationToken = default)
     {
-        //// create bucket if it does not exist
-        //var bucketExistArgs = new BucketExistsArgs()
-        //    .WithBucket(bucketName);
-        //if (await _client.BucketExistsAsync(bucketExistArgs, cancellationToken) == false)
-        //{
-        //    var makeBucketArgs = new MakeBucketArgs()
-        //        .WithBucket(bucketName);
-
-        //    await _client.MakeBucketAsync(makeBucketArgs, cancellationToken);
-        //}
-
         var sem = new SemaphoreSlim(3);
+
         List<Task> tasks = [];
         foreach (var file in files)
         {
@@ -60,68 +52,122 @@ public class MinioProvider : IFileProvider
                     "Cannot upload file to minio; Name: {name}; Bucket: {bucket}",
                     file.Name,
                     file.BucketName);
+
+                return ErrorHelper.Files.UploadFailure().ToErrorList();
             }
             finally
             {
                 sem.Release();
             }
         }
-
         await Task.WhenAll(tasks);
 
         return UnitResult.Success<ErrorList>();
     }
 
-    //public async Task<Result<string, Error>> DeleteFileAsync(
-    //    string bucketName,
-    //    string fileName,
-    //    CancellationToken cancellationToken = default)
-    //{
-    //    var args = new RemoveObjectArgs()
-    //        .WithBucket(bucketName)
-    //        .WithObject(fileName);
+    public async Task<UnitResult<ErrorList>> DeleteFilesAsync(
+        IEnumerable<string> filePaths,
+        string bucketName,
+        CancellationToken cancellationToken = default)
+    {
+        List<Task> tasks = [];
+        foreach (var path in filePaths)
+        {
+            try
+            {
+                var args = new RemoveObjectArgs()
+                    .WithBucket(bucketName)
+                    .WithObject(path);
 
-    //    await _client.RemoveObjectAsync(args, cancellationToken);
+                // to run task in separate thread from system threadpool
+                var task = Task.Run(async () =>
+                {
+                    await _client.RemoveObjectAsync(args, cancellationToken);
+                }, cancellationToken);
 
-    //    return fileName;
-    //}
+                tasks.Add(task);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Cannot delete file from minio; Path: {path}; Bucket: {bucket}",
+                    path,
+                    bucketName);
 
-    //public async Task<Result<string, Error>> GetFileAsync(
-    //    string bucketName,
-    //    string fileName,
-    //    CancellationToken cancellationToken = default)
-    //{
-    //    var args = new PresignedGetObjectArgs()
-    //        .WithBucket(bucketName)
-    //        .WithObject(fileName)
-    //        .WithExpiry(60*60*24);
+                return ErrorHelper.Files.DeleteFailure().ToErrorList();
+            }
+        }
+        await Task.WhenAll(tasks);
 
-    //    var result = await _client.PresignedGetObjectAsync(args);
+        return UnitResult.Success<ErrorList>();
+    }
 
-    //    return result;
-    //}
+    public async Task<Result<IEnumerable<string>, ErrorList>> GetFilesAsync(
+        string bucketName,
+        IEnumerable<FileVO> files,
+        CancellationToken cancellationToken = default)
+    {
+        List<Task> tasks = [];
+        List<string> presignedURLS = [];
 
-    //public async Task<UnitResult<Error>> CreateBucketsIfNotExistAsync(
-    //    IEnumerable<string> bucketName,
-    //    CancellationToken cancellationToken = default)
-    //{
-    //    try
-    //    {
-    //        var bucketExistArgs = new BucketExistsArgs()
-    //        .WithBucket(bucketName);
-    //        if (await _client.BucketExistsAsync(bucketExistArgs, cancellationToken) == false)
-    //        {
-    //            var makeBucketArgs = new MakeBucketArgs()
-    //                .WithBucket(bucketName);
+        foreach (var file in files)
+        {
+            try
+            {
+                var args = new PresignedGetObjectArgs()
+                    .WithBucket(bucketName)
+                    .WithObject(file.PathToStorage)
+                    .WithExpiry(60 * 60 * 24);
 
-    //            await _client.MakeBucketAsync(makeBucketArgs, cancellationToken);
-    //        }
+                // to run task in separate thread from system threadpool
+                var task = Task.Run(async () =>
+                {
+                    var result = await _client.PresignedGetObjectAsync(args);
 
-    //        return UnitResult.Success<Error>();
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return Error.Failure("Minio.failure", )
-    //    }
-    //}
+                    presignedURLS.Add(result);
+                }, cancellationToken);
+
+                tasks.Add(task);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Cannot get file from minio; Name: {name}; Bucket: {bucket}",
+                    file.Name,
+                    bucketName);
+
+                return ErrorHelper.Files.GetFailure().ToErrorList();
+            }
+        }
+
+        await Task.WhenAll(tasks);
+
+        return presignedURLS;
+    }
+
+    public async Task CreateRequiredBuckets(CancellationToken cancellationToken = default)
+    {
+        // getting list of required buckets
+        var bucketNamesList = typeof(Constants.BucketNames)
+                .GetFields()
+                .Where(f => f.IsLiteral)  // only consts
+                .Select(f => f.GetRawConstantValue()!.ToString()!)
+                .ToList();
+
+        foreach (var bucketName in bucketNamesList)
+        {
+            // create bucket if it does not exist
+            var bucketExistArgs = new BucketExistsArgs()
+                .WithBucket(bucketName);
+            if (await _client.BucketExistsAsync(bucketExistArgs, cancellationToken) == false)
+            {
+                var makeBucketArgs = new MakeBucketArgs()
+                    .WithBucket(bucketName);
+
+                await _client.MakeBucketAsync(makeBucketArgs, cancellationToken);
+
+                _logger.LogInformation("Bucket {name} created", bucketName);
+            }
+        }
+    }
 }
