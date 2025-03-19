@@ -4,6 +4,7 @@ using Minio;
 using Minio.DataModel.Args;
 using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;
+using PetFamily.Application.Shared.Messaging;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
 
@@ -80,21 +81,22 @@ public class MinioProvider : IFileProvider
             await sem.WaitAsync(cancellationToken);
             try
             {
+                // if file exists - delete it, if not - skip it
                 var existanceCheck = await _checkFileExistanceAsync(file, cancellationToken);
-                if (existanceCheck.IsFailure)
-                    return existanceCheck.Error.ToErrorList();
-
-                var args = new RemoveObjectArgs()
-                    .WithBucket(file.BucketName)
-                    .WithObject(file.FilePath);
-
-                // to run task in separate thread from system threadpool
-                var task = Task.Run(async () =>
+                if (existanceCheck.IsSuccess)
                 {
-                    await _client.RemoveObjectAsync(args, cancellationToken);
-                }, cancellationToken);
+                    var args = new RemoveObjectArgs()
+                        .WithBucket(file.BucketName)
+                        .WithObject(file.FilePath);
 
-                tasks.Add(task);
+                    // to run task in separate thread from system threadpool
+                    var task = Task.Run(async () =>
+                    {
+                        await _client.RemoveObjectAsync(args, cancellationToken);
+                    }, cancellationToken);
+
+                    tasks.Add(task);
+                }
             }
             catch (Exception ex)
             {

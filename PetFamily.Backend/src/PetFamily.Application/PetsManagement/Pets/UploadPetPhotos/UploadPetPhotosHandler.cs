@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;
+using PetFamily.Application.Shared.Messaging;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
@@ -16,6 +17,7 @@ public class UploadPetPhotosHandler
     private readonly IVolunteerRepository _volunteerRepository;
     private readonly IFileProvider _fileProvider;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMessageQueue<IEnumerable<FileInfoDTO>> _fileMessageQueue;
     private readonly IValidator<UploadPetPhotosCommand> _validator;
     private readonly ILogger<UploadPetPhotosHandler> _logger;
 
@@ -23,12 +25,14 @@ public class UploadPetPhotosHandler
         IVolunteerRepository volunteerRepository,
         IFileProvider fileProvider,
         IUnitOfWork unitOfWork,
+        IMessageQueue<IEnumerable<FileInfoDTO>> fileMessageQueue,
         IValidator<UploadPetPhotosCommand> validator,
         ILogger<UploadPetPhotosHandler> logger)
     {
         _volunteerRepository = volunteerRepository;
         _fileProvider = fileProvider;
         _unitOfWork = unitOfWork;
+        _fileMessageQueue = fileMessageQueue;
         _validator = validator;
         _logger = logger;
     }
@@ -89,6 +93,10 @@ public class UploadPetPhotosHandler
             var fileStorageResult = await _fileProvider.UploadFilesAsync(photosToStorage, cancellationToken);
             if (fileStorageResult.IsFailure)
             {
+                // Placing an operation to delete invalid files to memory queue
+                var fileInfos = photosToStorage.Select(f => f.Info).ToList();
+                await _fileMessageQueue.WriteAsync(fileInfos, cancellationToken);
+
                 transaction.Rollback();
                 return fileStorageResult.Error;
             }
