@@ -15,12 +15,10 @@ public interface IFileProvider
         CancellationToken cancellationToken = default);
 
     Task<UnitResult<ErrorList>> DeleteFilesAsync(
-        IEnumerable<string> files,
-        string bucketName,
+        IEnumerable<FileInfoDTO> files,
         CancellationToken cancellationToken = default);
 
     Task<Result<IEnumerable<string>, ErrorList>> GetFilesAsync(
-        string bucketName,
-        IEnumerable<FileVO> files,
+        IEnumerable<FileInfoDTO> files,
         CancellationToken cancellationToken = default);
 }

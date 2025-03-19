@@ -6,7 +6,6 @@ using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Infrastructure.Providers;
 public class MinioProvider : IFileProvider
@@ -37,8 +36,8 @@ public class MinioProvider : IFileProvider
             try
             {
                 var args = new PutObjectArgs()
-                    .WithBucket(file.BucketName)
-                    .WithObject(file.Name)
+                    .WithBucket(file.Info.BucketName)
+                    .WithObject(file.Info.FilePath)
                     .WithStreamData(file.ContentStream)
                     .WithObjectSize(file.ContentStream.Length);
 
@@ -54,8 +53,8 @@ public class MinioProvider : IFileProvider
             {
                 _logger.LogError(ex,
                     "Cannot upload file to minio; Name: {name}; Bucket: {bucket}",
-                    file.Name,
-                    file.BucketName);
+                    file.Info.FilePath,
+                    file.Info.BucketName);
 
                 return ErrorHelper.Files.UploadFailure().ToErrorList();
             }
@@ -70,21 +69,24 @@ public class MinioProvider : IFileProvider
     }
 
     public async Task<UnitResult<ErrorList>> DeleteFilesAsync(
-        IEnumerable<string> filePaths,
-        string bucketName,
+        IEnumerable<FileInfoDTO> files,
         CancellationToken cancellationToken = default)
     {
         var sem = new SemaphoreSlim(MAX_PARALLEL_DELETE_THREADS);
 
         List<Task> tasks = [];
-        foreach (var path in filePaths)
+        foreach (var file in files)
         {
             await sem.WaitAsync(cancellationToken);
             try
             {
+                var existanceCheck = await _checkFileExistanceAsync(file, cancellationToken);
+                if (existanceCheck.IsFailure)
+                    return existanceCheck.Error.ToErrorList();
+
                 var args = new RemoveObjectArgs()
-                    .WithBucket(bucketName)
-                    .WithObject(path);
+                    .WithBucket(file.BucketName)
+                    .WithObject(file.FilePath);
 
                 // to run task in separate thread from system threadpool
                 var task = Task.Run(async () =>
@@ -98,8 +100,8 @@ public class MinioProvider : IFileProvider
             {
                 _logger.LogError(ex,
                     "Cannot delete file from minio; Path: {path}; Bucket: {bucket}",
-                    path,
-                    bucketName);
+                    file.FilePath,
+                    file.BucketName);
 
                 return ErrorHelper.Files.DeleteFailure().ToErrorList();
             }
@@ -114,8 +116,7 @@ public class MinioProvider : IFileProvider
     }
 
     public async Task<Result<IEnumerable<string>, ErrorList>> GetFilesAsync(
-        string bucketName,
-        IEnumerable<FileVO> files,
+        IEnumerable<FileInfoDTO> files,
         CancellationToken cancellationToken = default)
     {
         var sem = new SemaphoreSlim(MAX_PARALLEL_GET_THREADS);
@@ -128,9 +129,13 @@ public class MinioProvider : IFileProvider
             await sem.WaitAsync(cancellationToken);
             try
             {
+                var existanceCheck = await _checkFileExistanceAsync(file, cancellationToken);
+                if (existanceCheck.IsFailure)
+                    return existanceCheck.Error.ToErrorList();
+
                 var args = new PresignedGetObjectArgs()
-                    .WithBucket(bucketName)
-                    .WithObject(file.PathToStorage)
+                    .WithBucket(file.BucketName)
+                    .WithObject(file.FilePath)
                     .WithExpiry(60 * 60 * 24);
 
                 // to run task in separate thread from system threadpool
@@ -147,8 +152,8 @@ public class MinioProvider : IFileProvider
             {
                 _logger.LogError(ex,
                     "Cannot get file from minio; Name: {name}; Bucket: {bucket}",
-                    file.Name,
-                    bucketName);
+                    file.FilePath,
+                    file.BucketName);
 
                 return ErrorHelper.Files.GetFailure().ToErrorList();
             }
@@ -161,6 +166,20 @@ public class MinioProvider : IFileProvider
         await Task.WhenAll(tasks);
 
         return presignedURLS;
+    }
+
+    private async Task<UnitResult<Error>> _checkFileExistanceAsync(
+        FileInfoDTO file,
+        CancellationToken cancellationToken = default)
+    {
+        var statArgs = new StatObjectArgs()
+                    .WithBucket(file.BucketName)
+                    .WithObject(file.FilePath);
+        var res = await _client.StatObjectAsync(statArgs, cancellationToken);
+        if (res.ContentType is null)
+            return ErrorHelper.Files.DeleteFailure("File not found");
+
+        return UnitResult.Success<Error>();
     }
 
     public async Task CreateRequiredBuckets(CancellationToken cancellationToken = default)

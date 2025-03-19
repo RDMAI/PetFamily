@@ -40,7 +40,7 @@ public class UploadPetPhotosHandlerTests
         var fileName = "test.jpg";
 
         var uploadPhotoDTO = new FileDTO(stream, fileName);
-        var uploadPhotoData = new FileData(stream, fileName, Constants.BucketNames.PET_PHOTOS);
+        var uploadPhotoData = new FileData(stream, new FileInfoDTO(fileName, Constants.BucketNames.PET_PHOTOS));
 
         var command = new UploadPetPhotosCommand(
             volunteer.Id.Value,
@@ -174,7 +174,7 @@ public class UploadPetPhotosHandlerTests
         var fileName = "test.jpg";
 
         var uploadPhotoDTO = new FileDTO(stream, fileName);
-        var uploadPhotoData = new FileData(stream, fileName, Constants.BucketNames.PET_PHOTOS);
+        var uploadPhotoData = new FileData(stream, new FileInfoDTO(fileName, Constants.BucketNames.PET_PHOTOS));
 
         var command = new UploadPetPhotosCommand(
             volunteer.Id.Value,

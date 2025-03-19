@@ -184,13 +184,20 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
             return ErrorHelper.General.NotFound(petId.Value);
 
         // creating new objects to overcome ef core's tracking
-        var petPhotos = pet.Photos.Values
-            .Select(p => FileVO.Create(p.Name, p.PathToStorage).Value)
+        if (pet.Photos.Values is null)
+        {
+            pet.UpdatePhotos(new ValueObjectList<FileVO>(photos));
+        }
+        else
+        {
+            var petPhotos = pet.Photos.Values
+            .Select(p => FileVO.Create(p.PathToStorage, p.Name).Value)
             .ToList();
-        petPhotos.AddRange(photos);
+            petPhotos.AddRange(photos);
 
-        var petPhotosVO = new ValueObjectList<FileVO>(petPhotos);
-        pet.UpdatePhotos(petPhotosVO);
+            var petPhotosVO = new ValueObjectList<FileVO>(petPhotos);
+            pet.UpdatePhotos(petPhotosVO);
+        }
 
         return UnitResult.Success<Error>();
     }
@@ -205,11 +212,16 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         if (pet == null)
             return ErrorHelper.General.NotFound(petId.Value);
 
+        if (pet.Photos.Values is null)
+            return ErrorHelper.General.NotFound();
+
         // creating new objects to overcome ef core's tracking
         var petPhotos = pet.Photos.Values
-            .Select(p => FileVO.Create(p.Name, p.PathToStorage).Value)
+            .Select(p => FileVO.Create(p.PathToStorage, p.Name).Value)
             .ToList();
-        petPhotos.RemoveAll(f => photos.Contains(f.PathToStorage));
+        var result = petPhotos.RemoveAll(f => photos.Contains(f.PathToStorage));
+        if (result == 0)
+            return ErrorHelper.General.NotFound();
 
         var petPhotosVO = new ValueObjectList<FileVO>(petPhotos);
         pet.UpdatePhotos(petPhotosVO);

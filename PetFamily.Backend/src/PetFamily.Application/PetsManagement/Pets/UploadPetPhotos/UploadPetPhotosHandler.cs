@@ -66,8 +66,7 @@ public class UploadPetPhotosHandler
             photosToDatabase = photosToDatabase.Append(FileVO.Create(storageName, file.Name).Value);
             photosToStorage = photosToStorage.Append(new FileData(
                 file.ContentStream,
-                storageName,
-                Constants.BucketNames.PET_PHOTOS));
+                new FileInfoDTO(storageName, Constants.BucketNames.PET_PHOTOS)));
         }
 
         // handling BL
@@ -75,7 +74,10 @@ public class UploadPetPhotosHandler
         try
         {
             // save photos' paths to DB
-            volunteer.AddPhotosToPet(petId, photosToDatabase);
+            var domainResult = volunteer.AddPhotosToPet(petId, photosToDatabase);
+            if (domainResult.IsFailure)
+                return domainResult.Error.ToErrorList();
+
             var dbResult = await _volunteerRepository.UpdateAsync(volunteer, cancellationToken);
             if (dbResult.IsFailure)
             {
