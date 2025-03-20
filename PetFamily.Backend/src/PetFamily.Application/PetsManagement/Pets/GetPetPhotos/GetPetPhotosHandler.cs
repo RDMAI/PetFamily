@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
+using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
@@ -58,14 +59,17 @@ public class GetPetPhotosHandler
         if (pet is null)
             return ErrorHelper.General.NotFound(petId.Value).ToErrorList();
 
-        if (pet.Photos is null || pet.Photos.Count == 0)
+        if (pet.Photos.Values is null || pet.Photos.Count == 0)
             return ErrorHelper.General.MethodNotApplicable("Pet does not have any photos").ToErrorList();
+
+        var photoInfos = pet.Photos.Select(p => new FileInfoDTO(
+            p.PathToStorage,
+            Constants.BucketNames.PET_PHOTOS));
 
         try
         {
             var photosLinksResult = await _fileProvider.GetFilesAsync(
-                Constants.BucketNames.PET_PHOTOS,
-                pet.Photos,
+                photoInfos,
                 cancellationToken);
 
             return photosLinksResult;

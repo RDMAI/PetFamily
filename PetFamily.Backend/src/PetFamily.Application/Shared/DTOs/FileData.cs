@@ -1,3 +1,3 @@
 ﻿namespace PetFamily.Application.Shared.DTOs;
 
-public record FileData(Stream ContentStream, string Name, string BucketName);
+public record FileData(Stream ContentStream, FileInfoDTO Info);

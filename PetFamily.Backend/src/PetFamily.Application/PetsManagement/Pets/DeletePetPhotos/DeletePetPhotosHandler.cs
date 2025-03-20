@@ -1,8 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
+using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Domain.Helpers;
+using PetFamily.Domain.PetsManagement.Entities;
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
@@ -53,12 +55,18 @@ public class DeletePetPhotosHandler
 
         var petId = PetId.Create(command.PetId);
 
+        var photoInfos = command.PhotoPaths.Select(p => 
+            new FileInfoDTO(p, Constants.BucketNames.PET_PHOTOS));
+
         // handling BL
         var transaction = await _transactionHelper.BeginTransaction(cancellationToken);
         try
         {
             // delete photos' paths from DB
-            volunteer.DeletePhotosFromPet(petId, command.PhotoPaths);
+            var domainResult = volunteer.DeletePhotosFromPet(petId, command.PhotoPaths);
+            //if (domainResult.IsFailure)
+            //    return domainResult.Error.ToErrorList();
+
             var dbResult = await _volunteerRepository.UpdateAsync(volunteer, cancellationToken);
             if (dbResult.IsFailure)
             {
@@ -68,9 +76,9 @@ public class DeletePetPhotosHandler
 
             // delete photos from file storage
             var fileStorageResult = await _fileProvider.DeleteFilesAsync(
-                command.PhotoPaths,
-                Constants.BucketNames.PET_PHOTOS,
+                photoInfos,
                 cancellationToken);
+
             if (fileStorageResult.IsFailure)
             {
                 transaction.Rollback();

@@ -18,6 +18,14 @@ namespace PetFamily.Application.UnitTests.PetsManagement;
 
 public class UploadPetPhotosHandlerTests
 {
+    // these get reinitilized for each test in class
+    private readonly Mock<IVolunteerRepository> _volunteerRepositoryMock = new();
+    private readonly Mock<IFileProvider> _fileProviderMock = new();
+    private readonly Mock<IDbTransaction> _transactionMock = new();
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+    private readonly InlineValidator<UploadPetPhotosCommand> _validatorStub = new();
+    private readonly NullLogger<UploadPetPhotosHandler> _loggerStub = new();
+
     [Fact]
     public async Task HandleAsync_AddingValidPhotos_ResultSuccess()
     {
@@ -32,7 +40,7 @@ public class UploadPetPhotosHandlerTests
         var fileName = "test.jpg";
 
         var uploadPhotoDTO = new FileDTO(stream, fileName);
-        var uploadPhotoData = new FileData(stream, fileName, Constants.BucketNames.PET_PHOTOS);
+        var uploadPhotoData = new FileData(stream, new FileInfoDTO(fileName, Constants.BucketNames.PET_PHOTOS));
 
         var command = new UploadPetPhotosCommand(
             volunteer.Id.Value,
@@ -41,34 +49,27 @@ public class UploadPetPhotosHandlerTests
 
         IEnumerable<FileData> filesData = [uploadPhotoData, uploadPhotoData];
 
-        // mocking dependencies
-        var volunteerRepositoryMock = new Mock<IVolunteerRepository>();
-        volunteerRepositoryMock.Setup(d => d.UpdateAsync(volunteer, ct))
+        // setting up mocks
+        _volunteerRepositoryMock.Setup(d => d.UpdateAsync(volunteer, ct))
             .ReturnsAsync(volunteer.Id);
-        volunteerRepositoryMock.Setup(d => d.GetByIdAsync(volunteer.Id, ct))
+        _volunteerRepositoryMock.Setup(d => d.GetByIdAsync(volunteer.Id, ct))
             .ReturnsAsync(volunteer);
 
-        var fileProviderMock = new Mock<IFileProvider>();
-        fileProviderMock.Setup(d => d.UploadFilesAsync(filesData, ct))
+        _fileProviderMock.Setup(d => d.UploadFilesAsync(filesData, ct))
             .ReturnsAsync(UnitResult.Success<ErrorList>());
 
-        var transactionMock = new Mock<IDbTransaction>();
-        var unitOfWorkMock = new Mock<IUnitOfWork>();
-        transactionMock.Setup(d => d.Commit());
-        transactionMock.Setup(d => d.Rollback());
-        transactionMock.Setup(d => d.Dispose());
-        unitOfWorkMock.Setup(d => d.BeginTransaction(ct))
-            .ReturnsAsync(transactionMock.Object);
-
-        var validatorStub = new InlineValidator<UploadPetPhotosCommand>();
-        var loggerStub = new NullLogger<UploadPetPhotosHandler>();
+        _transactionMock.Setup(d => d.Commit());
+        _transactionMock.Setup(d => d.Rollback());
+        _transactionMock.Setup(d => d.Dispose());
+        _unitOfWorkMock.Setup(d => d.BeginTransaction(ct))
+            .ReturnsAsync(_transactionMock.Object);
 
         var handler = new UploadPetPhotosHandler(
-            volunteerRepositoryMock.Object,
-            fileProviderMock.Object,
-            unitOfWorkMock.Object,
-            validatorStub,
-            loggerStub);
+            _volunteerRepositoryMock.Object,
+            _fileProviderMock.Object,
+            _unitOfWorkMock.Object,
+            _validatorStub,
+            _loggerStub);
 
         // Act
         var result = await handler.HandleAsync(
@@ -97,24 +98,17 @@ public class UploadPetPhotosHandlerTests
             Guid.NewGuid(),
             [uploadPhotoDTO, uploadPhotoDTO]);
 
-        // mocking dependencies
-        var volunteerRepositoryMock = new Mock<IVolunteerRepository>();
-        var fileProviderMock = new Mock<IFileProvider>();
-        var unitOfWorkMock = new Mock<IUnitOfWork>();
-
-        var validatorStub = new InlineValidator<UploadPetPhotosCommand>();
-        validatorStub.RuleFor(c => c.VolunteerId)
+        // setting up mocks
+        _validatorStub.RuleFor(c => c.VolunteerId)
             .NotEmpty()
             .WithError(ErrorHelper.General.ValueIsNullOrEmpty("VolunteerId"));
 
-        var loggerStub = new NullLogger<UploadPetPhotosHandler>();
-
         var handler = new UploadPetPhotosHandler(
-            volunteerRepositoryMock.Object,
-            fileProviderMock.Object,
-            unitOfWorkMock.Object,
-            validatorStub,
-            loggerStub);
+            _volunteerRepositoryMock.Object,
+            _fileProviderMock.Object,
+            _unitOfWorkMock.Object,
+            _validatorStub,
+            _loggerStub);
 
         // Act
         var result = await handler.HandleAsync(
@@ -146,23 +140,16 @@ public class UploadPetPhotosHandlerTests
 
         var error = ErrorHelper.General.NotFound();
 
-        // mocking dependencies
-        var volunteerRepositoryMock = new Mock<IVolunteerRepository>();
-        volunteerRepositoryMock.Setup(d => d.GetByIdAsync(volunteerId, ct))
+        // setting up mocks
+        _volunteerRepositoryMock.Setup(d => d.GetByIdAsync(volunteerId, ct))
             .ReturnsAsync(Result.Failure<Volunteer, ErrorList>(error));
 
-        var fileProviderMock = new Mock<IFileProvider>();
-        var unitOfWorkMock = new Mock<IUnitOfWork>();
-
-        var validatorStub = new InlineValidator<UploadPetPhotosCommand>();
-        var loggerStub = new NullLogger<UploadPetPhotosHandler>();
-
         var handler = new UploadPetPhotosHandler(
-            volunteerRepositoryMock.Object,
-            fileProviderMock.Object,
-            unitOfWorkMock.Object,
-            validatorStub,
-            loggerStub);
+            _volunteerRepositoryMock.Object,
+            _fileProviderMock.Object,
+            _unitOfWorkMock.Object,
+            _validatorStub,
+            _loggerStub);
 
         // Act
         var result = await handler.HandleAsync(
@@ -187,7 +174,7 @@ public class UploadPetPhotosHandlerTests
         var fileName = "test.jpg";
 
         var uploadPhotoDTO = new FileDTO(stream, fileName);
-        var uploadPhotoData = new FileData(stream, fileName, Constants.BucketNames.PET_PHOTOS);
+        var uploadPhotoData = new FileData(stream, new FileInfoDTO(fileName, Constants.BucketNames.PET_PHOTOS));
 
         var command = new UploadPetPhotosCommand(
             volunteer.Id.Value,
@@ -198,32 +185,24 @@ public class UploadPetPhotosHandlerTests
 
         var error = ErrorHelper.Files.UploadFailure();
 
-        // mocking dependencies
-        var volunteerRepositoryMock = new Mock<IVolunteerRepository>();
-        volunteerRepositoryMock.Setup(d => d.UpdateAsync(volunteer, ct))
+        // setting up mocks
+        _volunteerRepositoryMock.Setup(d => d.UpdateAsync(volunteer, ct))
             .ReturnsAsync(error.ToErrorList());
-        volunteerRepositoryMock.Setup(d => d.GetByIdAsync(volunteer.Id, ct))
+        _volunteerRepositoryMock.Setup(d => d.GetByIdAsync(volunteer.Id, ct))
             .ReturnsAsync(volunteer);
 
-        var fileProviderMock = new Mock<IFileProvider>();
-
-        var transactionMock = new Mock<IDbTransaction>();
-        var unitOfWorkMock = new Mock<IUnitOfWork>();
-        transactionMock.Setup(d => d.Commit());
-        transactionMock.Setup(d => d.Rollback());
-        transactionMock.Setup(d => d.Dispose());
-        unitOfWorkMock.Setup(d => d.BeginTransaction(ct))
-            .ReturnsAsync(transactionMock.Object);
-
-        var validatorStub = new InlineValidator<UploadPetPhotosCommand>();
-        var loggerStub = new NullLogger<UploadPetPhotosHandler>();
+        _transactionMock.Setup(d => d.Commit());
+        _transactionMock.Setup(d => d.Rollback());
+        _transactionMock.Setup(d => d.Dispose());
+        _unitOfWorkMock.Setup(d => d.BeginTransaction(ct))
+            .ReturnsAsync(_transactionMock.Object);
 
         var handler = new UploadPetPhotosHandler(
-            volunteerRepositoryMock.Object,
-            fileProviderMock.Object,
-            unitOfWorkMock.Object,
-            validatorStub,
-            loggerStub);
+            _volunteerRepositoryMock.Object,
+            _fileProviderMock.Object,
+            _unitOfWorkMock.Object,
+            _validatorStub,
+            _loggerStub);
 
         // Act
         var result = await handler.HandleAsync(
