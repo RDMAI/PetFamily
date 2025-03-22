@@ -51,6 +51,7 @@ public class GetVolunteersHandler
         var sql = """
             SELECT id, first_name, last_name, father_name, email, description, experience_years, phone, requisites, social_networks, is_deleted
             FROM Volunteers
+            WHERE is_deleted = false
             ORDER BY last_name
             LIMIT @limit OFFSET @offset
             """;

@@ -15,6 +15,7 @@ using PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateMainInfo;
 using PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateRequisites;
 using PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateSocialNetworks;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
+using PetFamily.Application.PetsManagement.Volunteers.Queries.GetById;
 using PetFamily.Application.PetsManagement.Volunteers.Queries.GetVolunteers;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.DTOs;
@@ -34,6 +35,22 @@ public class VolunteersController : ApplicationController
     {
         var result = await volunteersHandler.HandleAsync(
             request.ToQuery(),
+            cancellationToken);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(
+        [FromServices] IQueryHandler<VolunteerDTO, GetVolunteerByIdQuery> volunteersHandler,
+        [FromRoute] Guid id,
+        //[FromRoute] GetVolunteerByIdRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await volunteersHandler.HandleAsync(
+            new GetVolunteerByIdQuery(id),
             cancellationToken);
 
         if (result.IsFailure) return Error(result.Error);
