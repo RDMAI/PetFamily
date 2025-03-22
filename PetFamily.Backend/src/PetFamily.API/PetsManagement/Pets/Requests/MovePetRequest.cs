@@ -1,3 +1,14 @@
-﻿namespace PetFamily.API.PetsManagement.Pets.Requests;
+﻿using PetFamily.Application.PetsManagement.Pets.Commands.MovePet;
 
-public record MovePetRequest(int NewSerialNumber);
+namespace PetFamily.API.PetsManagement.Pets.Requests;
+
+public record MovePetRequest(int NewSerialNumber)
+{
+    public MovePetCommand ToCommand(Guid volunteerId, Guid petId)
+    {
+        return new MovePetCommand(
+            volunteerId,
+            petId,
+            NewSerialNumber);
+    }
+}

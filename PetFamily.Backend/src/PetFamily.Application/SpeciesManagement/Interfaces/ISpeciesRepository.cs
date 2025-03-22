@@ -15,8 +15,4 @@ public interface ISpeciesRepository
     Task<Result<Species, ErrorList>> GetByIdAsync(
         SpeciesId Id,
         CancellationToken cancellationToken = default);
-
-    Task<Result<IEnumerable<Species>, ErrorList>> GetAsync(
-        SpeciesFilter filter,
-        CancellationToken cancellationToken = default);
 }

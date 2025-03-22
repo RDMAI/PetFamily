@@ -2,20 +2,21 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PetFamily.Infrastructure.DataBaseAccess.Write;
 using PetFamily.Infrastructure.Options;
 
 namespace PetFamily.Infrastructure.BackgroundServices;
 
 public class SoftDeleteCleanerBackgroundService : BackgroundService
 {
-    private readonly IDbContextFactory<ApplicationDBContext> _dbFactory;
+    private readonly IDbContextFactory<WriteDBContext> _dbFactory;
     private readonly ILogger<SoftDeleteCleanerBackgroundService> _logger;
 
     private readonly TimeSpan _checkPeriod;
     private readonly TimeSpan _timeToRestore;
 
     public SoftDeleteCleanerBackgroundService(
-        IDbContextFactory<ApplicationDBContext> dbFactory,
+        IDbContextFactory<WriteDBContext> dbFactory,
         ILogger<SoftDeleteCleanerBackgroundService> logger,
         IOptions<SoftDeleteCleanerOptions> options)
     {

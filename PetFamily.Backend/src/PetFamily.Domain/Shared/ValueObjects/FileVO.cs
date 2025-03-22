@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using PetFamily.Domain.Helpers;
+using System.Text.Json.Serialization;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
@@ -19,6 +20,7 @@ public record FileVO
         return new FileVO(pathToStorage, name);
     }
 
+    [JsonConstructor]
     private FileVO(string pathToStorage, string name)
     {
         PathToStorage = pathToStorage;
