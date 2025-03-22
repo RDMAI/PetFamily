@@ -9,26 +9,19 @@ using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Application.Shared.Messaging;
 using PetFamily.Application.SpeciesManagement.Interfaces;
 using PetFamily.Infrastructure.BackgroundServices;
-using PetFamily.Infrastructure.EFHelpers;
+using PetFamily.Infrastructure.DataBaseAccess.Read;
+using PetFamily.Infrastructure.DataBaseAccess.Write;
+using PetFamily.Infrastructure.DataBaseAccess.Write.Repositories;
 using PetFamily.Infrastructure.MessageQueues;
 using PetFamily.Infrastructure.Options;
 using PetFamily.Infrastructure.Providers;
-using PetFamily.Infrastructure.Repositories;
 
 namespace PetFamily.Infrastructure.Extensions;
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // for bg services and ws connections
-        services.AddDbContextFactory<ApplicationDBContext>();
-
-        // scopped dbcontext = different context for each web request
-        services.AddDbContext<ApplicationDBContext>();
-        services.AddScoped<IUnitOfWork, EFUnitOfWork>();
-
-        services.AddScoped<IVolunteerRepository, VolunteerRepository>();
-        services.AddScoped<ISpeciesRepository, SpeciesRepository>();
+        services.AddDatabaseAccess();
 
         services.AddSingleton<IMessageQueue<IEnumerable<FileInfoDTO>>, InMemoryMessageQueue<IEnumerable<FileInfoDTO>>>();
 
@@ -36,6 +29,25 @@ public static class DependencyInjection
         services.AddFileCleaner(configuration);
 
         services.AddConfiguredMinio(configuration);
+
+        return services;
+    }
+
+    private static IServiceCollection AddDatabaseAccess(this IServiceCollection services)
+    {
+        // dapper for reads
+        DapperConfigurationHelper.Configure();
+        services.AddTransient<IDBConnectionFactory, DapperConnectionFactory>();
+
+        // for bg services and ws connections
+        services.AddDbContextFactory<WriteDBContext>();
+
+        // scopped dbcontext = different context for each web request
+        services.AddDbContext<WriteDBContext>();
+        services.AddScoped<IUnitOfWork, EFUnitOfWork>();
+
+        services.AddScoped<IVolunteerRepository, VolunteerRepository>();
+        services.AddScoped<ISpeciesRepository, SpeciesRepository>();
 
         return services;
     }
@@ -89,7 +101,7 @@ public static class DependencyInjection
     {
         await using var scope = host.Services.CreateAsyncScope();
 
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<WriteDBContext>();
         await dbContext.Database.MigrateAsync();
     }
 

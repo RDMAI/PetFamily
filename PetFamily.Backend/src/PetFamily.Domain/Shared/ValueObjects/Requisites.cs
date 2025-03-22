@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using PetFamily.Domain.Helpers;
+using System.Text.Json.Serialization;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
@@ -21,6 +22,7 @@ public record Requisites
         return new Requisites(name, description, value);
     }
 
+    [JsonConstructor]
     private Requisites(string name, string description, string value)
     {
         Name = name;

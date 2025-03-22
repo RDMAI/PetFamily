@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using PetFamily.Domain.Helpers;
+using System.Text.Json.Serialization;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
@@ -18,6 +19,7 @@ public record SocialNetwork
         return new SocialNetwork(name, link);
     }
 
+    [JsonConstructor]
     private SocialNetwork(string name, string link)
     {
         Name = name;

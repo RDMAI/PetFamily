@@ -2,7 +2,7 @@
 using FluentValidation;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using PetFamily.Application.PetsManagement.Pets.UploadPetPhotos;
+using PetFamily.Application.PetsManagement.Pets.Commands.UploadPetPhotos;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;

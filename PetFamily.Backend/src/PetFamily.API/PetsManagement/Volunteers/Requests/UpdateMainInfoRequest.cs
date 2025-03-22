@@ -1,4 +1,6 @@
-﻿namespace PetFamily.API.PetsManagement.Volunteers.Requests;
+﻿using PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateMainInfo;
+
+namespace PetFamily.API.PetsManagement.Volunteers.Requests;
 
 public record UpdateMainInfoRequest(
     string FirstName,
@@ -7,4 +9,18 @@ public record UpdateMainInfoRequest(
     string Email,
     string Description,
     float ExperienceYears,
-    string Phone);
+    string Phone)
+{
+    public UpdateMainInfoCommand ToCommand(Guid volunteerId)
+    {
+        return new UpdateMainInfoCommand(
+            volunteerId,
+            FirstName,
+            LastName,
+            FatherName,
+            Email,
+            Description,
+            ExperienceYears,
+            Phone);
+    }
+}

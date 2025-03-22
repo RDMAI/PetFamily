@@ -1,28 +1,49 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PetFamily.API.PetsManagement.Pets.Extensions;
 using PetFamily.API.PetsManagement.Pets.Requests;
-using PetFamily.API.PetsManagement.Volunteers.Extensions;
 using PetFamily.API.PetsManagement.Volunteers.Requests;
 using PetFamily.API.Shared;
 using PetFamily.API.Shared.Processors;
 using PetFamily.API.Shared.Requests;
-using PetFamily.Application.PetsManagement.Pets.AddPet;
-using PetFamily.Application.PetsManagement.Pets.MovePet;
+using PetFamily.Application.PetsManagement.Pets.Commands.AddPet;
+using PetFamily.Application.PetsManagement.Pets.Commands.DeletePetPhotos;
+using PetFamily.Application.PetsManagement.Pets.Commands.MovePet;
+using PetFamily.Application.PetsManagement.Pets.Commands.UploadPetPhotos;
 using PetFamily.Application.PetsManagement.Pets.UploadPetPhotos;
-using PetFamily.Application.PetsManagement.Volunteers.CreateVolunteer;
-using PetFamily.Application.PetsManagement.Volunteers.DeleteVolunteer;
-using PetFamily.Application.PetsManagement.Volunteers.UpdateMainInfo;
-using PetFamily.Application.PetsManagement.Volunteers.UpdateRequisites;
-using PetFamily.Application.PetsManagement.Volunteers.UpdateSocialNetworks;
+using PetFamily.Application.PetsManagement.Volunteers.Commands.CreateVolunteer;
+using PetFamily.Application.PetsManagement.Volunteers.Commands.DeleteVolunteer;
+using PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateMainInfo;
+using PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateRequisites;
+using PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateSocialNetworks;
+using PetFamily.Application.PetsManagement.Volunteers.DTOs;
+using PetFamily.Application.PetsManagement.Volunteers.Queries.GetVolunteers;
+using PetFamily.Application.Shared.Abstractions;
+using PetFamily.Application.Shared.DTOs;
 using PetFamily.Domain.Helpers;
+using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
+using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 
 namespace PetFamily.API.PetsManagement;
 
 public class VolunteersController : ApplicationController
 {
+    [HttpGet]
+    public async Task<IActionResult> GetAll(
+        [FromServices] IQueryHandler<DataListPage<VolunteerDTO>, GetVolunteersQuery> volunteersHandler,
+        [FromQuery] GetVolunteersRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await volunteersHandler.HandleAsync(
+            request.ToQuery(),
+            cancellationToken);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        return Ok(result.Value);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromServices] CreateVolunteerHandler volunteerHandler,
+        [FromServices] ICommandHandler<VolunteerId, CreateVolunteerCommand> volunteerHandler,
         [FromBody] CreateVolunteerRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -38,7 +59,7 @@ public class VolunteersController : ApplicationController
 
     [HttpPatch("{id:guid}/main-info")]
     public async Task<IActionResult> UpdateMainInfo(
-        [FromServices] UpdateMainInfoHandler volunteerHandler,
+        [FromServices] ICommandHandler<VolunteerId, UpdateMainInfoCommand> volunteerHandler,
         [FromRoute] Guid id,
         [FromBody] UpdateMainInfoRequest request,
         CancellationToken cancellationToken = default)
@@ -55,7 +76,7 @@ public class VolunteersController : ApplicationController
 
     [HttpPatch("{id:guid}/social-networks")]
     public async Task<IActionResult> UpdateSocialNetworks(
-        [FromServices] UpdateSocialNetworksHandler volunteerHandler,
+        [FromServices] ICommandHandler<VolunteerId, UpdateSocialNetworksCommand> volunteerHandler,
         [FromRoute] Guid id,
         [FromBody] UpdateSocialNetworksRequest request,
         CancellationToken cancellationToken = default)
@@ -72,7 +93,7 @@ public class VolunteersController : ApplicationController
 
     [HttpPatch("{id:guid}/requisites")]
     public async Task<IActionResult> UpdateRequisites(
-        [FromServices] UpdateRequisitesHandler volunteerHandler,
+        [FromServices] ICommandHandler<VolunteerId, UpdateRequisitesCommand> volunteerHandler,
         [FromRoute] Guid id,
         [FromBody] UpdateRequisitesRequest request,
         CancellationToken cancellationToken = default)
@@ -89,7 +110,7 @@ public class VolunteersController : ApplicationController
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(
-        [FromServices] DeleteVolunteerHandler volunteerHandler,
+        [FromServices] ICommandHandler<VolunteerId, DeleteVolunteerCommand> volunteerHandler,
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
@@ -105,7 +126,7 @@ public class VolunteersController : ApplicationController
 
     [HttpPost("{id:guid}/pets")]
     public async Task<IActionResult> AddPet(
-        [FromServices] AddPetHandler petHandler,
+        [FromServices] ICommandHandler<PetId, AddPetCommand> petHandler,
         [FromRoute] Guid id,
         [FromBody] AddPetRequest request,
         CancellationToken cancellationToken = default)
@@ -124,7 +145,7 @@ public class VolunteersController : ApplicationController
 
     [HttpPatch("{volunteerId:guid}/pet/{petId:guid}/serial-number")]
     public async Task<IActionResult> MovePet(
-        [FromServices] MovePetHandler petHandler,
+        [FromServices] ICommandHandler<PetId, MovePetCommand> petHandler,
         [FromRoute] Guid volunteerId,
         [FromRoute] Guid petId,
         [FromBody] MovePetRequest request,
@@ -142,7 +163,7 @@ public class VolunteersController : ApplicationController
 
     [HttpPost("{volunteerId:guid}/pet/{petId:guid}/photos")]
     public async Task<IActionResult> UploadPetPhotos(
-        [FromServices] UploadPetPhotosHandler petHandler,
+        [FromServices] ICommandHandler<PetId, UploadPetPhotosCommand> petHandler,
         [FromRoute] Guid volunteerId,
         [FromRoute] Guid petId,
         [FromForm] UploadFilesRequest request,
@@ -167,7 +188,7 @@ public class VolunteersController : ApplicationController
 
     [HttpDelete("{volunteerId:guid}/pet/{petId:guid}/photos")]
     public async Task<IActionResult> DeletePetPhotos(
-        [FromServices] DeletePetPhotosHandler petHandler,
+        [FromServices] ICommandHandler<PetId, DeletePetPhotosCommand> petHandler,
         [FromRoute] Guid volunteerId,
         [FromRoute] Guid petId,
         [FromBody] DeleteFilesRequest request,
