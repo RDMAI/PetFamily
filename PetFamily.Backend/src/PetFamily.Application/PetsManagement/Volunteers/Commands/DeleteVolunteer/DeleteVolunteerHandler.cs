@@ -9,12 +9,12 @@ namespace PetFamily.Application.PetsManagement.Volunteers.Commands.DeleteVolunte
 public class DeleteVolunteerHandler
     : ICommandHandler<VolunteerId, DeleteVolunteerCommand>
 {
-    private readonly IVolunteerRepository _volunteerRepository;
+    private readonly IVolunteerAggregateRepository _volunteerRepository;
     private readonly DeleteVolunteerCommandValidator _validator;
     private readonly ILogger<DeleteVolunteerHandler> _logger;
 
     public DeleteVolunteerHandler(
-        IVolunteerRepository volunteerRepository,
+        IVolunteerAggregateRepository volunteerRepository,
         DeleteVolunteerCommandValidator validator,
         ILogger<DeleteVolunteerHandler> logger)
     {

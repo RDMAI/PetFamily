@@ -19,7 +19,7 @@ namespace PetFamily.Application.UnitTests.PetsManagement;
 public class UploadPetPhotosHandlerTests
 {
     // these get reinitilized for each test in class
-    private readonly Mock<IVolunteerRepository> _volunteerRepositoryMock = new();
+    private readonly Mock<IVolunteerAggregateRepository> _volunteerRepositoryMock = new();
     private readonly Mock<IFileProvider> _fileProviderMock = new();
     private readonly Mock<IDbTransaction> _transactionMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();

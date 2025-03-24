@@ -2,20 +2,20 @@
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Domain.SpeciesContext.ValueObjects;
-public record SpeciesName
+namespace PetFamily.Domain.SpeciesManagement.ValueObjects;
+public record BreedName
 {
     public string Value { get; }
 
-    public static Result<SpeciesName, Error> Create(string value)
+    public static Result<BreedName, Error> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value) || value.Length > Constants.MAX_LOW_TEXT_LENGTH)
             return ErrorHelper.General.ValueIsInvalid("Name");
 
-        return new SpeciesName(value);
+        return new BreedName(value);
     }
 
-    private SpeciesName(string value)
+    private BreedName(string value)
     {
         Value = value;
     }

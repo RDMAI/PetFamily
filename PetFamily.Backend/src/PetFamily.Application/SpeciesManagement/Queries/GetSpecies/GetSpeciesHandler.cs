@@ -1,28 +1,28 @@
 ﻿using CSharpFunctionalExtensions;
-using PetFamily.Application.PetsManagement.Volunteers.DTOs;
-using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.DTOs;
+using PetFamily.Application.SpeciesManagement.DTOs;
+using PetFamily.Application.SpeciesManagement.Interfaces;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Application.PetsManagement.Volunteers.Queries.GetVolunteers;
+namespace PetFamily.Application.SpeciesManagement.Queries.GetSpecies;
 
-public class GetVolunteersHandler
-    : IQueryHandler<DataListPage<VolunteerDTO>, GetVolunteersQuery>
+public class GetSpeciesHandler
+    : IQueryHandler<DataListPage<SpeciesDTO>, GetSpeciesQuery>
 {
-    private readonly IVolunteerAggregateDBReader _dbReader;
-    private readonly GetVolunteersQueryValidator _validator;
+    private readonly ISpeciesAggregateDBReader _dbReader;
+    private readonly GetSpeciesQueryValidator _validator;
 
-    public GetVolunteersHandler(
-        IVolunteerAggregateDBReader dbReader,
-        GetVolunteersQueryValidator validator)
+    public GetSpeciesHandler(
+        ISpeciesAggregateDBReader dbReader,
+        GetSpeciesQueryValidator validator)
     {
         _dbReader = dbReader;
         _validator = validator;
     }
 
-    public async Task<Result<DataListPage<VolunteerDTO>, ErrorList>> HandleAsync(
-        GetVolunteersQuery query,
+    public async Task<Result<DataListPage<SpeciesDTO>, ErrorList>> HandleAsync(
+        GetSpeciesQuery query,
         CancellationToken cancellationToken = default)
     {
         // query validation

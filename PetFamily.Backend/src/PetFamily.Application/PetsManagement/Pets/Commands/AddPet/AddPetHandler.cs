@@ -10,21 +10,21 @@ using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.SpeciesContext.ValueObjects;
+using PetFamily.Domain.SpeciesManagement.ValueObjects;
 
 namespace PetFamily.Application.PetsManagement.Pets.Commands.AddPet;
 
 public class AddPetHandler
     : ICommandHandler<PetId, AddPetCommand>
 {
-    private readonly IVolunteerRepository _volunteerRepository;
-    private readonly ISpeciesRepository _speciesRepository;
+    private readonly IVolunteerAggregateRepository _volunteerRepository;
+    private readonly ISpeciesAggregateRepository _speciesRepository;
     private readonly AddPetCommandValidator _validator;
     private readonly ILogger<AddPetHandler> _logger;
 
     public AddPetHandler(
-        IVolunteerRepository volunteerRepository,
-        ISpeciesRepository speciesRepository,
+        IVolunteerAggregateRepository volunteerRepository,
+        ISpeciesAggregateRepository speciesRepository,
         AddPetCommandValidator validator,
         ILogger<AddPetHandler> logger)
     {

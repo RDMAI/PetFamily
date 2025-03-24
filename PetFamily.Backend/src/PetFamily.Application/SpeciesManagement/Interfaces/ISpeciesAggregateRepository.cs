@@ -1,12 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
 using PetFamily.Application.SpeciesManagement.DTOs;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.SpeciesContext.Entities;
-using PetFamily.Domain.SpeciesContext.ValueObjects;
+using PetFamily.Domain.SpeciesManagement.Entities;
+using PetFamily.Domain.SpeciesManagement.ValueObjects;
 
 namespace PetFamily.Application.SpeciesManagement.Interfaces;
 
-public interface ISpeciesRepository
+public interface ISpeciesAggregateRepository
 {
     Task<Result<Species, ErrorList>> GetByBreedIdAsync(
         BreedId breedId,

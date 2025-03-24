@@ -3,13 +3,13 @@ using PetFamily.Application.Shared.Validation;
 using PetFamily.Application.SpeciesManagement.DTOs;
 using PetFamily.Domain.Helpers;
 
-namespace PetFamily.Application.PetsManagement.Volunteers.Queries.GetVolunteers;
+namespace PetFamily.Application.SpeciesManagement.Queries.GetSpecies;
 
-public class GetVolunteersQueryValidator : AbstractValidator<GetVolunteersQuery>
+public class GetSpeciesQueryValidator : AbstractValidator<GetSpeciesQuery>
 {
-    public GetVolunteersQueryValidator()
+    public GetSpeciesQueryValidator()
     {
-        RuleFor(q => q.Sort).MustBeValidSorting(typeof(BreedDTO));
+        RuleFor(q => q.Sort).MustBeValidSorting(typeof(SpeciesDTO));
 
         RuleFor(q => q.CurrentPage)
             .GreaterThanOrEqualTo(1)

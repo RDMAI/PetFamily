@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PetFamily.Domain.PetsManagement.Entities;
-using PetFamily.Domain.SpeciesContext.Entities;
+using PetFamily.Domain.SpeciesManagement.Entities;
 
 namespace PetFamily.Infrastructure.DataBaseAccess.Write;
 

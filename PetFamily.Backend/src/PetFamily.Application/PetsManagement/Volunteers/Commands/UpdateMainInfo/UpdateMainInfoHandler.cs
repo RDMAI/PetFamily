@@ -13,12 +13,12 @@ namespace PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateMainInf
     public class UpdateMainInfoHandler
         : ICommandHandler<VolunteerId, UpdateMainInfoCommand>
     {
-        private readonly IVolunteerRepository _volunteerRepository;
+        private readonly IVolunteerAggregateRepository _volunteerRepository;
         private readonly UpdateMainInfoCommandValidator _validator;
         private readonly ILogger<UpdateMainInfoHandler> _logger;
 
         public UpdateMainInfoHandler(
-            IVolunteerRepository volunteerRepository,
+            IVolunteerAggregateRepository volunteerRepository,
             UpdateMainInfoCommandValidator validator,
             ILogger<UpdateMainInfoHandler> logger)
         {

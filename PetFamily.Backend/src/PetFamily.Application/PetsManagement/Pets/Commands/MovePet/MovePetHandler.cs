@@ -12,12 +12,12 @@ namespace PetFamily.Application.PetsManagement.Pets.Commands.MovePet;
 public class MovePetHandler
     : ICommandHandler<PetId, MovePetCommand>
 {
-    private readonly IVolunteerRepository _volunteerRepository;
+    private readonly IVolunteerAggregateRepository _volunteerRepository;
     private readonly MovePetCommandValidator _validator;
     private readonly ILogger<MovePetHandler> _logger;
 
     public MovePetHandler(
-        IVolunteerRepository volunteerRepository,
+        IVolunteerAggregateRepository volunteerRepository,
         MovePetCommandValidator validator,
         ILogger<MovePetHandler> logger)
     {

@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using PetFamily.Application.Shared.DTOs;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
 
@@ -26,6 +27,36 @@ public static class CustomValidator
             if (result.IsSuccess) return;
 
             context.AddFailure(result.Error.Serialize());
+        });
+    }
+
+    public static IRuleBuilderOptionsConditions<T, IEnumerable<SortByDTO>> MustBeValidSorting<T>(
+        this IRuleBuilder<T, IEnumerable<SortByDTO>> ruleBuilder,
+        Type type)
+    {
+        var props = type.GetProperties().Select(p => p.Name);
+
+        return ruleBuilder.Custom((sortList, context) =>
+        {
+            foreach (var sort in sortList)
+                if (props.Contains(sort.Property) == false)
+                {
+                    context.AddFailure(ErrorHelper.General.ValueIsInvalid($"Property: {sort.Property}").Serialize());
+                }
+        });
+    }
+
+    public static IRuleBuilderOptionsConditions<T, IEnumerable<SortByDTO>> MustBeValidSorting<T>(
+        this IRuleBuilder<T, IEnumerable<SortByDTO>> ruleBuilder,
+        string[] propertyNames)
+    {
+        return ruleBuilder.Custom((sortList, context) =>
+        {
+            foreach (var sort in sortList)
+                if (propertyNames.Contains(sort.Property) == false)
+                {
+                    context.AddFailure(ErrorHelper.General.ValueIsInvalid($"Property: {sort.Property}").Serialize());
+                }
         });
     }
 

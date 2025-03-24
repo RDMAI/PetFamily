@@ -12,12 +12,12 @@ namespace PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateRequisi
 public class UpdateRequisitesHandler
     : ICommandHandler<VolunteerId, UpdateRequisitesCommand>
 {
-    private readonly IVolunteerRepository _volunteerRepository;
+    private readonly IVolunteerAggregateRepository _volunteerRepository;
     private readonly UpdateRequisitesCommandValidator _validator;
     private readonly ILogger<UpdateRequisitesHandler> _logger;
 
     public UpdateRequisitesHandler(
-        IVolunteerRepository volunteerRepository,
+        IVolunteerAggregateRepository volunteerRepository,
         UpdateRequisitesCommandValidator validator,
         ILogger<UpdateRequisitesHandler> logger)
     {

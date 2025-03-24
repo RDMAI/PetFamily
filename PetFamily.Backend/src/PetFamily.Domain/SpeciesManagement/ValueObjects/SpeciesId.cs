@@ -1,4 +1,4 @@
-﻿namespace PetFamily.Domain.SpeciesContext.ValueObjects;
+﻿namespace PetFamily.Domain.SpeciesManagement.ValueObjects;
 
 public record SpeciesId : IComparable<SpeciesId>
 {
