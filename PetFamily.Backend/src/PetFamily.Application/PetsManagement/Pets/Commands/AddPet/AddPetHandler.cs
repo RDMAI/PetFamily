@@ -4,6 +4,7 @@ using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.SpeciesManagement.Interfaces;
+using PetFamily.Application.SpeciesManagement.Queries.GetBreeds;
 using PetFamily.Domain.PetsManagement.Entities;
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
@@ -18,18 +19,18 @@ public class AddPetHandler
     : ICommandHandler<PetId, AddPetCommand>
 {
     private readonly IVolunteerAggregateRepository _volunteerRepository;
-    private readonly ISpeciesAggregateRepository _speciesRepository;
+    private readonly ISpeciesAggregateDBReader _speciesDBReader;
     private readonly AddPetCommandValidator _validator;
     private readonly ILogger<AddPetHandler> _logger;
 
     public AddPetHandler(
         IVolunteerAggregateRepository volunteerRepository,
-        ISpeciesAggregateRepository speciesRepository,
+        ISpeciesAggregateDBReader speciesDBReader,
         AddPetCommandValidator validator,
         ILogger<AddPetHandler> logger)
     {
         _volunteerRepository = volunteerRepository;
-        _speciesRepository = speciesRepository;
+        _speciesDBReader = speciesDBReader;
         _validator = validator;
         _logger = logger;
     }
@@ -57,10 +58,12 @@ public class AddPetHandler
 
         // validate breed
         var breedId = BreedId.Create(command.Pet.BreedId);
-        var petSpeciesResult = await _speciesRepository.GetByBreedIdAsync(breedId, cancellationToken);
-        if (petSpeciesResult.IsFailure)
-            return petSpeciesResult.Error;
-        var petBreed = PetBreed.Create(breedId, petSpeciesResult.Value.Id).Value;
+        var breedResult = await _speciesDBReader.GetBreedByIdAsync(breedId.Value, cancellationToken);
+        if (breedResult.IsFailure)
+            return breedResult.Error;
+
+        var speciesId = SpeciesId.Create(breedResult.Value.SpeciesId);
+        var petBreed = PetBreed.Create(breedId, speciesId).Value;
 
         var petId = PetId.GenerateNew();
         var petName = PetName.Create(command.Pet.Name).Value;

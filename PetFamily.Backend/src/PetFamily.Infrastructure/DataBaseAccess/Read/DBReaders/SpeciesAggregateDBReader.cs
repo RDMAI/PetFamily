@@ -7,11 +7,13 @@ using PetFamily.Application.SpeciesManagement.DTOs;
 using PetFamily.Application.SpeciesManagement.Interfaces;
 using PetFamily.Application.SpeciesManagement.Queries.GetBreeds;
 using PetFamily.Application.SpeciesManagement.Queries.GetSpecies;
+using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
 using PetFamily.Infrastructure.DataBaseAccess.Read.Helpers;
 using System.Text;
 
 namespace PetFamily.Infrastructure.DataBaseAccess.Read.DBReaders;
+
 public class SpeciesAggregateDBReader : ISpeciesAggregateDBReader
 {
     private readonly IDBConnectionFactory _dBConnectionFactory;
@@ -63,24 +65,50 @@ public class SpeciesAggregateDBReader : ISpeciesAggregateDBReader
         return Result.Success<DataListPage<SpeciesDTO>, ErrorList>(result);
     }
 
+    public async Task<Result<SpeciesDTO, ErrorList>> GetByIdAsync(
+        Guid SpeciesId,
+        CancellationToken cancellationToken = default)
+    {
+        using var connection = _dBConnectionFactory.Create();
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@id", SpeciesId);
+
+        var sql = new StringBuilder(
+            """
+            SELECT id, name
+            FROM Species
+            WHERE id = @id
+            LIMIT 1
+            """
+        );
+
+        var entity = await connection.QueryFirstAsync<SpeciesDTO>(sql.ToString(), parameters);
+
+        if (entity == null)
+            return ErrorHelper.General.NotFound(SpeciesId).ToErrorList();
+
+        return Result.Success<SpeciesDTO, ErrorList>(entity);
+    }
+
     public async Task<Result<DataListPage<BreedDTO>, ErrorList>> GetBreedsAsync(
         GetBreedsQuery query,
         CancellationToken cancellationToken = default)
     {
         using var connection = _dBConnectionFactory.Create();
-
+        
+        var parameters = new DynamicParameters();
+        parameters.Add("@speciesId", query.SpeciesId);
+        
         var totalCount = await connection.ExecuteScalarAsync<int>("""
             SELECT Count(*)
             FROM Breeds
             WHERE species_id = @speciesId
-            """);
-
-        var parameters = new DynamicParameters();
-        parameters.Add("@speciesId", query.SpeciesId);
+            """, parameters);
 
         var sql = new StringBuilder(
             """
-            SELECT id, name
+            SELECT id, name, species_id
             FROM Breeds
             WHERE species_id = @speciesId
             """);
@@ -98,5 +126,31 @@ public class SpeciesAggregateDBReader : ISpeciesAggregateDBReader
         };
 
         return Result.Success<DataListPage<BreedDTO>, ErrorList>(result);
+    }
+
+    public async Task<Result<BreedDTO, ErrorList>> GetBreedByIdAsync(
+        Guid BreedId,
+        CancellationToken cancellationToken = default)
+    {
+        using var connection = _dBConnectionFactory.Create();
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@id", BreedId);
+
+        var sql = new StringBuilder(
+            """
+            SELECT id, name, species_id
+            FROM Breeds
+            WHERE id = @id
+            LIMIT 1
+            """
+        );
+
+        var entity = await connection.QueryFirstAsync<BreedDTO>(sql.ToString(), parameters);
+
+        if (entity == null)
+            return ErrorHelper.General.NotFound(BreedId).ToErrorList();
+
+        return Result.Success<BreedDTO, ErrorList>(entity);
     }
 }

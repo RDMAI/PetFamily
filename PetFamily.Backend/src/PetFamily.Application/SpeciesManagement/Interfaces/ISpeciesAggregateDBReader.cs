@@ -13,7 +13,15 @@ public interface ISpeciesAggregateDBReader
         GetSpeciesQuery query,
         CancellationToken cancellationToken = default);
 
+    public Task<Result<SpeciesDTO, ErrorList>> GetByIdAsync(
+        Guid SpeciesId,
+        CancellationToken cancellationToken = default);
+
     public Task<Result<DataListPage<BreedDTO>, ErrorList>> GetBreedsAsync(
         GetBreedsQuery query,
+        CancellationToken cancellationToken = default);
+
+    public Task<Result<BreedDTO, ErrorList>> GetBreedByIdAsync(
+        Guid BreedId,
         CancellationToken cancellationToken = default);
 }

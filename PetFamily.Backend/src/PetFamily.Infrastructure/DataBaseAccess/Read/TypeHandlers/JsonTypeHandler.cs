@@ -2,7 +2,7 @@
 using System.Data;
 using System.Text.Json;
 
-namespace PetFamily.Infrastructure.DataBaseAccess.Read;
+namespace PetFamily.Infrastructure.DataBaseAccess.Read.TypeHandlers;
 public class JsonTypeHandler<T> : SqlMapper.TypeHandler<T>
 {
     public override T Parse(object value)
