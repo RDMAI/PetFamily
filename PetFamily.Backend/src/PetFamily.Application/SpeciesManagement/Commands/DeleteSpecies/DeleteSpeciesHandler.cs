@@ -1,9 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Shared.Abstractions;
+using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Application.SpeciesManagement.Interfaces;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.SpeciesManagement.ValueObjects;
+using System.Text;
 
 namespace PetFamily.Application.SpeciesManagement.Commands.DeleteSpecies;
 
@@ -11,18 +14,18 @@ public class DeleteSpeciesHandler
     : ICommandHandler<SpeciesId, DeleteSpeciesCommand>
 {
     private readonly ISpeciesAggregateRepository _speciesRepository;
-    private readonly ISpeciesAggregateDBReader _speciesDBReader;
+    private readonly IDBConnectionFactory _dBConnectionFactory;
     private readonly DeleteSpeciesCommandValidator _validator;
     private readonly ILogger<DeleteSpeciesHandler> _logger;
 
     public DeleteSpeciesHandler(
         ISpeciesAggregateRepository speciesRepository,
-        ISpeciesAggregateDBReader speciesDBReader,
+        IDBConnectionFactory dBConnectionFactory,
         DeleteSpeciesCommandValidator validator,
         ILogger<DeleteSpeciesHandler> logger)
     {
         _speciesRepository = speciesRepository;
-        _speciesDBReader = speciesDBReader;
+        _dBConnectionFactory = dBConnectionFactory;
         _validator = validator;
         _logger = logger;
     }
@@ -48,7 +51,7 @@ public class DeleteSpeciesHandler
             return entityResult.Error;
 
         // check if there are any pet of this species
-        var checkPetsResult = await _speciesDBReader.ArePetsWithSpeciesIdNotExistAsync(speciesId.Value, cancellationToken);
+        var checkPetsResult = await ArePetsWithSpeciesIdNotExistAsync(speciesId.Value, cancellationToken);
         if (checkPetsResult.IsFailure)  // if error - pets exist
             return checkPetsResult.Error;
 
@@ -58,5 +61,33 @@ public class DeleteSpeciesHandler
         _logger.LogInformation("Species with id {Id} deleted", speciesId.Value);
 
         return speciesId;
+    }
+
+    public async Task<UnitResult<ErrorList>> ArePetsWithSpeciesIdNotExistAsync(
+        Guid SpeciesId,
+        CancellationToken cancellationToken = default)
+    {
+        using var connection = _dBConnectionFactory.Create();
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@speciesId", SpeciesId);
+
+        var sql = new StringBuilder(
+            """
+            SELECT id
+            FROM Pets
+            WHERE species_id = @speciesId
+            LIMIT 1
+            """
+        );
+
+        var result = await connection.QueryAsync<Guid>(sql.ToString(), parameters);
+        if (result is not null && result.Any())
+            return Error.Conflict(
+                "relation.exist",
+                $"Cannot delete species {SpeciesId}. It has related pet: {result.First()}")
+                .ToErrorList();
+
+        return UnitResult.Success<ErrorList>();
     }
 }

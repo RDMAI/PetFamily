@@ -2,7 +2,7 @@
 using PetFamily.Application.Shared.DTOs;
 using System.Text;
 
-namespace PetFamily.Infrastructure.DataBaseAccess.Read.Helpers;
+namespace PetFamily.Application.Shared.Helpers;
 
 public static class DapperSQLHelper
 {
@@ -19,7 +19,7 @@ public static class DapperSQLHelper
         {
             sqlBuilder.Append($" {s.Property}");
 
-            var dir = s.IsAscending? "asc" : "desc";
+            var dir = s.IsAscending ? "asc" : "desc";
             sqlBuilder.Append($" {dir},");
         }
         sqlBuilder.Remove(sqlBuilder.Length - 1, 1);  // removes the last ","

@@ -1,25 +1,32 @@
 ﻿using CSharpFunctionalExtensions;
+using Dapper;
+using Microsoft.Extensions.Logging;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.DTOs;
+using PetFamily.Application.Shared.Helpers;
+using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Application.SpeciesManagement.DTOs;
-using PetFamily.Application.SpeciesManagement.Interfaces;
 using PetFamily.Application.SpeciesManagement.Queries.GetBreeds;
 using PetFamily.Domain.Shared;
+using System.Text;
 
 namespace PetFamily.Application.SpeciesManagement.Queries.GetSpecies;
 
 public class GetBreedsHandler
     : IQueryHandler<DataListPage<BreedDTO>, GetBreedsQuery>
 {
-    private readonly ISpeciesAggregateDBReader _dbReader;
+    private readonly IDBConnectionFactory _dBConnectionFactory;
     private readonly GetBreedsQueryValidator _validator;
+    private readonly ILogger<GetBreedsHandler> _logger;
 
     public GetBreedsHandler(
-        ISpeciesAggregateDBReader dbReader,
-        GetBreedsQueryValidator validator)
+        IDBConnectionFactory dBConnectionFactory,
+        GetBreedsQueryValidator validator,
+        ILogger<GetBreedsHandler> logger)
     {
-        _dbReader = dbReader;
+        _dBConnectionFactory = dBConnectionFactory;
         _validator = validator;
+        _logger = logger;
     }
 
     public async Task<Result<DataListPage<BreedDTO>, ErrorList>> HandleAsync(
@@ -36,6 +43,40 @@ public class GetBreedsHandler
             return new ErrorList(errors);
         }
 
-        return await _dbReader.GetBreedsAsync(query, cancellationToken);
+        using var connection = _dBConnectionFactory.Create();
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@speciesId", query.SpeciesId);
+
+        var totalCount = await connection.ExecuteScalarAsync<int>("""
+            SELECT Count(*)
+            FROM Breeds
+            WHERE species_id = @speciesId
+            """, parameters);
+
+        var sql = new StringBuilder(
+            """
+            SELECT id, name, species_id
+            FROM Breeds
+            WHERE species_id = @speciesId
+            """);
+
+        if (query.Sort != null && query.Sort.Any())
+            DapperSQLHelper.ApplySorting(sql, query.Sort);
+        DapperSQLHelper.ApplyPagination(sql, parameters, query.CurrentPage, query.PageSize);
+
+        _logger.LogInformation("Dapper SQL: {sql}", sql.ToString());
+
+        var entities = await connection.QueryAsync<BreedDTO>(sql.ToString(), parameters);
+
+        var result = new DataListPage<BreedDTO>
+        {
+            TotalCount = totalCount,
+            PageNumber = query.CurrentPage,
+            PageSize = query.PageSize,
+            Data = entities
+        };
+
+        return Result.Success<DataListPage<BreedDTO>, ErrorList>(result);
     }
 }

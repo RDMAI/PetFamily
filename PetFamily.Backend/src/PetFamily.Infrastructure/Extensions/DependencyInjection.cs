@@ -10,7 +10,6 @@ using PetFamily.Application.Shared.Messaging;
 using PetFamily.Application.SpeciesManagement.Interfaces;
 using PetFamily.Infrastructure.BackgroundServices;
 using PetFamily.Infrastructure.DataBaseAccess.Read;
-using PetFamily.Infrastructure.DataBaseAccess.Read.DBReaders;
 using PetFamily.Infrastructure.DataBaseAccess.Read.Helpers;
 using PetFamily.Infrastructure.DataBaseAccess.Write;
 using PetFamily.Infrastructure.DataBaseAccess.Write.Repositories;
@@ -40,8 +39,6 @@ public static class DependencyInjection
         // dapper for reads
         DapperConfigurationHelper.Configure();
         services.AddTransient<IDBConnectionFactory, DapperConnectionFactory>();
-        services.AddScoped<IVolunteerAggregateDBReader, VolunteerAggregateDBReader>();
-        services.AddScoped<ISpeciesAggregateDBReader, SpeciesAggregateDBReader>();
 
         // for bg services and ws connections
         services.AddDbContextFactory<WriteDBContext>();

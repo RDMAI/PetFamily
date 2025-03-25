@@ -1,23 +1,31 @@
 ﻿using CSharpFunctionalExtensions;
+using Dapper;
+using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Application.Shared.Abstractions;
+using PetFamily.Application.Shared.Interfaces;
+using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
+using System.Text;
 
 namespace PetFamily.Application.PetsManagement.Volunteers.Queries.GetById;
 
 public class GetVolunteerByIdHandler
     : IQueryHandler<VolunteerDTO, GetVolunteerByIdQuery>
 {
-    private readonly IVolunteerAggregateDBReader _dbReader;
+    private readonly IDBConnectionFactory _dBConnectionFactory;
     private readonly GetVolunteerByIdQueryValidator _validator;
+    private readonly ILogger<GetVolunteerByIdHandler> _logger;
 
     public GetVolunteerByIdHandler(
-        IVolunteerAggregateDBReader dbReader,
-        GetVolunteerByIdQueryValidator validator)
+        IDBConnectionFactory dBConnectionFactory,
+        GetVolunteerByIdQueryValidator validator,
+        ILogger<GetVolunteerByIdHandler> logger)
     {
-        _dbReader = dbReader;
+        _dBConnectionFactory = dBConnectionFactory;
         _validator = validator;
+        _logger = logger;
     }
 
     public async Task<Result<VolunteerDTO, ErrorList>> HandleAsync(
@@ -34,6 +42,24 @@ public class GetVolunteerByIdHandler
             return new ErrorList(errors);
         }
 
-        return await _dbReader.GetByIdAsync(query, cancellationToken);
+        using var connection = _dBConnectionFactory.Create();
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@id", query.Id);
+
+        var sql = new StringBuilder(
+            """
+            SELECT id, first_name, last_name, father_name, email, description, experience_years, phone, requisites, social_networks, is_deleted
+            FROM Volunteers
+            WHERE id = @id and is_deleted = false
+            LIMIT 1
+            """);
+
+        var entity = await connection.QueryFirstAsync<VolunteerDTO>(sql.ToString(), parameters);
+
+        if (entity == null)
+            return ErrorHelper.General.NotFound(query.Id).ToErrorList();
+
+        return Result.Success<VolunteerDTO, ErrorList>(entity);
     }
 }

@@ -1,24 +1,31 @@
 ﻿using CSharpFunctionalExtensions;
+using Dapper;
+using Microsoft.Extensions.Logging;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.DTOs;
+using PetFamily.Application.Shared.Helpers;
+using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Application.SpeciesManagement.DTOs;
-using PetFamily.Application.SpeciesManagement.Interfaces;
 using PetFamily.Domain.Shared;
+using System.Text;
 
 namespace PetFamily.Application.SpeciesManagement.Queries.GetSpecies;
 
 public class GetSpeciesHandler
     : IQueryHandler<DataListPage<SpeciesDTO>, GetSpeciesQuery>
 {
-    private readonly ISpeciesAggregateDBReader _dbReader;
+    private readonly IDBConnectionFactory _dBConnectionFactory;
     private readonly GetSpeciesQueryValidator _validator;
+    private readonly ILogger<GetSpeciesHandler> _logger;
 
     public GetSpeciesHandler(
-        ISpeciesAggregateDBReader dbReader,
-        GetSpeciesQueryValidator validator)
+        IDBConnectionFactory dBConnectionFactory,
+        GetSpeciesQueryValidator validator,
+        ILogger<GetSpeciesHandler> logger)
     {
-        _dbReader = dbReader;
+        _dBConnectionFactory = dBConnectionFactory;
         _validator = validator;
+        _logger = logger;
     }
 
     public async Task<Result<DataListPage<SpeciesDTO>, ErrorList>> HandleAsync(
@@ -35,6 +42,37 @@ public class GetSpeciesHandler
             return new ErrorList(errors);
         }
 
-        return await _dbReader.GetAsync(query, cancellationToken);
+        using var connection = _dBConnectionFactory.Create();
+
+        var totalCount = await connection.ExecuteScalarAsync<int>("""
+            SELECT Count(*)
+            FROM Species
+            """);
+
+        var parameters = new DynamicParameters();
+        var sql = new StringBuilder(
+            """
+            SELECT id, name
+            FROM Species
+            """);
+
+        if (query.Sort.Any())
+            DapperSQLHelper.ApplySorting(sql, query.Sort);
+
+        DapperSQLHelper.ApplyPagination(sql, parameters, query.CurrentPage, query.PageSize);
+
+        _logger.LogInformation("Dapper SQL: {sql}", sql.ToString());
+
+        var entities = await connection.QueryAsync<SpeciesDTO>(sql.ToString(), parameters);
+
+        var result = new DataListPage<SpeciesDTO>
+        {
+            TotalCount = totalCount,
+            PageNumber = query.CurrentPage,
+            PageSize = query.PageSize,
+            Data = entities
+        };
+
+        return Result.Success<DataListPage<SpeciesDTO>, ErrorList>(result);
     }
 }

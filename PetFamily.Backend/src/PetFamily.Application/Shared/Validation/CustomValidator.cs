@@ -32,14 +32,12 @@ public static class CustomValidator
 
     public static IRuleBuilderOptionsConditions<T, IEnumerable<SortByDTO>> MustBeValidSorting<T>(
         this IRuleBuilder<T, IEnumerable<SortByDTO>> ruleBuilder,
-        Type type)
+        IEnumerable<string> propertyNames)
     {
-        var props = type.GetProperties().Select(p => p.Name);
-
         return ruleBuilder.Custom((sortList, context) =>
         {
             foreach (var sort in sortList)
-                if (props.Contains(sort.Property) == false)
+                if (propertyNames.Contains(sort.Property, StringComparer.OrdinalIgnoreCase) == false)
                 {
                     context.AddFailure(ErrorHelper.General.ValueIsInvalid($"Property: {sort.Property}").Serialize());
                 }
@@ -48,16 +46,11 @@ public static class CustomValidator
 
     public static IRuleBuilderOptionsConditions<T, IEnumerable<SortByDTO>> MustBeValidSorting<T>(
         this IRuleBuilder<T, IEnumerable<SortByDTO>> ruleBuilder,
-        string[] propertyNames)
+        Type type)
     {
-        return ruleBuilder.Custom((sortList, context) =>
-        {
-            foreach (var sort in sortList)
-                if (propertyNames.Contains(sort.Property) == false)
-                {
-                    context.AddFailure(ErrorHelper.General.ValueIsInvalid($"Property: {sort.Property}").Serialize());
-                }
-        });
+        var props = type.GetProperties().Select(p => p.Name);
+
+        return MustBeValidSorting(ruleBuilder, props);
     }
 
     public static IRuleBuilderOptionsConditions<T, TElement> MustBeNotNull<T, TElement>(
