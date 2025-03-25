@@ -11,14 +11,14 @@ using PetFamily.Domain.Shared;
 namespace PetFamily.Application.PetsManagement.Pets.UploadPetPhotos;
 public class GetPetPhotosHandler
 {
-    private readonly IVolunteerRepository _volunteerRepository;
+    private readonly IVolunteerAggregateRepository _volunteerRepository;
     private readonly IFileProvider _fileProvider;
     private readonly IUnitOfWork _transactionHelper;
     private readonly GetPetPhotosCommandValidator _validator;
     private readonly ILogger<GetPetPhotosHandler> _logger;
 
     public GetPetPhotosHandler(
-        IVolunteerRepository volunteerRepository,
+        IVolunteerAggregateRepository volunteerRepository,
         IFileProvider fileProvider,
         IUnitOfWork transactionHelper,
         GetPetPhotosCommandValidator validator,

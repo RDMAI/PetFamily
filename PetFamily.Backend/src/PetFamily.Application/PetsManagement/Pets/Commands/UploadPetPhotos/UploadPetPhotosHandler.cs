@@ -16,7 +16,7 @@ namespace PetFamily.Application.PetsManagement.Pets.Commands.UploadPetPhotos;
 public class UploadPetPhotosHandler
     : ICommandHandler<PetId, UploadPetPhotosCommand>
 {
-    private readonly IVolunteerRepository _volunteerRepository;
+    private readonly IVolunteerAggregateRepository _volunteerRepository;
     private readonly IFileProvider _fileProvider;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageQueue<IEnumerable<FileInfoDTO>> _fileMessageQueue;
@@ -24,7 +24,7 @@ public class UploadPetPhotosHandler
     private readonly ILogger<UploadPetPhotosHandler> _logger;
 
     public UploadPetPhotosHandler(
-        IVolunteerRepository volunteerRepository,
+        IVolunteerAggregateRepository volunteerRepository,
         IFileProvider fileProvider,
         IUnitOfWork unitOfWork,
         IMessageQueue<IEnumerable<FileInfoDTO>> fileMessageQueue,

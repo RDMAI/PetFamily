@@ -1,11 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
-using FluentValidation;
+using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.DTOs;
+using PetFamily.Application.Shared.Helpers;
 using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Domain.Shared;
+using System.Text;
 
 namespace PetFamily.Application.PetsManagement.Volunteers.Queries.GetVolunteers;
 
@@ -14,13 +16,16 @@ public class GetVolunteersHandler
 {
     private readonly IDBConnectionFactory _dBConnectionFactory;
     private readonly GetVolunteersQueryValidator _validator;
+    private readonly ILogger<GetVolunteersHandler> _logger;
 
     public GetVolunteersHandler(
         IDBConnectionFactory dBConnectionFactory,
-        GetVolunteersQueryValidator validator)
+        GetVolunteersQueryValidator validator,
+        ILogger<GetVolunteersHandler> logger)
     {
         _dBConnectionFactory = dBConnectionFactory;
         _validator = validator;
+        _logger = logger;
     }
 
     public async Task<Result<DataListPage<VolunteerDTO>, ErrorList>> HandleAsync(
@@ -42,28 +47,35 @@ public class GetVolunteersHandler
         var totalCount = await connection.ExecuteScalarAsync<int>("""
             SELECT Count(*)
             FROM Volunteers
+            WHERE is_deleted = false
             """);
 
         var parameters = new DynamicParameters();
         parameters.Add("@offset", (query.CurrentPage - 1) * query.PageSize);
         parameters.Add("@limit", query.PageSize);
 
-        var sql = """
+        var sql = new StringBuilder(
+            """
             SELECT id, first_name, last_name, father_name, email, description, experience_years, phone, requisites, social_networks, is_deleted
             FROM Volunteers
             WHERE is_deleted = false
-            ORDER BY last_name
-            LIMIT @limit OFFSET @offset
-            """;
+            """);
 
-        var volunteers = await connection.QueryAsync<VolunteerDTO>(sql, parameters);
+        if (query.Sort.Any())
+            DapperSQLHelper.ApplySorting(sql, query.Sort);
+
+        DapperSQLHelper.ApplyPagination(sql, parameters, query.CurrentPage, query.PageSize);
+
+        _logger.LogInformation("Dapper SQL: {sql}", sql.ToString());
+
+        var entities = await connection.QueryAsync<VolunteerDTO>(sql.ToString(), parameters);
 
         var result = new DataListPage<VolunteerDTO>
         {
             TotalCount = totalCount,
             PageNumber = query.CurrentPage,
             PageSize = query.PageSize,
-            Data = volunteers
+            Data = entities
         };
 
         return Result.Success<DataListPage<VolunteerDTO>, ErrorList>(result);

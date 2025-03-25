@@ -3,7 +3,7 @@ using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.SpeciesContext.ValueObjects;
+using PetFamily.Domain.SpeciesManagement.ValueObjects;
 
 namespace PetFamily.Application.UnitTests.Helpers;
 

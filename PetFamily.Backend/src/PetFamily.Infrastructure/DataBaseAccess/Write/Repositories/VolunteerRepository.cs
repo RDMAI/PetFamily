@@ -10,7 +10,7 @@ using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Infrastructure.DataBaseAccess.Write.Repositories;
 
-public class VolunteerRepository : IVolunteerRepository
+public class VolunteerRepository : IVolunteerAggregateRepository
 {
     private readonly WriteDBContext _context;
 

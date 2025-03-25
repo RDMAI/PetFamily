@@ -5,22 +5,14 @@ using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Application.PetsManagement.Volunteers.Interfaces;
-public interface IVolunteerRepository
+public interface IVolunteerAggregateRepository
 {
     Task<Result<Volunteer, ErrorList>> GetByIdAsync(
         VolunteerId Id,
         CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Returns error if volunteer with the same 
-    /// </summary>
-    /// <param name="email"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
     Task<UnitResult<ErrorList>> IsEmailNotExistAsync(
         Email email,
         CancellationToken cancellationToken = default);
-
     Task<UnitResult<ErrorList>> IsPhoneNotExistAsync(
         Phone phone,
         CancellationToken cancellationToken = default);

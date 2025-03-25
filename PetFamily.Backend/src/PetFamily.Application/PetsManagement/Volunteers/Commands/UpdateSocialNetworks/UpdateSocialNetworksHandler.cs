@@ -12,12 +12,12 @@ namespace PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateSocialN
 public class UpdateSocialNetworksHandler
     : ICommandHandler<VolunteerId, UpdateSocialNetworksCommand>
 {
-    private readonly IVolunteerRepository _volunteerRepository;
+    private readonly IVolunteerAggregateRepository _volunteerRepository;
     private readonly UpdateSocialNetworksCommandValidator _validator;
     private readonly ILogger<UpdateSocialNetworksHandler> _logger;
 
     public UpdateSocialNetworksHandler(
-        IVolunteerRepository volunteerRepository,
+        IVolunteerAggregateRepository volunteerRepository,
         UpdateSocialNetworksCommandValidator validator,
         ILogger<UpdateSocialNetworksHandler> logger)
     {

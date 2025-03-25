@@ -1,15 +1,14 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.SpeciesManagement.DTOs;
 using PetFamily.Application.SpeciesManagement.Interfaces;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.SpeciesContext.Entities;
-using PetFamily.Domain.SpeciesContext.ValueObjects;
+using PetFamily.Domain.SpeciesManagement.Entities;
+using PetFamily.Domain.SpeciesManagement.ValueObjects;
 
 namespace PetFamily.Infrastructure.DataBaseAccess.Write.Repositories;
 
-public class SpeciesRepository : ISpeciesRepository
+public class SpeciesRepository : ISpeciesAggregateRepository
 {
     private readonly WriteDBContext _context;
 
@@ -44,5 +43,20 @@ public class SpeciesRepository : ISpeciesRepository
             return ErrorHelper.General.NotFound().ToErrorList();
 
         return entity;
+    }
+
+    public async Task<Result<SpeciesId, ErrorList>> HardDeleteAsync(
+        Species entity,
+        CancellationToken cancellationToken = default)
+    {
+        _context.Species.Remove(entity);
+        await _context.SaveChangesAsync(cancellationToken);
+        return entity.Id;
+    }
+
+    public async Task<Result<SpeciesId, ErrorList>> UpdateAsync(Species entity, CancellationToken cancellationToken = default)
+    {
+        await _context.SaveChangesAsync(cancellationToken);
+        return entity.Id;
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.SpeciesContext.Entities;
-using PetFamily.Domain.SpeciesContext.ValueObjects;
+using PetFamily.Domain.SpeciesManagement.Entities;
+using PetFamily.Domain.SpeciesManagement.ValueObjects;
 
 namespace PetFamily.Infrastructure.DataBaseAccess.Write.Configurations;
 
@@ -29,7 +29,9 @@ public class SpeciesConfiguration : IEntityTypeConfiguration<Species>
 
         builder.HasMany(d => d.Breeds)
             .WithOne()
-            .HasForeignKey("species_id");
+            .HasForeignKey("species_id")
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired();
 
         builder.Navigation(d => d.Breeds).AutoInclude();
     }

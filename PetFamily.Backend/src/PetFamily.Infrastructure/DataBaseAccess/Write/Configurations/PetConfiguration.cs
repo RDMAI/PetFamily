@@ -4,7 +4,7 @@ using PetFamily.Domain.PetsManagement.Entities;
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.SpeciesContext.ValueObjects;
+using PetFamily.Domain.SpeciesManagement.ValueObjects;
 using PetFamily.Infrastructure.DataBaseAccess.Write.Converters;
 
 namespace PetFamily.Infrastructure.DataBaseAccess.Write.Configurations;

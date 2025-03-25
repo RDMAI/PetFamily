@@ -1,4 +1,4 @@
-﻿using PetFamily.Domain.SpeciesContext.ValueObjects;
+﻿using PetFamily.Domain.SpeciesManagement.ValueObjects;
 
 namespace PetFamily.Application.SpeciesManagement.DTOs;
 

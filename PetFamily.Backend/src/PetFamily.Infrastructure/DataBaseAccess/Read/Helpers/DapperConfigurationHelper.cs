@@ -1,7 +1,7 @@
 ﻿using PetFamily.Domain.Shared.ValueObjects;
-using System.Text.Json.Serialization;
+using PetFamily.Infrastructure.DataBaseAccess.Read.TypeHandlers;
 
-namespace PetFamily.Infrastructure.DataBaseAccess.Read;
+namespace PetFamily.Infrastructure.DataBaseAccess.Read.Helpers;
 
 public class DapperConfigurationHelper
 {

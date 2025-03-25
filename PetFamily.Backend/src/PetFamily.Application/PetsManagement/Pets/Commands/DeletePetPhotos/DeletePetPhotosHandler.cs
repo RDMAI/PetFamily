@@ -13,14 +13,14 @@ namespace PetFamily.Application.PetsManagement.Pets.Commands.DeletePetPhotos;
 public class DeletePetPhotosHandler
     : ICommandHandler<PetId, DeletePetPhotosCommand>
 {
-    private readonly IVolunteerRepository _volunteerRepository;
+    private readonly IVolunteerAggregateRepository _volunteerRepository;
     private readonly IFileProvider _fileProvider;
     private readonly IUnitOfWork _transactionHelper;
     private readonly DeletePetPhotosCommandValidator _validator;
     private readonly ILogger<DeletePetPhotosHandler> _logger;
 
     public DeletePetPhotosHandler(
-        IVolunteerRepository volunteerRepository,
+        IVolunteerAggregateRepository volunteerRepository,
         IFileProvider fileProvider,
         IUnitOfWork transactionHelper,
         DeletePetPhotosCommandValidator validator,

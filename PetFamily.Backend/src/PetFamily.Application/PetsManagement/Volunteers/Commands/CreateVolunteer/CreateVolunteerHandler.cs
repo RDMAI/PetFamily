@@ -4,7 +4,6 @@ using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.DTOs;
-using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsManagement.Entities;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
@@ -16,12 +15,12 @@ namespace PetFamily.Application.PetsManagement.Volunteers.Commands.CreateVolunte
     public class CreateVolunteerHandler
         : ICommandHandler<VolunteerId, CreateVolunteerCommand>
     {
-        private readonly IVolunteerRepository _volunteerRepository;
+        private readonly IVolunteerAggregateRepository _volunteerRepository;
         private readonly CreateVolunteerCommandValidator _validator;
         private readonly ILogger<CreateVolunteerHandler> _logger;
 
         public CreateVolunteerHandler(
-            IVolunteerRepository volunteerRepository,
+            IVolunteerAggregateRepository volunteerRepository,
             CreateVolunteerCommandValidator validator,
             ILogger<CreateVolunteerHandler> logger)
         {

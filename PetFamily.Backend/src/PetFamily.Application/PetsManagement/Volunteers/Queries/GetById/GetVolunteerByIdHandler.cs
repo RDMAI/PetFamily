@@ -1,10 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
+using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
+using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
+using System.Text;
 
 namespace PetFamily.Application.PetsManagement.Volunteers.Queries.GetById;
 
@@ -13,13 +16,16 @@ public class GetVolunteerByIdHandler
 {
     private readonly IDBConnectionFactory _dBConnectionFactory;
     private readonly GetVolunteerByIdQueryValidator _validator;
+    private readonly ILogger<GetVolunteerByIdHandler> _logger;
 
     public GetVolunteerByIdHandler(
         IDBConnectionFactory dBConnectionFactory,
-        GetVolunteerByIdQueryValidator validator)
+        GetVolunteerByIdQueryValidator validator,
+        ILogger<GetVolunteerByIdHandler> logger)
     {
         _dBConnectionFactory = dBConnectionFactory;
         _validator = validator;
+        _logger = logger;
     }
 
     public async Task<Result<VolunteerDTO, ErrorList>> HandleAsync(
@@ -41,18 +47,19 @@ public class GetVolunteerByIdHandler
         var parameters = new DynamicParameters();
         parameters.Add("@id", query.Id);
 
-        var sql = """
+        var sql = new StringBuilder(
+            """
             SELECT id, first_name, last_name, father_name, email, description, experience_years, phone, requisites, social_networks, is_deleted
             FROM Volunteers
             WHERE id = @id and is_deleted = false
             LIMIT 1
-            """;
+            """);
 
-        var volunteer = await connection.QueryFirstAsync<VolunteerDTO>(sql, parameters);
+        var entity = await connection.QueryFirstAsync<VolunteerDTO>(sql.ToString(), parameters);
 
-        if (volunteer == null)
+        if (entity == null)
             return ErrorHelper.General.NotFound(query.Id).ToErrorList();
 
-        return Result.Success<VolunteerDTO, ErrorList>(volunteer);
+        return Result.Success<VolunteerDTO, ErrorList>(entity);
     }
 }
