@@ -1,4 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Application.PetsManagement.Pets.DTOs;
+using PetFamily.Application.PetsManagement.Pets.Queries.GetPets;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.PetsManagement.Volunteers.Queries.GetById;
 using PetFamily.Application.PetsManagement.Volunteers.Queries.GetVolunteers;
@@ -15,5 +17,9 @@ public interface IVolunteerAggregateDBReader
 
     public Task<Result<VolunteerDTO, ErrorList>> GetByIdAsync(
         GetVolunteerByIdQuery query,
+        CancellationToken cancellationToken = default);
+
+    public Task<Result<DataListPage<PetDTO>, ErrorList>> GetPetsAsync(
+        GetPetsQuery query,
         CancellationToken cancellationToken = default);
 }

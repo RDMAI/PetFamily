@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PetFamily.Infrastructure.DataBaseAccess.Write;
@@ -12,9 +13,11 @@ using PetFamily.Infrastructure.DataBaseAccess.Write;
 namespace PetFamily.Infrastructure.Migrations
 {
     [DbContext(typeof(WriteDBContext))]
-    partial class WriteDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250325085703_CascadeDeleteForSpeciesAndBreeds")]
+    partial class CascadeDeleteForSpeciesAndBreeds
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,7 +313,7 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("species_id")
+                    b.Property<Guid?>("species_id")
                         .HasColumnType("uuid")
                         .HasColumnName("species_id");
 
@@ -372,7 +375,6 @@ namespace PetFamily.Infrastructure.Migrations
                         .WithMany("Breeds")
                         .HasForeignKey("species_id")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_breeds_species_species_id");
                 });
 

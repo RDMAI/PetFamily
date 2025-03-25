@@ -24,4 +24,12 @@ public interface ISpeciesAggregateDBReader
     public Task<Result<BreedDTO, ErrorList>> GetBreedByIdAsync(
         Guid BreedId,
         CancellationToken cancellationToken = default);
+
+    public Task<UnitResult<ErrorList>> ArePetsWithBreedIdNotExistAsync(
+        Guid BreedId,
+        CancellationToken cancellationToken = default);
+
+    public Task<UnitResult<ErrorList>> ArePetsWithSpeciesIdNotExistAsync(
+        Guid SpeciesId,
+        CancellationToken cancellationToken = default);
 }

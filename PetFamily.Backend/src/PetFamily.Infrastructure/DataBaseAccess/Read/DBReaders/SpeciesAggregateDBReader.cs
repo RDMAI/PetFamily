@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;
@@ -9,6 +10,7 @@ using PetFamily.Application.SpeciesManagement.Queries.GetBreeds;
 using PetFamily.Application.SpeciesManagement.Queries.GetSpecies;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
+using PetFamily.Domain.SpeciesManagement.ValueObjects;
 using PetFamily.Infrastructure.DataBaseAccess.Read.Helpers;
 using System.Text;
 
@@ -152,5 +154,61 @@ public class SpeciesAggregateDBReader : ISpeciesAggregateDBReader
             return ErrorHelper.General.NotFound(BreedId).ToErrorList();
 
         return Result.Success<BreedDTO, ErrorList>(entity);
+    }
+
+    public async Task<UnitResult<ErrorList>> ArePetsWithBreedIdNotExistAsync(
+        Guid BreedId,
+        CancellationToken cancellationToken = default)
+    {
+        using var connection = _dBConnectionFactory.Create();
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@breedId", BreedId);
+
+        var sql = new StringBuilder(
+            """
+            SELECT id
+            FROM Pets
+            WHERE breed_id = @breedId
+            LIMIT 1
+            """
+        );
+
+        var result = await connection.QueryAsync<Guid>(sql.ToString(), parameters);
+        if (result is not null && result.Any())
+            return Error.Conflict(
+                "relation.exist",
+                $"Cannot delete breed {BreedId}. It has related pet: {result.First()}")
+                .ToErrorList();
+
+        return UnitResult.Success<ErrorList>();
+    }
+
+    public async Task<UnitResult<ErrorList>> ArePetsWithSpeciesIdNotExistAsync(
+        Guid SpeciesId,
+        CancellationToken cancellationToken = default)
+    {
+        using var connection = _dBConnectionFactory.Create();
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@speciesId", SpeciesId);
+
+        var sql = new StringBuilder(
+            """
+            SELECT id
+            FROM Pets
+            WHERE species_id = @speciesId
+            LIMIT 1
+            """
+        );
+
+        var result = await connection.QueryAsync<Guid>(sql.ToString(), parameters);
+        if (result is not null && result.Any())
+            return Error.Conflict(
+                "relation.exist",
+                $"Cannot delete species {SpeciesId}. It has related pet: {result.First()}")
+                .ToErrorList();
+
+        return UnitResult.Success<ErrorList>();
     }
 }

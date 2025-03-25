@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using PetFamily.Domain.Helpers;
+using PetFamily.Domain.PetsManagement.Entities;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.SpeciesManagement.ValueObjects;
 
@@ -25,6 +26,13 @@ public class Species : Entity<SpeciesId>
             return ErrorHelper.General.ValueIsNullOrEmpty("Breed");
 
         _breeds.Add(breed);
+        return this;
+    }
+
+    public Result<Species, Error> DeleteBreed(BreedId breedId)
+    {
+        _breeds.RemoveAll(b => b.Id == breedId);
+
         return this;
     }
 }

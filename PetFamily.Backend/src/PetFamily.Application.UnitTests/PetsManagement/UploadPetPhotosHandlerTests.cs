@@ -6,6 +6,7 @@ using PetFamily.Application.PetsManagement.Pets.Commands.UploadPetPhotos;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;
+using PetFamily.Application.Shared.Messaging;
 using PetFamily.Application.Shared.Validation;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsManagement.Entities;
@@ -23,6 +24,7 @@ public class UploadPetPhotosHandlerTests
     private readonly Mock<IFileProvider> _fileProviderMock = new();
     private readonly Mock<IDbTransaction> _transactionMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+    private readonly Mock<IMessageQueue<IEnumerable<FileInfoDTO>>> _fileMessageQueue = new();
     private readonly InlineValidator<UploadPetPhotosCommand> _validatorStub = new();
     private readonly NullLogger<UploadPetPhotosHandler> _loggerStub = new();
 
@@ -63,6 +65,8 @@ public class UploadPetPhotosHandlerTests
         _transactionMock.Setup(d => d.Dispose());
         _unitOfWorkMock.Setup(d => d.BeginTransaction(ct))
             .ReturnsAsync(_transactionMock.Object);
+
+        _fileMessageQueue.Setup(d => d.)
 
         var handler = new UploadPetPhotosHandler(
             _volunteerRepositoryMock.Object,
