@@ -5,6 +5,7 @@ using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
+using System.Linq.Expressions;
 
 namespace PetFamily.Domain.PetsManagement.Entities;
 
@@ -200,6 +201,11 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         }
 
         return UnitResult.Success<Error>();
+    }
+
+    public int HardDeletePets(Func<Pet, bool> condition)
+    {
+        return _pets.RemoveAll(p => condition(p));
     }
 
     public UnitResult<Error> DeletePhotosFromPet(PetId petId, IEnumerable<string> photos)

@@ -89,7 +89,8 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
         builder.HasMany(d => d.Pets)
             .WithOne()
             .HasForeignKey("volunteer_id")
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired();
 
         builder.Property(d => d.IsDeleted)
             .HasColumnName("is_deleted");

@@ -5,8 +5,10 @@ using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.Interfaces;
+using PetFamily.Application.SpeciesManagement.DTOs;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
+using PetFamily.Domain.SpeciesManagement.ValueObjects;
 using System.Text;
 
 namespace PetFamily.Application.PetsManagement.Volunteers.Queries.GetById;
@@ -55,10 +57,11 @@ public class GetVolunteerByIdHandler
             LIMIT 1
             """);
 
-        var entity = await connection.QueryFirstAsync<VolunteerDTO>(sql.ToString(), parameters);
-
-        if (entity == null)
+        var result = await connection.QueryAsync<VolunteerDTO>(sql.ToString(), parameters);
+        if (result is null || result.Any() == false)
             return ErrorHelper.General.NotFound(query.Id).ToErrorList();
+
+        var entity = result.First();
 
         return Result.Success<VolunteerDTO, ErrorList>(entity);
     }
