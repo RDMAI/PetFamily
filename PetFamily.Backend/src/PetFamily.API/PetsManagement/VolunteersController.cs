@@ -8,6 +8,7 @@ using PetFamily.Application.PetsManagement.Pets.Commands.AddPet;
 using PetFamily.Application.PetsManagement.Pets.Commands.DeletePet;
 using PetFamily.Application.PetsManagement.Pets.Commands.DeletePetPhotos;
 using PetFamily.Application.PetsManagement.Pets.Commands.MovePet;
+using PetFamily.Application.PetsManagement.Pets.Commands.SetMainPetPhoto;
 using PetFamily.Application.PetsManagement.Pets.Commands.UpdatePet;
 using PetFamily.Application.PetsManagement.Pets.Commands.UpdatePetStatus;
 using PetFamily.Application.PetsManagement.Pets.Commands.UploadPetPhotos;
@@ -259,7 +260,7 @@ public class VolunteersController : ApplicationController
         return CreatedBaseURI(result.Value);
     }
 
-    [HttpPatch("{volunteerId:guid}/pet/{petId:guid}/photos")]
+    [HttpPatch("{volunteerId:guid}/pet/{petId:guid}/main-photo")]
     public async Task<IActionResult> SetMainPetPhoto(
         [FromServices] ICommandHandler<PetId, SetMainPetPhotoCommand> petHandler,
         [FromRoute] Guid volunteerId,
@@ -267,7 +268,7 @@ public class VolunteersController : ApplicationController
         [FromBody] SetMainPetPhotoRequest request,
         CancellationToken cancellationToken = default)
     {
-        var mainPhotoCommand = new SetMainPetPhotoCommand(volunteerId, petId, fileDTOs);
+        var mainPhotoCommand = new SetMainPetPhotoCommand(volunteerId, petId, request.PhotoPath);
 
         var result = await petHandler.HandleAsync(
             mainPhotoCommand,
@@ -275,7 +276,7 @@ public class VolunteersController : ApplicationController
 
         if (result.IsFailure) return Error(result.Error);
 
-        return CreatedBaseURI(result.Value);
+        return Ok(result.Value);
     }
 
     [HttpDelete("{volunteerId:guid}/pet/{petId:guid}/photos")]
