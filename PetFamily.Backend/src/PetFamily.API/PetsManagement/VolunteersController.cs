@@ -259,6 +259,25 @@ public class VolunteersController : ApplicationController
         return CreatedBaseURI(result.Value);
     }
 
+    [HttpPatch("{volunteerId:guid}/pet/{petId:guid}/photos")]
+    public async Task<IActionResult> SetMainPetPhoto(
+        [FromServices] ICommandHandler<PetId, SetMainPetPhotoCommand> petHandler,
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromBody] SetMainPetPhotoRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var mainPhotoCommand = new SetMainPetPhotoCommand(volunteerId, petId, fileDTOs);
+
+        var result = await petHandler.HandleAsync(
+            mainPhotoCommand,
+            cancellationToken);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        return CreatedBaseURI(result.Value);
+    }
+
     [HttpDelete("{volunteerId:guid}/pet/{petId:guid}/photos")]
     public async Task<IActionResult> DeletePetPhotos(
         [FromServices] ICommandHandler<PetId, DeletePetPhotosCommand> petHandler,

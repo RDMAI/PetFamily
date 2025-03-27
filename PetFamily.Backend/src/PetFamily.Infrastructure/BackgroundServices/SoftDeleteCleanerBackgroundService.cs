@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Application.Shared.Messaging;
-using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Infrastructure.DataBaseAccess.Write;
@@ -37,8 +36,8 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
         _fileMessageQueue = fileMessageQueue;
         if (options != null)
         {
-            _checkPeriod = TimeSpan.FromSeconds(5); // TimeSpan.FromHours(options.Value.CheckPeriodHours);
-            _timeToRestore = TimeSpan.FromSeconds(1); // TimeSpan.FromHours(options.Value.TimeToRestoreHours);
+            _checkPeriod = TimeSpan.FromHours(options.Value.CheckPeriodHours);
+            _timeToRestore = TimeSpan.FromHours(options.Value.TimeToRestoreHours);
         }
     }
 
