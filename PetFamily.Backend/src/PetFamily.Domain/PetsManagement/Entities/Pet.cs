@@ -1,6 +1,10 @@
 ﻿using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
+using PetFamily.Domain.SpeciesManagement.Entities;
+using System.Drawing;
+using System.Net;
+using System.Xml.Linq;
 
 namespace PetFamily.Domain.PetsManagement.Entities;
 public class Pet : SoftDeletableEntity<PetId>
@@ -70,16 +74,47 @@ public class Pet : SoftDeletableEntity<PetId>
         return this;
     }
 
-    public Pet UpdateRequisites(ValueObjectList<Requisites> requisites)
+    public Pet UpdateFull(PetName name,
+        Description description,
+        PetColor color,
+        PetWeight weight,
+        PetHeight height,
+        PetBreed breed,
+        PetHealthInfo healthInformation,
+        Address address,
+        Phone ownerPhone,
+        bool isCastrated,
+        DateOnly birthDate,
+        bool isVacinated,
+        PetStatus status,
+        ValueObjectList<Requisites> requisites)
     {
+        Name = name;
+        Description = description;
+        Color = color;
+        Weight = weight;
+        Height = height;
+        Breed = breed;
+        HealthInformation = healthInformation;
+        Address = address;
+        OwnerPhone = ownerPhone;
+        IsCastrated = isCastrated;
+        BirthDate = birthDate;
+        IsVacinated = isVacinated;
+        Status = status;
         Requisites = requisites;
+
         return this;
     }
 
-    // for testing
-    public override string ToString()
+    public Pet UpdateStatus(PetStatus status)
     {
-        return Name.Value + " " + Id.Value.ToString();
-        //return base.ToString();
+        Status = status;
+        return this;
+    }
+
+    public Pet SetMainPhoto()
+    {
+        return this;
     }
 }

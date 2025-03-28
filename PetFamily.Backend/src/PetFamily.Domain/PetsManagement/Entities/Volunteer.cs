@@ -5,6 +5,8 @@ using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
+using System.Collections.Generic;
+using System;
 
 namespace PetFamily.Domain.PetsManagement.Entities;
 
@@ -200,6 +202,35 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         }
 
         return UnitResult.Success<Error>();
+    }
+
+    public UnitResult<Error> SetMainPetPhoto(PetId petId, string photoPath)
+    {
+        if (_pets.Count == 0)
+            return ErrorHelper.General.MethodNotApplicable(
+                "Volunteer does not have any pets");
+
+        var pet = _pets.FirstOrDefault(p => p.Id == petId);
+        if (pet == null)
+            return ErrorHelper.General.NotFound(petId.Value);
+
+        var photos = pet.Photos.ToList();
+        var photoToMove = photos.FirstOrDefault(p => p.PathToStorage == photoPath);
+        if (photoToMove is null)
+            return ErrorHelper.General.NotFound();
+
+        var photo = FileVO.Create(photoPath, photoToMove.Name).Value;
+        photos.RemoveAll(p => p.PathToStorage == photoPath);
+        photos.Insert(0, photo);
+
+        pet.UpdatePhotos(new ValueObjectList<FileVO>(photos));
+
+        return UnitResult.Success<Error>();
+    }
+
+    public int HardDeletePets(Func<Pet, bool> condition)
+    {
+        return _pets.RemoveAll(p => condition(p));
     }
 
     public UnitResult<Error> DeletePhotosFromPet(PetId petId, IEnumerable<string> photos)

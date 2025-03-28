@@ -79,15 +79,14 @@ public class DeleteBreedHandler
             SELECT id
             FROM Pets
             WHERE breed_id = @breedId
-            LIMIT 1
             """
         );
 
-        var result = await connection.QueryAsync<Guid>(sql.ToString(), parameters);
-        if (result is not null && result.Any())
+        var result = await connection.QueryFirstOrDefaultAsync<Guid?>(sql.ToString(), parameters);
+        if (result is not null)
             return Error.Conflict(
                 "relation.exist",
-                $"Cannot delete breed {BreedId}. It has related pet: {result.First()}")
+                $"Cannot delete breed {BreedId}. It has related pet: {result}")
                 .ToErrorList();
 
         return UnitResult.Success<ErrorList>();

@@ -4,7 +4,7 @@ using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;
-using PetFamily.Domain.PetsManagement.Entities;
+using PetFamily.Domain.Helpers;
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
@@ -12,21 +12,21 @@ using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.SpeciesManagement.ValueObjects;
 
-namespace PetFamily.Application.PetsManagement.Pets.Commands.AddPet;
+namespace PetFamily.Application.PetsManagement.Pets.Commands.UpdatePet;
 
-public class AddPetHandler
-    : ICommandHandler<PetId, AddPetCommand>
+public class UpdatePetHandler
+    : ICommandHandler<PetId, UpdatePetCommand>
 {
     private readonly IVolunteerAggregateRepository _volunteerRepository;
     private readonly IDBConnectionFactory _dBConnectionFactory;
-    private readonly AddPetCommandValidator _validator;
-    private readonly ILogger<AddPetHandler> _logger;
+    private readonly UpdatePetCommandValidator _validator;
+    private readonly ILogger<UpdatePetHandler> _logger;
 
-    public AddPetHandler(
+    public UpdatePetHandler(
         IVolunteerAggregateRepository volunteerRepository,
         IDBConnectionFactory dBConnectionFactory,
-        AddPetCommandValidator validator,
-        ILogger<AddPetHandler> logger)
+        UpdatePetCommandValidator validator,
+        ILogger<UpdatePetHandler> logger)
     {
         _volunteerRepository = volunteerRepository;
         _dBConnectionFactory = dBConnectionFactory;
@@ -35,7 +35,7 @@ public class AddPetHandler
     }
 
     public async Task<Result<PetId, ErrorList>> HandleAsync(
-        AddPetCommand command,
+        UpdatePetCommand command,
         CancellationToken cancellationToken = default)
     {
         // command validation
@@ -55,18 +55,27 @@ public class AddPetHandler
             return volunteerResult.Error;
         var volunteer = volunteerResult.Value;
 
-        // validate breed
-        var breedId = BreedId.Create(command.Pet.BreedId);
-        using var connection = _dBConnectionFactory.Create();
+        // validate pet
+        var petId = PetId.Create(command.PetId);
+        var pet = volunteer.Pets.FirstOrDefault(p => p.Id == petId);
+        if (pet == null)
+            return ErrorHelper.General.NotFound(petId.Value).ToErrorList();
 
-        var breedResult = await CommonPetQueries.GetBreedByIdAsync(connection, breedId.Value, cancellationToken);
-        if (breedResult.IsFailure)
-            return breedResult.Error;
+        // validate breed if it was changed
+        var petBreed = pet.Breed;
+        if (petBreed.BreedId.Value != command.Pet.BreedId)
+        {
+            var breedId = BreedId.Create(command.Pet.BreedId);
 
-        var speciesId = SpeciesId.Create(breedResult.Value.SpeciesId);
-        var petBreed = PetBreed.Create(breedId, speciesId).Value;
+            using var connection = _dBConnectionFactory.Create();
+            var breedResult = await CommonPetQueries.GetBreedByIdAsync(connection, breedId.Value, cancellationToken);
+            if (breedResult.IsFailure)
+                return breedResult.Error;
 
-        var petId = PetId.GenerateNew();
+            var speciesId = SpeciesId.Create(breedResult.Value.SpeciesId);
+            petBreed = PetBreed.Create(breedId, speciesId).Value;
+        }
+
         var petName = PetName.Create(command.Pet.Name).Value;
         var petDescription = Description.Create(command.Pet.Description).Value;
         var petColor = PetColor.Create(command.Pet.Color).Value;
@@ -91,8 +100,8 @@ public class AddPetHandler
                 requisites.Value).Value);
         }
 
-        var pet = new Pet(petId,
-            petName,
+        // Handle BL
+        pet.UpdateFull(petName,
             petDescription,
             petColor,
             petWeight,
@@ -106,10 +115,6 @@ public class AddPetHandler
             command.Pet.IsVacinated,
             petStatus,
             (ValueObjectList<Requisites>)requisitesBufferList);
-
-        var domainResult = volunteer.AddPet(pet);
-        if (domainResult.IsFailure)
-            return domainResult.Error.ToErrorList();
 
         var result = await _volunteerRepository.UpdateAsync(volunteer, cancellationToken);
         if (result.IsFailure)

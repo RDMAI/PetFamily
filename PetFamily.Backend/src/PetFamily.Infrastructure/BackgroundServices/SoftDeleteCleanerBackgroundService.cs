@@ -1,7 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PetFamily.Application.Shared.DTOs;
+using PetFamily.Application.Shared.Interfaces;
+using PetFamily.Application.Shared.Messaging;
+using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Infrastructure.DataBaseAccess.Write;
 using PetFamily.Infrastructure.Options;
 
@@ -11,6 +17,8 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
 {
     private readonly IDbContextFactory<WriteDBContext> _dbFactory;
     private readonly ILogger<SoftDeleteCleanerBackgroundService> _logger;
+    private readonly IDBConnectionFactory _dBConnectionFactory;
+    private readonly IMessageQueue<IEnumerable<FileInfoDTO>> _fileMessageQueue;
 
     private readonly TimeSpan _checkPeriod;
     private readonly TimeSpan _timeToRestore;
@@ -18,10 +26,14 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
     public SoftDeleteCleanerBackgroundService(
         IDbContextFactory<WriteDBContext> dbFactory,
         ILogger<SoftDeleteCleanerBackgroundService> logger,
+        IDBConnectionFactory dBConnectionFactory,
+        IMessageQueue<IEnumerable<FileInfoDTO>> fileMessageQueue,
         IOptions<SoftDeleteCleanerOptions> options)
     {
         _dbFactory = dbFactory;
         _logger = logger;
+        _dBConnectionFactory = dBConnectionFactory;
+        _fileMessageQueue = fileMessageQueue;
         if (options != null)
         {
             _checkPeriod = TimeSpan.FromHours(options.Value.CheckPeriodHours);
@@ -43,13 +55,16 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
             {
                 using var context = _dbFactory.CreateDbContext();
 
+                // deleting pets
+                await _deletePets(context, stoppingToken);
+
+                // deleting volunteers
                 var deletedVolunteers = context.Volunteers
                     .Where(v => v.IsDeleted &&
                         DateTime.UtcNow - v.DeletionDate!.Value >= _timeToRestore);
 
                 // this will also cascade delete related pets
                 context.Volunteers.RemoveRange(deletedVolunteers);
-
                 await context.SaveChangesAsync(stoppingToken);
 
                 _logger.LogInformation("SoftDeleteCleanerBackgroundService executed successfully");
@@ -61,5 +76,53 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
         }
 
         _logger.LogInformation("SoftDeleteCleanerBackgroundService finished");
+    }
+
+    private class _petPhotosDTO
+    {
+        public Guid Id { get; init; }
+        public FileVO[] Photos { get; init; } = [];
+    }
+
+    private async Task _deletePets(WriteDBContext context, CancellationToken stoppingToken)
+    {
+        using var connection = _dBConnectionFactory.Create();
+
+        // Getting all required to delete pets. Retrieving id and file paths
+        var petsSql = $"""
+            SELECT id, photos
+            FROM Pets
+            WHERE is_deleted AND
+                '{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}' - deletion_date >= '{_timeToRestore}'
+            """;
+
+        _logger.LogInformation("Dapper pets select sql:\n{sql}", petsSql);
+        var pets = await connection.QueryAsync<_petPhotosDTO>(petsSql);
+        if (pets is null || pets.Any() == false)
+            return;
+
+        // Creating a list of ids for postgres
+        var deletedPetIds = "('" + string.Join("', '", pets.Select(p => p.Id)) + "')";
+
+        var petsDeleteSQL = $"""
+            DELETE FROM Pets
+            WHERE id IN {deletedPetIds}
+            """;
+        _logger.LogInformation("Pets delete sql:\n{sql}", petsSql);
+
+        // With raw sql it is one database call. With DDD, it will be 2 (get volunteers and update volunteers)
+        var deleteResult = await context.Database.ExecuteSqlRawAsync(petsDeleteSQL, stoppingToken);
+
+        // Placing an operation to delete photos of deleted pets
+        List<FileInfoDTO> fileInfos = [];
+        foreach (var p in pets)
+        {
+            var f = p.Photos.Select(photo => new FileInfoDTO(
+                photo.PathToStorage,
+                Constants.BucketNames.PET_PHOTOS));
+            fileInfos.AddRange(f);
+        }
+        if (fileInfos.Count != 0)
+            await _fileMessageQueue.WriteAsync(fileInfos, stoppingToken);
     }
 }

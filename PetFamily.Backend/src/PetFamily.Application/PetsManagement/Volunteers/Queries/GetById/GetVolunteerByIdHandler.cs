@@ -2,7 +2,6 @@
 using Dapper;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
-using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Domain.Helpers;
@@ -52,14 +51,12 @@ public class GetVolunteerByIdHandler
             SELECT id, first_name, last_name, father_name, email, description, experience_years, phone, requisites, social_networks, is_deleted
             FROM Volunteers
             WHERE id = @id and is_deleted = false
-            LIMIT 1
             """);
 
-        var entity = await connection.QueryFirstAsync<VolunteerDTO>(sql.ToString(), parameters);
-
-        if (entity == null)
+        var result = await connection.QueryFirstOrDefaultAsync<VolunteerDTO>(sql.ToString(), parameters);
+        if (result is null)
             return ErrorHelper.General.NotFound(query.Id).ToErrorList();
 
-        return Result.Success<VolunteerDTO, ErrorList>(entity);
+        return Result.Success<VolunteerDTO, ErrorList>(result);
     }
 }

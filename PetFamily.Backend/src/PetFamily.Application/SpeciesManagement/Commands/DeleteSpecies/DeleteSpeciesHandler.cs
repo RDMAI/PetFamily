@@ -77,12 +77,11 @@ public class DeleteSpeciesHandler
             SELECT id
             FROM Pets
             WHERE species_id = @speciesId
-            LIMIT 1
             """
         );
 
-        var result = await connection.QueryAsync<Guid>(sql.ToString(), parameters);
-        if (result is not null && result.Any())
+        var result = await connection.QueryAsync<Guid?>(sql.ToString(), parameters);
+        if (result is not null)
             return Error.Conflict(
                 "relation.exist",
                 $"Cannot delete species {SpeciesId}. It has related pet: {result.First()}")
