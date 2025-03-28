@@ -3,7 +3,6 @@ using Dapper;
 using PetFamily.Application.SpeciesManagement.DTOs;
 using PetFamily.Domain.Helpers;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.SpeciesManagement.ValueObjects;
 using System.Data;
 using System.Text;
 
@@ -24,16 +23,13 @@ public static class CommonPetQueries
             SELECT id, name, species_id
             FROM Breeds
             WHERE id = @id
-            LIMIT 1
             """
         );
 
-        var result = await connection.QueryAsync<BreedDTO>(sql.ToString(), parameters);
-        if (result is null || result.Any() == false)
+        var result = await connection.QueryFirstOrDefaultAsync<BreedDTO>(sql.ToString(), parameters);
+        if (result is null)
             return ErrorHelper.General.NotFound(BreedId).ToErrorList();
 
-        var entity = result.First();
-
-        return Result.Success<BreedDTO, ErrorList>(entity);
+        return Result.Success<BreedDTO, ErrorList>(result);
     }
 }
