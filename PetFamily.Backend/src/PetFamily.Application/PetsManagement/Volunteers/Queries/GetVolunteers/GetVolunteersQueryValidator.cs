@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
+using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.Shared.Validation;
-using PetFamily.Application.SpeciesManagement.DTOs;
 using PetFamily.Domain.Helpers;
 
 namespace PetFamily.Application.PetsManagement.Volunteers.Queries.GetVolunteers;
@@ -9,7 +9,7 @@ public class GetVolunteersQueryValidator : AbstractValidator<GetVolunteersQuery>
 {
     public GetVolunteersQueryValidator()
     {
-        RuleFor(q => q.Sort).MustBeValidSorting(typeof(BreedDTO));
+        RuleFor(q => q.Sort).MustBeValidSorting(typeof(VolunteerDTO));
 
         RuleFor(q => q.CurrentPage)
             .GreaterThanOrEqualTo(1)

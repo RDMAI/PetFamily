@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.Shared.DTOs;
 using System.Text;
 
@@ -17,7 +18,7 @@ public static class DapperSQLHelper
 
         foreach (var s in sortList)
         {
-            sqlBuilder.Append($" {s.Property}");
+            sqlBuilder.Append($" {s.Property.ToLower()}");
 
             var dir = s.IsAscending ? "asc" : "desc";
             sqlBuilder.Append($" {dir},");

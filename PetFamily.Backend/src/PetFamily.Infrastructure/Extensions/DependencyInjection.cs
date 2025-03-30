@@ -9,6 +9,7 @@ using PetFamily.Application.Shared.Interfaces;
 using PetFamily.Application.Shared.Messaging;
 using PetFamily.Application.SpeciesManagement.Interfaces;
 using PetFamily.Infrastructure.BackgroundServices;
+using PetFamily.Infrastructure.DataBaseAccess;
 using PetFamily.Infrastructure.DataBaseAccess.Read;
 using PetFamily.Infrastructure.DataBaseAccess.Read.Helpers;
 using PetFamily.Infrastructure.DataBaseAccess.Write;
@@ -22,7 +23,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDatabaseAccess();
+        services.AddDatabaseAccess(configuration);
 
         services.AddSingleton<IMessageQueue<IEnumerable<FileInfoDTO>>, InMemoryMessageQueue<IEnumerable<FileInfoDTO>>>();
 
@@ -34,17 +35,21 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddDatabaseAccess(this IServiceCollection services)
+    private static IServiceCollection AddDatabaseAccess(this IServiceCollection services, IConfiguration configuration)
     {
+        var dbConnectionString = configuration.GetConnectionString(DBConstants.DATABASE);
+
         // dapper for reads
         DapperConfigurationHelper.Configure();
-        services.AddTransient<IDBConnectionFactory, DapperConnectionFactory>();
+        services.AddSingleton<IDBConnectionFactory, DapperConnectionFactory>(_ =>
+            new DapperConnectionFactory(dbConnectionString));
 
         // for bg services and ws connections
-        services.AddDbContextFactory<WriteDBContext>();
+        services.AddSingleton<IDbContextFactory<WriteDBContext>>(_ =>
+            new WriteDBContextFactory(dbConnectionString));
 
         // scopped dbcontext = different context for each web request
-        services.AddDbContext<WriteDBContext>();
+        services.AddScoped(_ => new WriteDBContext(dbConnectionString));
         services.AddScoped<IUnitOfWork, EFUnitOfWork>();
 
         services.AddScoped<IVolunteerAggregateRepository, VolunteerRepository>();

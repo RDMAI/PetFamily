@@ -72,7 +72,7 @@ public class UpdatePetHandler
             if (breedResult.IsFailure)
                 return breedResult.Error;
 
-            var speciesId = SpeciesId.Create(breedResult.Value.SpeciesId);
+            var speciesId = SpeciesId.Create(breedResult.Value.Species_Id);
             petBreed = PetBreed.Create(breedId, speciesId).Value;
         }
 

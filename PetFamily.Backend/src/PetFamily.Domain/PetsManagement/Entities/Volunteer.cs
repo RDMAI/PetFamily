@@ -5,8 +5,6 @@ using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
-using System.Collections.Generic;
-using System;
 
 namespace PetFamily.Domain.PetsManagement.Entities;
 
