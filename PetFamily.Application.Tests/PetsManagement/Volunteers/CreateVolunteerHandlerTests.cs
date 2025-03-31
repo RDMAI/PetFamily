@@ -11,14 +11,9 @@ using PetFamily.Infrastructure.DataBaseAccess.Write;
 
 namespace PetFamily.Application.IntegrationTests.PetsManagement.Volunteers;
 
-public class CreateVolunteerHandlerTests : IClassFixture<IntegrationTestWebFactory>, IAsyncLifetime
+public class CreateVolunteerHandlerTests : BaseHandlerTests
 {
-    private readonly IntegrationTestWebFactory _webFactory;
-
-    public CreateVolunteerHandlerTests(IntegrationTestWebFactory webFactory)
-    {
-        _webFactory = webFactory;
-    }
+    public CreateVolunteerHandlerTests(IntegrationTestWebFactory webFactory) : base(webFactory) { }
 
     [Fact]
     public async Task HandleAsync_CreatingVolunteerFromValidCommand_ReturnSuccess()
@@ -45,13 +40,14 @@ public class CreateVolunteerHandlerTests : IClassFixture<IntegrationTestWebFacto
         var result = await sut.HandleAsync(command, ct);
 
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.True(result.Value is not null);
+        var errorMessage = result.IsSuccess ? "" : result.Error.First().Message;
+        Assert.True(result.IsSuccess, errorMessage);
+        Assert.True(result.Value is not null, "Result value is null");
 
         // check if the entity is in the database
         using var context = scope.ServiceProvider.GetRequiredService<WriteDBContext>();
         var entity = await context.Volunteers.FirstOrDefaultAsync(v => v.Id == result.Value, ct);
-        Assert.True(entity is not null);
+        Assert.True(entity is not null, "Entity from database is null");
     }
 
     [Fact]
@@ -76,7 +72,7 @@ public class CreateVolunteerHandlerTests : IClassFixture<IntegrationTestWebFacto
         // database seeding
         using var scope = _webFactory.Services.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<WriteDBContext>();
-        context.Volunteers.AddRange(EntitiesHelper.CreateValidVolunteer(specificFirstName: "Vasya", uniqueEmail: email));
+        context.Volunteers.AddRange(SeedingHelper.CreateValidVolunteer(specificFirstName: "Vasya", uniqueEmail: email));
         await context.SaveChangesAsync();
         
         var sut = scope.ServiceProvider
@@ -86,7 +82,7 @@ public class CreateVolunteerHandlerTests : IClassFixture<IntegrationTestWebFacto
         var result = await sut.HandleAsync(command, ct);
 
         // Assert
-        Assert.True(result.IsFailure);
+        Assert.True(result.IsFailure, "Result is success, expected failure");
 
         // check if the entity is NOT in the database
         var fullName = VolunteerFullName.Create(
@@ -95,14 +91,6 @@ public class CreateVolunteerHandlerTests : IClassFixture<IntegrationTestWebFacto
             fatherName: command.FatherName).Value;
 
         var entity = await context.Volunteers.FirstOrDefaultAsync(v => v.FullName == fullName, ct);
-        Assert.True(entity is null);
-    }
-
-
-    public async Task InitializeAsync() { }
-
-    public async Task DisposeAsync()
-    {
-        await _webFactory.ResetDatabaseAsync();
+        Assert.True(entity is null, "Entity from database is not null, expected otherwise");
     }
 }

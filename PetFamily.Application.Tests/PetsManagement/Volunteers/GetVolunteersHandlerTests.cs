@@ -9,14 +9,9 @@ using PetFamily.Infrastructure.DataBaseAccess.Write;
 
 namespace PetFamily.Application.IntegrationTests.PetsManagement.Volunteers;
 
-public class GetVolunteersHandlerTests : IClassFixture<IntegrationTestWebFactory>, IAsyncLifetime
+public class GetVolunteersHandlerTests : BaseHandlerTests
 {
-    private readonly IntegrationTestWebFactory _webFactory;
-
-    public GetVolunteersHandlerTests(IntegrationTestWebFactory webFactory)
-    {
-        _webFactory = webFactory;
-    }
+    public GetVolunteersHandlerTests(IntegrationTestWebFactory webFactory) : base(webFactory) { }
 
     [Fact]
     public async Task HandleAsync_GettingPage1_WithPageSize10_WithSortingByMultipleProperties_ReturnSuccess()
@@ -36,7 +31,7 @@ public class GetVolunteersHandlerTests : IClassFixture<IntegrationTestWebFactory
         // database seeding
         using var scope = _webFactory.Services.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<WriteDBContext>();
-        context.Volunteers.AddRange(EntitiesHelper.CreateValidVolunteerList(20));
+        context.Volunteers.AddRange(SeedingHelper.CreateValidVolunteerList(20));
         await context.SaveChangesAsync();
 
         var sut = scope.ServiceProvider
@@ -46,17 +41,18 @@ public class GetVolunteersHandlerTests : IClassFixture<IntegrationTestWebFactory
         var result = await sut.HandleAsync(query, ct);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        var errorMessage = result.IsSuccess ? "" : result.Error.First().Message;
+        Assert.True(result.IsSuccess, errorMessage);
         var data = result.Value.Data;
-        Assert.True(data.Any());
-        Assert.True(data.Count() <= 10);
+        Assert.True(data.Any(), "Data from database is empty");
+        Assert.True(data.Count() <= 10, "Data pagesize is incorrect");
         var firstId = data.First().Id;
         var firstIdFromManuallyOrdered = data
             .OrderBy(v => v.Last_Name)
             .OrderBy(v => v.First_Name)
             .First().Id;
 
-        Assert.True(firstId == firstIdFromManuallyOrdered);
+        Assert.True(firstId == firstIdFromManuallyOrdered, "Data ordering is incorrect");
     }
 
     [Fact]
@@ -83,14 +79,8 @@ public class GetVolunteersHandlerTests : IClassFixture<IntegrationTestWebFactory
         var result = await sut.HandleAsync(query, ct);
 
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.True(result.Value.Data.Any() == false);
-    }
-
-    public async Task InitializeAsync() { }
-
-    public async Task DisposeAsync()
-    {
-        await _webFactory.ResetDatabaseAsync();
+        var errorMessage = result.IsSuccess ? "" : result.Error.First().Message;
+        Assert.True(result.IsSuccess, errorMessage);
+        Assert.True(result.Value.Data.Any() == false, "Data from database is not empty, expected otherwise");
     }
 }

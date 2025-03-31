@@ -3,18 +3,12 @@ using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared.Primitives;
 using PetFamily.Domain.Shared.ValueObjects;
+using PetFamily.Domain.SpeciesManagement.Entities;
 using PetFamily.Domain.SpeciesManagement.ValueObjects;
 
 namespace PetFamily.Application.IntegrationTests.Seeding;
-public static class EntitiesHelper
+public static class SeedingHelper
 {
-    /// <summary>
-    /// Returns valid volunteer
-    /// </summary>
-    /// <param name="specificFirstName"></param>
-    /// <param name="uniqueEmail"></param>
-    /// <param name="uniquePhone"></param>
-    /// <returns></returns>
     public static Volunteer CreateValidVolunteer(
         string specificFirstName = "Ivan",
         string uniqueEmail = "Example@gmail.com",
@@ -74,12 +68,7 @@ public static class EntitiesHelper
         return volunteers;
     }
 
-    /// <summary>
-    /// Returns valid pet with specified or default name
-    /// </summary>
-    /// <param name="specificName"></param>
-    /// <returns></returns>
-    public static Pet CreateValidPet(string specificName = "Fido")
+    public static Pet CreateValidPet(BreedId breedId, SpeciesId speciesId, string specificName = "Fido")
     {
         var petId = PetId.GenerateNew();
         var name = PetName.Create(specificName).Value;
@@ -89,7 +78,7 @@ public static class EntitiesHelper
         var weight = PetWeight.Create(10).Value;
         var height = PetHeight.Create(30).Value;
 
-        var breed = PetBreed.Create(BreedId.GenerateNew(), SpeciesId.GenerateNew()).Value;
+        var breed = PetBreed.Create(breedId, speciesId).Value;
 
         var healthInfo = PetHealthInfo.Create("Healthy").Value;
 
@@ -126,15 +115,69 @@ public static class EntitiesHelper
             requisitesVO);
     }
 
-    public static List<Pet> CreateValidPetList(int amount)
+    /// <summary>
+    /// Creates list of valid pets with unique name (Fido + iteration counter)
+    /// </summary>
+    /// <param name="amount"></param>
+    /// <returns></returns>
+    public static List<Pet> CreateValidPetList(BreedId breedId, SpeciesId speciesId, int amount)
     {
         List<Pet> pets = [];
 
         for (int i = 0; i < amount; i++)
         {
-            pets.Add(CreateValidPet(specificName: $"Fido_{i}"));
+            pets.Add(CreateValidPet(
+                breedId: breedId,
+                speciesId: speciesId,
+                specificName: $"Fido_{i}"));
         }
 
         return pets;
+    }
+
+    public static Species CreateValidSpecies(string specificName = "Dog")
+    {
+        return new Species(
+            id: SpeciesId.GenerateNew(),
+            name: SpeciesName.Create(specificName).Value);
+    }
+
+    /// <summary>
+    /// Creates list of valid 4 species: Dog, Cat, Parrot and Hamster
+    /// </summary>
+    /// <returns></returns>
+    public static List<Species> CreateValidSpeciesList()
+    {
+        List<Species> species = [];
+        species.Add(CreateValidSpecies(specificName: "Dog"));
+        species.Add(CreateValidSpecies(specificName: "Cat"));
+        species.Add(CreateValidSpecies(specificName: "Parrot"));
+        species.Add(CreateValidSpecies(specificName: "Hamster"));
+
+        return species;
+    }
+
+    public static Breed CreateValidBreed(string specificName = "Labrador")
+    {
+        return new Breed(
+            id: BreedId.GenerateNew(),
+            name: BreedName.Create(specificName).Value);
+    }
+
+    /// <summary>
+    /// Creates list of valid pets with unique name (PetBreed + iteration counter)
+    /// </summary>
+    /// <param name="amount"></param>
+    /// <returns></returns>
+    public static List<Breed> CreateValidBreedList(int amount)
+    {
+        List<Breed> breeds = [];
+
+        for (int i = 0; i < amount; i++)
+        {
+            breeds.Add(CreateValidBreed(specificName: $"PetBreed_{i}"));
+        }
+
+        return breeds;
     }
 }

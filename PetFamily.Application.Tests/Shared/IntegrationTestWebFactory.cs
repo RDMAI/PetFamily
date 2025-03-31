@@ -1,11 +1,16 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using CSharpFunctionalExtensions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using Npgsql;
+using PetFamily.Application.Shared.DTOs;
 using PetFamily.Application.Shared.Interfaces;
+using PetFamily.Domain.Helpers;
+using PetFamily.Domain.Shared;
 using PetFamily.Infrastructure.DataBaseAccess.Read;
 using PetFamily.Infrastructure.DataBaseAccess.Write;
 using Respawn;
@@ -23,6 +28,7 @@ public class IntegrationTestWebFactory : WebApplicationFactory<Program>, IAsyncL
 
     private Respawner _respawner = default;
     private NpgsqlConnection _dbConnection = default;
+    private Mock<IFileProvider> _fileProviderMock = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -42,6 +48,31 @@ public class IntegrationTestWebFactory : WebApplicationFactory<Program>, IAsyncL
         services.RemoveAll<WriteDBContext>();
         services.AddScoped(_ =>
             new WriteDBContext(_dbContainer.GetConnectionString()));
+
+        services.RemoveAll<IFileProvider>();
+        services.AddScoped(_ => _fileProviderMock.Object);
+    }
+
+    public void SetupSuccessFileProviderMock()
+    {
+        _fileProviderMock
+            .Setup(f => f.UploadFilesAsync(It.IsAny<IEnumerable<FileData>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(UnitResult.Success<ErrorList>());
+
+        _fileProviderMock
+            .Setup(f => f.DeleteFilesAsync(It.IsAny<IEnumerable<FileInfoDTO>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(UnitResult.Success<ErrorList>());
+    }
+
+    public void SetupFailureFileProviderMock()
+    {
+        _fileProviderMock
+            .Setup(f => f.UploadFilesAsync(It.IsAny<IEnumerable<FileData>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(UnitResult.Failure<ErrorList>(ErrorHelper.Files.UploadFailure()));
+
+        _fileProviderMock
+            .Setup(f => f.DeleteFilesAsync(It.IsAny<IEnumerable<FileInfoDTO>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(UnitResult.Failure<ErrorList>(ErrorHelper.Files.DeleteFailure()));
     }
 
     public async Task InitializeRespawner()

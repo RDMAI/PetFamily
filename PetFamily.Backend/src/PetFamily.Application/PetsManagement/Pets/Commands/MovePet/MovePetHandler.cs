@@ -59,7 +59,7 @@ public class MovePetHandler
             return domainResult.Error.ToErrorList();
 
         var result = await _volunteerRepository.UpdateAsync(volunteer, cancellationToken);
-        if (!result.IsFailure)
+        if (result.IsFailure)
             return result.Error;
 
         return petId;

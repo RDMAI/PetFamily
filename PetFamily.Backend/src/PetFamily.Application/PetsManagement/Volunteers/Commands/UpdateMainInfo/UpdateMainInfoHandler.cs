@@ -46,6 +46,7 @@ namespace PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateMainInf
             var entityResult = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
             if (entityResult.IsFailure)
                 return entityResult.Error;
+            var entity = entityResult.Value;
 
             // create VOs
             var fullName = VolunteerFullName.Create(command.FirstName,
@@ -56,16 +57,22 @@ namespace PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateMainInf
             var phone = Phone.Create(command.Phone).Value;
             var experienceYears = VolunteerExperienceYears.Create(command.ExperienceYears).Value;
 
-            // check if Entity with this phone or email already exists
-            var emailResponse = await _volunteerRepository.IsEmailNotExistAsync(email, cancellationToken);
-            if (emailResponse.IsFailure)
-                return emailResponse.Error;
-            var phoneResponse = await _volunteerRepository.IsPhoneNotExistAsync(phone, cancellationToken);
-            if (phoneResponse.IsFailure)
-                return phoneResponse.Error;
+            // if email is changed, check if Entity with this email exists
+            if (entity.Email != email)
+            {
+                var emailResponse = await _volunteerRepository.IsEmailNotExistAsync(email, cancellationToken);
+                if (emailResponse.IsFailure)
+                    return emailResponse.Error;
+            }
+            // same with phone
+            if (entity.Phone != phone)
+            {
+                var phoneResponse = await _volunteerRepository.IsPhoneNotExistAsync(phone, cancellationToken);
+                if (phoneResponse.IsFailure)
+                    return phoneResponse.Error;
+            }
 
             // update entity
-            var entity = entityResult.Value;
             entity.UpdateMainInfo(fullName,
                 email,
                 description,
