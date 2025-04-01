@@ -10,11 +10,10 @@ public class Species : Entity<SpeciesId>
 {
     // EF Core
     private Species() { }
-    public Species(SpeciesId id, SpeciesName name, List<Breed> breeds)
+    public Species(SpeciesId id, SpeciesName name)
     {
         Id = id;
         Name = name;
-        _breeds = breeds;
     }
     public SpeciesName Name { get; private set; }
     public IReadOnlyList<Breed> Breeds => _breeds;

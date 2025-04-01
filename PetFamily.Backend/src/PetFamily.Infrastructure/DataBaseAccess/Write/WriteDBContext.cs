@@ -8,21 +8,19 @@ namespace PetFamily.Infrastructure.DataBaseAccess.Write;
 
 public class WriteDBContext : DbContext
 {
-    private readonly IConfiguration _configuration;
-    // PostgresDB to connect to docker container, PostgresDBLocal for local database
-    public const string DATABASE = "PostgresDB";
+    private readonly string _connectionString;
 
     public DbSet<Volunteer> Volunteers => Set<Volunteer>();
     public DbSet<Species> Species => Set<Species>();
 
-    public WriteDBContext(IConfiguration configuration)
+    public WriteDBContext(string connectionString)
     {
-        _configuration = configuration;
+        _connectionString = connectionString;
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql(_configuration.GetConnectionString(DATABASE));  // gets connection string from secrets
+        optionsBuilder.UseNpgsql(_connectionString);
         optionsBuilder.UseSnakeCaseNamingConvention();
         optionsBuilder.UseLoggerFactory(CreateLoggerFactory());
 
