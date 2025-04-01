@@ -2,10 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.IntegrationTests.Seeding;
 using PetFamily.Application.IntegrationTests.Shared;
-using PetFamily.Application.PetsManagement.Volunteers.Commands.CreateVolunteer;
-using PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateMainInfo;
 using PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateRequisites;
-using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.DTOs;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
