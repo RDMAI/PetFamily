@@ -143,16 +143,17 @@ public static class SeedingHelper
     }
 
     /// <summary>
-    /// Creates list of valid 4 species: Dog, Cat, Parrot and Hamster
+    /// Creates list of valid species with unique name (Species + iteration counter)
     /// </summary>
     /// <returns></returns>
-    public static List<Species> CreateValidSpeciesList()
+    public static List<Species> CreateValidSpeciesList(int amount)
     {
         List<Species> species = [];
-        species.Add(CreateValidSpecies(specificName: "Dog"));
-        species.Add(CreateValidSpecies(specificName: "Cat"));
-        species.Add(CreateValidSpecies(specificName: "Parrot"));
-        species.Add(CreateValidSpecies(specificName: "Hamster"));
+
+        for (int i = 0; i < amount; i++)
+        {
+            species.Add(CreateValidSpecies(specificName: $"Species_{i}"));
+        }
 
         return species;
     }

@@ -3,9 +3,7 @@ using PetFamily.Application.IntegrationTests.Seeding;
 using PetFamily.Application.IntegrationTests.Shared;
 using PetFamily.Application.PetsManagement.Volunteers.DTOs;
 using PetFamily.Application.PetsManagement.Volunteers.Queries.GetById;
-using PetFamily.Application.PetsManagement.Volunteers.Queries.GetVolunteers;
 using PetFamily.Application.Shared.Abstractions;
-using PetFamily.Application.Shared.DTOs;
 using PetFamily.Infrastructure.DataBaseAccess.Write;
 
 namespace PetFamily.Application.IntegrationTests.PetsManagement.Volunteers;
@@ -40,6 +38,6 @@ public class GetVolunteerByIdHandlerTests : BaseHandlerTests
         var errorMessage = result.IsSuccess ? "" : result.Error.First().Message;
         Assert.True(result.IsSuccess, errorMessage);
         Assert.True(result.Value is not null, "Result value is null");
-        Assert.True(result.Value.Id == query.Id, "entity with wrong id returned");
+        Assert.True(result.Value.Id == query.Id, "Entity with wrong id returned");
     }
 }
