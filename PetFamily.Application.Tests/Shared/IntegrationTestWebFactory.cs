@@ -83,7 +83,8 @@ public class IntegrationTestWebFactory : WebApplicationFactory<Program>, IAsyncL
 
         _respawner = await Respawner.CreateAsync(_dbConnection, new RespawnerOptions
         {
-            DbAdapter = DbAdapter.Postgres
+            DbAdapter = DbAdapter.Postgres,
+            SchemasToInclude = [ "public" ]
         });
     }
 
