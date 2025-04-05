@@ -12,5 +12,6 @@ public class DapperConfigurationHelper
         Dapper.SqlMapper.AddTypeHandler(new JsonTypeHandler<Requisites[]>());
         Dapper.SqlMapper.AddTypeHandler(new JsonTypeHandler<SocialNetwork[]>());
         Dapper.SqlMapper.AddTypeHandler(new JsonTypeHandler<FileVO[]>());
+        Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
     }
 }

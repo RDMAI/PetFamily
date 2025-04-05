@@ -37,9 +37,9 @@ public class DeletePetPhotosHandlerTests : BaseHandlerTests
         
         var pathToFile = Guid.NewGuid().ToString() + "_test.jpg";
         IEnumerable<FileVO> files = [FileVO.Create(pathToFile, "test.jpg").Value];
-        volunteer.AddPhotosToPet(pet.Id, files);
-
         volunteer.AddPet(pet);
+
+        volunteer.AddPhotosToPet(pet.Id, files);
         _context.Volunteers.Add(volunteer);
 
         await _context.SaveChangesAsync();
@@ -84,11 +84,10 @@ public class DeletePetPhotosHandlerTests : BaseHandlerTests
 
         var pathToFile = Guid.NewGuid().ToString() + "_test.jpg";
         IEnumerable<FileVO> files = [FileVO.Create(pathToFile, "test.jpg").Value];
+        volunteer.AddPet(pet);
         volunteer.AddPhotosToPet(pet.Id, files);
 
-        volunteer.AddPet(pet);
         _context.Volunteers.Add(volunteer);
-
         await _context.SaveChangesAsync();
 
         var fakeVolunteerId = VolunteerId.GenerateNew();
@@ -108,8 +107,9 @@ public class DeletePetPhotosHandlerTests : BaseHandlerTests
         Assert.True(result.Error is not null, "Result error is null");
 
         // check if the entity is in the database
+        var petId = PetId.Create(command.PetId);
         var entity = await _context.Volunteers
-            .Where(v => v.Pets.Any(p => p.Id == result.Value)).FirstOrDefaultAsync();
+            .Where(v => v.Pets.Any(p => p.Id == petId)).FirstOrDefaultAsync();
         Assert.True(entity is not null, "Pet is not in the database");
         var photos = entity.Pets.First().Photos.ToList();
         Assert.True(photos.Count != 0, "Photo is not deleted");

@@ -12,6 +12,9 @@ using PetFamily.Application.PetsManagement.Pets.Commands.SetMainPetPhoto;
 using PetFamily.Application.PetsManagement.Pets.Commands.UpdatePet;
 using PetFamily.Application.PetsManagement.Pets.Commands.UpdatePetStatus;
 using PetFamily.Application.PetsManagement.Pets.Commands.UploadPetPhotos;
+using PetFamily.Application.PetsManagement.Pets.DTOs;
+using PetFamily.Application.PetsManagement.Pets.Queries.GetPetById;
+using PetFamily.Application.PetsManagement.Pets.Queries.GetPets;
 using PetFamily.Application.PetsManagement.Pets.UploadPetPhotos;
 using PetFamily.Application.PetsManagement.Volunteers.Commands.CreateVolunteer;
 using PetFamily.Application.PetsManagement.Volunteers.Commands.DeleteVolunteer;
@@ -24,6 +27,7 @@ using PetFamily.Application.PetsManagement.Volunteers.Queries.GetVolunteers;
 using PetFamily.Application.Shared.Abstractions;
 using PetFamily.Application.Shared.DTOs;
 using PetFamily.Domain.Helpers;
+using PetFamily.Domain.PetsManagement.Entities;
 using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 
@@ -143,6 +147,36 @@ public class VolunteersController : ApplicationController
         var volunteerId = result.Value;
 
         return Ok(volunteerId.Value);
+    }
+
+    [HttpGet("{volunteerid:guid}/pets")]
+    public async Task<IActionResult> GetPets(
+        [FromServices] IQueryHandler<DataListPage<PetDTO>, GetPetsQuery> petHandler,
+        [FromRoute] Guid volunteerid,
+        [FromQuery] GetPetsRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var getPetsQuery = request.ToQuery(volunteerid);
+        var result = await petHandler.HandleAsync(getPetsQuery, cancellationToken);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet("{volunteerid:guid}/pets/{petid:guid}")]
+    public async Task<IActionResult> GetPetById(
+        [FromServices] IQueryHandler<PetDTO, GetPetByIdQuery> petHandler,
+        [FromRoute] Guid volunteerid,
+        [FromRoute] Guid petid,
+        CancellationToken cancellationToken = default)
+    {
+        var getPetByIdQuery = new GetPetByIdQuery(volunteerid, petid);
+        var result = await petHandler.HandleAsync(getPetByIdQuery, cancellationToken);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        return Ok(result.Value);
     }
 
     [HttpPost("{id:guid}/pets")]

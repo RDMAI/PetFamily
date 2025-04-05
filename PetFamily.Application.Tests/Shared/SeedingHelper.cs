@@ -68,30 +68,49 @@ public static class SeedingHelper
         return volunteers;
     }
 
+    private static readonly string[] petColors = ["Black", "White", "Brown", "Gray"];
+
+    /// <summary>
+    /// Creates valid pet with partially random values of properties
+    /// </summary>
+    /// <param name="breedId"></param>
+    /// <param name="speciesId"></param>
+    /// <param name="specificName"></param>
+    /// <returns></returns>
     public static Pet CreateValidPet(BreedId breedId, SpeciesId speciesId, string specificName = "Fido")
     {
+        Random rnd = new Random();
+
         var petId = PetId.GenerateNew();
         var name = PetName.Create(specificName).Value;
 
         var description = Description.Create($"Test description for {name.Value}").Value;
-        var color = PetColor.Create("Black").Value;
-        var weight = PetWeight.Create(10).Value;
-        var height = PetHeight.Create(30).Value;
+
+        var color = PetColor.Create(
+            petColors[rnd.Next(0, petColors.Length-1)]
+            ).Value;
+        var weight = PetWeight.Create(rnd.Next(1, 10)).Value;
+        var height = PetHeight.Create(rnd.Next(1, 30)).Value;
 
         var breed = PetBreed.Create(breedId, speciesId).Value;
 
-        var healthInfo = PetHealthInfo.Create("Healthy").Value;
+        var healthInfo = PetHealthInfo.Create(
+            rnd.Next(100) > 50 ? "Healthy" : "Needs medical attention"
+            ).Value;
 
         var address = Address.Create("Moscow",
             "Dvorovaya",
-            1,
+            rnd.Next(1, 60),
             null,
-            1).Value;
+            rnd.Next(1, 20)).Value;
 
-        var phone = Phone.Create("89000000001").Value;
-        var isCastrated = true;
-        var birthDate = new DateOnly(2020, 01, 01);
-        var isVacinated = true;
+        var phone = Phone.Create("89000000" + rnd.Next(9) + rnd.Next(9) + rnd.Next(9)).Value;
+        var isCastrated = rnd.Next(100) > 50;
+        var birthDate = new DateOnly(
+            year: 2000 + rnd.Next(25),
+            month: rnd.Next(1, 12),
+            day: rnd.Next(1, 28));
+        var isVacinated = rnd.Next(100) > 50;
         var status = PetStatus.Create(PetStatuses.SeekingHome).Value;
 
         IEnumerable<Requisites> requisitesEnumerable = [
