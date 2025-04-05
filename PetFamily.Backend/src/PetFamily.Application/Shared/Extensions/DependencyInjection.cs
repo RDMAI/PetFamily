@@ -4,7 +4,7 @@ using PetFamily.Application.PetsManagement.Pets.Commands.AddPet;
 using PetFamily.Application.PetsManagement.Pets.Commands.DeletePetPhotos;
 using PetFamily.Application.PetsManagement.Pets.Commands.MovePet;
 using PetFamily.Application.PetsManagement.Pets.Commands.UploadPetPhotos;
-using PetFamily.Application.PetsManagement.Pets.UploadPetPhotos;
+using PetFamily.Application.PetsManagement.Pets.Queries.GetPetPhotos;
 using PetFamily.Application.PetsManagement.Volunteers.Commands.CreateVolunteer;
 using PetFamily.Application.PetsManagement.Volunteers.Commands.DeleteVolunteer;
 using PetFamily.Application.PetsManagement.Volunteers.Commands.UpdateMainInfo;

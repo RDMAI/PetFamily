@@ -41,7 +41,7 @@ public class GetPetByIdHandlerTests : BaseHandlerTests
         context.Volunteers.Add(volunteer);
         await context.SaveChangesAsync();
 
-        var query = new GetPetByIdQuery(pets.First().Id.Value);
+        var query = new GetPetByIdQuery(volunteer.Id.Value, pets.First().Id.Value);
 
         var ct = new CancellationTokenSource().Token;
 
@@ -55,7 +55,7 @@ public class GetPetByIdHandlerTests : BaseHandlerTests
         var errorMessage = result.IsSuccess ? "" : result.Error.First().Message;
         Assert.True(result.IsSuccess, errorMessage);
         Assert.True(result.Value is not null, "Result value is null");
-        Assert.True(result.Value.Id == query.Id, "Entity with wrong id returned");
+        Assert.True(result.Value.Id == query.PetId, "Entity with wrong id returned");
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class GetPetByIdHandlerTests : BaseHandlerTests
         context.Volunteers.Add(volunteer);
         await context.SaveChangesAsync();
 
-        var query = new GetPetByIdQuery(PetId.GenerateNew().Value);
+        var query = new GetPetByIdQuery(volunteer.Id.Value, PetId.GenerateNew().Value);
 
         var ct = new CancellationTokenSource().Token;
 

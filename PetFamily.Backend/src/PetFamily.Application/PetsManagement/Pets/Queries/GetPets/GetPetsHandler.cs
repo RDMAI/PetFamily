@@ -44,13 +44,71 @@ public class GetPetsHandler : IQueryHandler<DataListPage<PetDTO>, GetPetsQuery>
         using var connection = _dBConnectionFactory.Create();
 
         var parameters = new DynamicParameters();
+        var sqlFiltering = _createFilteringSQL(parameters, query);
 
-        // first apply filters
-        var sql = new StringBuilder(
-            """
+        var sqlForCounting = new StringBuilder("""
+            SELECT Count(Pets.id)
             FROM Pets
-            WHERE is_deleted = false
             """);
+        sqlForCounting.Append(sqlFiltering);
+        var totalCount = await connection.ExecuteScalarAsync<int>(sqlForCounting.ToString(), parameters);
+
+        // after count excuted, reuse the SAME string builder with different SELECT statement
+        var sqlForSelecting = new StringBuilder("""
+            SELECT
+                id,
+                name,
+                description,
+                color,
+                weight,
+                height,
+                breed_id,
+                species_id,
+                health_information,
+                city,
+                street,
+                house_number,
+                house_subnumber,
+                appartment_number,
+                owner_phone,
+                is_castrated,
+                birth_date,
+                is_vacinated,
+                status,
+                serial_number,
+                volunteer_id,
+                is_deleted
+            FROM Pets
+            """);
+        sqlForSelecting.Append(sqlFiltering);
+        parameters.Add("@offset", (query.CurrentPage - 1) * query.PageSize);
+        parameters.Add("@limit", query.PageSize);
+
+        if (query.Sort is not null && query.Sort.Any())
+            DapperSQLHelper.ApplySorting(sqlForSelecting, query.Sort);
+
+        DapperSQLHelper.ApplyPagination(sqlForSelecting, parameters, query.CurrentPage, query.PageSize);
+
+        _logger.LogInformation("Dapper SQL: {sql}", sqlForSelecting.ToString());
+
+        var entities = await connection.QueryAsync<PetDTO>(sqlForSelecting.ToString(), parameters);
+
+        var result = new DataListPage<PetDTO>
+        {
+            TotalCount = totalCount,
+            PageNumber = query.CurrentPage,
+            PageSize = query.PageSize,
+            Data = entities
+        };
+
+        return Result.Success<DataListPage<PetDTO>, ErrorList>(result);
+    }
+
+    private StringBuilder _createFilteringSQL(
+        DynamicParameters parameters,
+        GetPetsQuery query)
+    {
+        var sql = new StringBuilder(" WHERE is_deleted = false");
 
         if (string.IsNullOrEmpty(query.Name) == false)
         {
@@ -162,33 +220,6 @@ public class GetPetsHandler : IQueryHandler<DataListPage<PetDTO>, GetPetsQuery>
             sql.Append(" AND volunteer_id = @volunteer_id");
         }
 
-        var sqlCount = new StringBuilder(sql.ToString());
-        sqlCount.Insert(0, "SELECT Count(Pets.id) ");  // insert count query
-
-        var totalCount = await connection.ExecuteScalarAsync<int>(sqlCount.ToString(), parameters);
-
-        // after count executed, use the same string without "SELECT Count"
-        sql.Insert(0, "SELECT * ");
-        parameters.Add("@offset", (query.CurrentPage - 1) * query.PageSize);
-        parameters.Add("@limit", query.PageSize);
-
-        if (query.Sort is not null && query.Sort.Any())
-            DapperSQLHelper.ApplySorting(sql, query.Sort);
-
-        DapperSQLHelper.ApplyPagination(sql, parameters, query.CurrentPage, query.PageSize);
-
-        _logger.LogInformation("Dapper SQL: {sql}", sql.ToString());
-
-        var entities = await connection.QueryAsync<PetDTO>(sql.ToString(), parameters);
-
-        var result = new DataListPage<PetDTO>
-        {
-            TotalCount = totalCount,
-            PageNumber = query.CurrentPage,
-            PageSize = query.PageSize,
-            Data = entities
-        };
-
-        return Result.Success<DataListPage<PetDTO>, ErrorList>(result);
+        return sql;
     }
 }
