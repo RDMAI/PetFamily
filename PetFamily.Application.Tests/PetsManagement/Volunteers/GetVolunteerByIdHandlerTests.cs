@@ -21,7 +21,7 @@ public class GetVolunteerByIdHandlerTests : BaseHandlerTests
         using var context = scope.ServiceProvider.GetRequiredService<WriteDBContext>();
         var volunteers = SeedingHelper.CreateValidVolunteerList(2);
 
-        context.Volunteers.AddRange(volunteers);
+        context.Volunteers.AddRange();
         await context.SaveChangesAsync();
 
         var query = new GetVolunteerByIdQuery(volunteers.First().Id.Value);

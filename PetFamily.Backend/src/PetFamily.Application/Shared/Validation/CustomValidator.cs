@@ -30,6 +30,29 @@ public static class CustomValidator
         });
     }
 
+    public static IRuleBuilderOptionsConditions<T, IEnumerable<SortByDTO>> MustBeValidSorting<T>(
+        this IRuleBuilder<T, IEnumerable<SortByDTO>> ruleBuilder,
+        IEnumerable<string> propertyNames)
+    {
+        return ruleBuilder.Custom((sortList, context) =>
+        {
+            foreach (var sort in sortList)
+                if (propertyNames.Contains(sort.Property, StringComparer.OrdinalIgnoreCase) == false)
+                {
+                    context.AddFailure(ErrorHelper.General.ValueIsInvalid($"Property: {sort.Property}").Serialize());
+                }
+        });
+    }
+
+    public static IRuleBuilderOptionsConditions<T, IEnumerable<SortByDTO>> MustBeValidSorting<T>(
+        this IRuleBuilder<T, IEnumerable<SortByDTO>> ruleBuilder,
+        Type type)
+    {
+        var props = type.GetProperties().Select(p => p.Name);
+
+        return MustBeValidSorting(ruleBuilder, props);
+    }
+
     public static IRuleBuilderOptionsConditions<T, TElement> MustBeNotNull<T, TElement>(
         this IRuleBuilder<T, TElement> ruleBuilder)
     {
@@ -44,34 +67,39 @@ public static class CustomValidator
         });
     }
 
-    public static IRuleBuilderOptionsConditions<T, IEnumerable<SortByDTO>?> MustBeValidSorting<T>(
-        this IRuleBuilder<T, IEnumerable<SortByDTO>?> ruleBuilder,
-        IEnumerable<string> propertyNames)
-    {
-        return ruleBuilder.Custom((sortList, context) =>
-        {
-            if (sortList is null) return;
-            foreach (var sort in sortList)
-                if (propertyNames.Contains(sort.Property, StringComparer.OrdinalIgnoreCase) == false)
-                {
-                    context.AddFailure(ErrorHelper.General.ValueIsInvalid($"Property: {sort.Property}").Serialize());
-                }
-        });
-    }
-
-    public static IRuleBuilderOptionsConditions<T, IEnumerable<SortByDTO>?> MustBeValidSorting<T>(
-        this IRuleBuilder<T, IEnumerable<SortByDTO>?> ruleBuilder,
-        Type type)
-    {
-        var props = type.GetProperties().Select(p => p.Name);
-
-        return MustBeValidSorting(ruleBuilder, props);
-    }
-
     public static IRuleBuilderOptions<T, TProperty> WithError<T, TProperty>(
         this IRuleBuilderOptions<T, TProperty> rule,
         Error error)
     {
         return rule.WithMessage(error.Serialize());
     }
+
+    /// <summary>
+    /// Validates list of DTOs to be valid list of ValueObjects
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="Tdto"></typeparam>
+    /// <typeparam name="TValueObject"></typeparam>
+    /// <param name="ruleBuilder"></param>
+    /// <param name="DTOFactoryMethod"></param>
+    /// <returns></returns>
+    //public static IRuleBuilderOptionsConditions<T, IEnumerable<Tdto>> MustBeListOfValueObjects<T, Tdto, TValueObject>(
+    //    this IRuleBuilder<T, IEnumerable<Tdto>> ruleBuilder,
+    //    Func<Tdto, Result<TValueObject, Error>> DTOFactoryMethod)
+    //{
+    //    return ruleBuilder.Custom((listDTO, context) => {
+    //        if (listDTO == null)
+    //        {
+    //            context.AddFailure(ErrorHelper.General.ValueIsNull().Message);
+    //            return;
+    //        }
+
+    //        foreach (Tdto dto in listDTO)
+    //        {
+    //            var resultDTO = DTOFactoryMethod(dto);
+    //            if (resultDTO.IsFailure)
+    //                context.AddFailure(resultDTO.Error.Message);
+    //        }
+    //    });
+    //}
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿
+using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Infrastructure.DataBaseAccess.Write;
 
 namespace PetFamily.Application.IntegrationTests.Shared;
