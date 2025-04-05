@@ -2,7 +2,7 @@
 using PetFamily.Application.Shared.Validation;
 using PetFamily.Domain.Helpers;
 
-namespace PetFamily.Application.PetsManagement.Pets.UploadPetPhotos;
+namespace PetFamily.Application.PetsManagement.Pets.Queries.GetPetPhotos;
 public class GetPetPhotosCommandValidator : AbstractValidator<GetPetPhotosCommand>
 {
     public GetPetPhotosCommandValidator()

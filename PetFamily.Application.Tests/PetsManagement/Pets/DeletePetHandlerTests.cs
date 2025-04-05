@@ -92,6 +92,6 @@ public class DeletePetHandlerTests : BaseHandlerTests
         // check if the entity is NOT in the database
         var entity = await _context.Volunteers
             .Where(v => v.Pets.Any(p => p.IsDeleted)).FirstOrDefaultAsync();
-        Assert.True(entity is not null, "Entity is not deleted, expeccted otherwise");
+        Assert.True(entity is null, "Entity is not deleted, expected otherwise");
     }
 }

@@ -8,7 +8,7 @@ using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
 using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Application.PetsManagement.Pets.UploadPetPhotos;
+namespace PetFamily.Application.PetsManagement.Pets.Queries.GetPetPhotos;
 public class GetPetPhotosHandler
 {
     private readonly IVolunteerAggregateRepository _volunteerRepository;
