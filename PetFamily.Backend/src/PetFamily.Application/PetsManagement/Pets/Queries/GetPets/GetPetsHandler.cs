@@ -44,7 +44,7 @@ public class GetPetsHandler : IQueryHandler<DataListPage<PetDTO>, GetPetsQuery>
         using var connection = _dBConnectionFactory.Create();
 
         var parameters = new DynamicParameters();
-        var sqlFiltering = _createFilteringSQL(parameters, query);
+        var sqlFiltering = СreateFilteringSQL(parameters, query);
 
         var sqlForCounting = new StringBuilder("""
             SELECT Count(Pets.id)
@@ -104,7 +104,7 @@ public class GetPetsHandler : IQueryHandler<DataListPage<PetDTO>, GetPetsQuery>
         return Result.Success<DataListPage<PetDTO>, ErrorList>(result);
     }
 
-    private StringBuilder _createFilteringSQL(
+    private StringBuilder СreateFilteringSQL(
         DynamicParameters parameters,
         GetPetsQuery query)
     {
