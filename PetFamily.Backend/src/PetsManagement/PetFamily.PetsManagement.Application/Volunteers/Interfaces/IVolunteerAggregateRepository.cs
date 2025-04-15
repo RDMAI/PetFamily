@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using PetFamily.PetsManagement.Domain.Entities;
-using PetFamily.PetsManagement.Domain.ValueObjects.Volunteers;
-using PetFamily.Shared.Core;
-using PetFamily.Shared.Core.ValueObjects;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects;
+using PetFamily.Shared.Kernel.ValueObjects.Ids;
 
 namespace PetFamily.PetsManagement.Application.Volunteers.Interfaces;
 public interface IVolunteerAggregateRepository

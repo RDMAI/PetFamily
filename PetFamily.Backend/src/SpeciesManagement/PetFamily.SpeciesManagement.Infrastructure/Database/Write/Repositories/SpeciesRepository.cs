@@ -1,19 +1,17 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.SpeciesManagement.Interfaces;
-using PetFamily.Domain.Helpers;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.SpeciesManagement.Entities;
-using PetFamily.Domain.SpeciesManagement.ValueObjects;
-using PetFamily.PetsManagement.Infrastructure.Database.Write;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects.Ids;
+using PetFamily.SpeciesManagement.Application.Interfaces;
+using PetFamily.SpeciesManagement.Domain.Entities;
 
-namespace PetFamily.PetsManagement.Infrastructure.Database.Write.Repositories;
+namespace PetFamily.SpeciesManagement.Infrastructure.Database.Write.Repositories;
 
 public class SpeciesRepository : ISpeciesAggregateRepository
 {
-    private readonly WriteDBContext _context;
+    private readonly SpeciesWriteDBContext _context;
 
-    public SpeciesRepository(WriteDBContext context)
+    public SpeciesRepository(SpeciesWriteDBContext context)
     {
         _context = context;
     }

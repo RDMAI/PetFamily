@@ -18,4 +18,7 @@ public record PetName
     {
         Value = value;
     }
+
+    // EF Core
+    private PetName() { }
 }

@@ -24,4 +24,7 @@ public record PetBreed
         BreedId = breedId;
         SpeciesId = speciesId;
     }
+
+    // EF Core
+    private PetBreed() { }
 }

@@ -17,4 +17,7 @@ public record Description
     {
         Value = value;
     }
+
+    // EF Core
+    private Description() { }
 }

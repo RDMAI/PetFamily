@@ -19,4 +19,7 @@ public record Phone
     {
         Value = value;
     }
+
+    // EF Core
+    private Phone() { }
 }

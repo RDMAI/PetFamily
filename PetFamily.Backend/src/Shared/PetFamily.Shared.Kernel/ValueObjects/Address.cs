@@ -36,4 +36,7 @@ public record Address
         HouseSubNumber = houseSubNumber;
         AppartmentNumber = appartmentNumber;
     }
+
+    // EF Core
+    private Address() { }
 }

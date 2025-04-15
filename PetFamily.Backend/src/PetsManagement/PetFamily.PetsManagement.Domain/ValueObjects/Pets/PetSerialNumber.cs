@@ -19,6 +19,9 @@ public record PetSerialNumber
         Value = value;
     }
 
+    // EF Core
+    private PetSerialNumber() { }
+
     public static bool operator >(PetSerialNumber a, PetSerialNumber b)
         => a.Value > b.Value;
     public static bool operator <(PetSerialNumber a, PetSerialNumber b)

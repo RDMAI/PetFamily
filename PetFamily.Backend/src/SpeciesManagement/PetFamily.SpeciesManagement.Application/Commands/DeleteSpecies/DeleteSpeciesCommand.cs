@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Shared.Abstractions;
+﻿using PetFamily.Shared.Core.Abstractions;
 
 namespace PetFamily.SpeciesManagement.Application.Commands.DeleteSpecies;
 

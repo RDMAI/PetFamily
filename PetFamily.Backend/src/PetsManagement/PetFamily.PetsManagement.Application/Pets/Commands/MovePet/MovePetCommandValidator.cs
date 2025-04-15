@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using PetFamily.Application.Shared.Validation;
-using PetFamily.Domain.Helpers;
-using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
+using PetFamily.PetsManagement.Domain.ValueObjects.Pets;
+using PetFamily.Shared.Core.Validation;
+using PetFamily.Shared.Kernel;
 
 namespace PetFamily.PetsManagement.Application.Pets.Commands.MovePet;
 

@@ -19,6 +19,9 @@ public record PetStatus
     {
         Value = value;
     }
+
+    // EF Core
+    private PetStatus() { }
 }
 
 public enum PetStatuses

@@ -28,4 +28,7 @@ public record Requisites
         Description = description;
         Value = value;
     }
+
+    // EF Core
+    private Requisites() { }
 }

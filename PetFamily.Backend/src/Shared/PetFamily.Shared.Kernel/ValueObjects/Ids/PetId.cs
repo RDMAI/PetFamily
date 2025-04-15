@@ -15,4 +15,7 @@ public record PetId : IComparable<PetId>
     {
         Value = value;
     }
+
+    // EF Core
+    private PetId() { }
 }

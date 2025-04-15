@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
-using PetFamily.Application.Shared.Validation;
-using PetFamily.Domain.Helpers;
+using PetFamily.Shared.Core.Validation;
+using PetFamily.Shared.Kernel;
 using PetFamily.SpeciesManagement.Application.DTOs;
 
 namespace PetFamily.SpeciesManagement.Application.Queries.GetBreeds;

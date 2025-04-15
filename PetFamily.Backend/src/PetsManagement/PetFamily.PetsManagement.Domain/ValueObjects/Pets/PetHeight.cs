@@ -18,4 +18,7 @@ public record PetHeight
     {
         Value = value;
     }
+
+    // EF Core
+    private PetHeight() { }
 }

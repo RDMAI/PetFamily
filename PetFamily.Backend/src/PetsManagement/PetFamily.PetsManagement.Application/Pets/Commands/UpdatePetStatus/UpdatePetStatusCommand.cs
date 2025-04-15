@@ -1,5 +1,4 @@
-﻿using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
-using PetFamily.Shared.Core.Application.Abstractions;
+﻿using PetFamily.Shared.Core.Abstractions;
 
 namespace PetFamily.PetsManagement.Application.Pets.Commands.UpdatePetStatus;
 

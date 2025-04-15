@@ -7,9 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Files\PetFamily.Files.Contracts\PetFamily.Files.Contracts.csproj" />
+    <ProjectReference Include="..\..\Shared\PetFamily.Shared.Core\PetFamily.Shared.Core.csproj" />
+    <ProjectReference Include="..\..\Shared\PetFamily.Shared.Kernel\PetFamily.Shared.Kernel.csproj" />
+    <ProjectReference Include="..\..\SpeciesManagement\PetFamily.SpeciesManagement.Contracts\PetFamily.SpeciesManagement.Contracts.csproj" />
     <ProjectReference Include="..\PetFamily.PetsManagement.Domain\PetFamily.PetsManagement.Domain.csproj" />
-    <ProjectReference Include="..\PetFamily.PetsManagement.Infrastructure\PetFamily.PetsManagement.Infrastructure.csproj" />
-    <ProjectReference Include="..\PetFamily.Shared.Core\PetFamily.Shared.Core.csproj" />
   </ItemGroup>
 
 </Project>

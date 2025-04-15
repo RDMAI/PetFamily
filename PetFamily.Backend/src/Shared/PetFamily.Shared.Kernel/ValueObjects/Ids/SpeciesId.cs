@@ -15,4 +15,7 @@ public record SpeciesId : IComparable<SpeciesId>
     {
         Value = value;
     }
+
+    // EF Core
+    private SpeciesId() { }
 }

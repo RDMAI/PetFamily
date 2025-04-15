@@ -25,4 +25,7 @@ public record File
         PathToStorage = pathToStorage;
         Name = name;
     }
+
+    // EF Core
+    private File() { }
 }

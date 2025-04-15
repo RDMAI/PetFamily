@@ -1,5 +1,5 @@
-﻿using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.PetsManagement.Application.Pets.DTOs;
+﻿using PetFamily.PetsManagement.Application.Pets.DTOs;
+using PetFamily.Shared.Kernel.ValueObjects;
 
 namespace PetFamily.PetsManagement.Application.Volunteers.DTOs;
 

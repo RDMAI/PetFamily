@@ -18,4 +18,7 @@ public record VolunteerExperienceYears
     {
         Value = value;
     }
+
+    // EF Core
+    private VolunteerExperienceYears() { }
 }

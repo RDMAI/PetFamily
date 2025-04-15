@@ -29,4 +29,7 @@ public record VolunteerFullName
         LastName = lastName;
         FatherName = fatherName;
     }
+
+    // EF Core
+    private VolunteerFullName() { }
 }

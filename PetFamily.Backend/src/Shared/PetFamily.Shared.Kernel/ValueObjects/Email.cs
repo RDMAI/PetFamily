@@ -18,4 +18,7 @@ public record Email
     {
         Value = value;
     }
+
+    // EF Core
+    private Email() { }
 }

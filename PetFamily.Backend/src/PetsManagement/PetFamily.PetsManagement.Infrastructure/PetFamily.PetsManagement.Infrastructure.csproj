@@ -7,15 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
+    <PackageReference Include="EntityFrameworkCore.NamingConventions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.4" />
-    <PackageReference Include="Npgsql" Version="9.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.4" />
+    <PackageReference Include="Npgsql" Version="8.0.7" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\PetFamily.Shared.Core\PetFamily.Shared.Core.csproj" />
     <ProjectReference Include="..\..\Shared\PetFamily.Shared.Kernel\PetFamily.Shared.Kernel.csproj" />
     <ProjectReference Include="..\PetFamily.PetsManagement.Domain\PetFamily.PetsManagement.Domain.csproj" />
+    <ProjectReference Include="..\PetFamily.PetsManagement.Application\PetFamily.PetsManagement.Application.csproj" />
   </ItemGroup>
 
 </Project>

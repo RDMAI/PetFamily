@@ -18,4 +18,7 @@ public record PetWeight
     {
         Value = value;
     }
+
+    // EF Core
+    private PetWeight() { }
 }

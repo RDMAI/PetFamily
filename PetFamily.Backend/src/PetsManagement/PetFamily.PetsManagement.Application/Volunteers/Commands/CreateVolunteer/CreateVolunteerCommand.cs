@@ -1,6 +1,6 @@
-﻿using PetFamily.Application.Shared.DTOs;
-using PetFamily.PetsManagement.Application.Volunteers.DTOs;
-using PetFamily.Shared.Core.Application.Abstractions;
+﻿using PetFamily.PetsManagement.Application.Volunteers.DTOs;
+using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Core.DTOs;
 
 namespace PetFamily.PetsManagement.Application.Volunteers.Commands.CreateVolunteer;
 public record CreateVolunteerCommand(

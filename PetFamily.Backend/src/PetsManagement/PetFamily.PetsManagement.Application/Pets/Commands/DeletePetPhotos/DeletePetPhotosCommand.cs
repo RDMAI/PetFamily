@@ -1,4 +1,4 @@
-﻿using PetFamily.Shared.Core.Application.Abstractions;
+﻿using PetFamily.Shared.Core.Abstractions;
 
 namespace PetFamily.PetsManagement.Application.Pets.Commands.DeletePetPhotos;
 

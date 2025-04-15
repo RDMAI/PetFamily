@@ -24,4 +24,7 @@ public record SocialNetwork
         Name = name;
         Link = link;
     }
+
+    // EF Core
+    private SocialNetwork() { }
 }

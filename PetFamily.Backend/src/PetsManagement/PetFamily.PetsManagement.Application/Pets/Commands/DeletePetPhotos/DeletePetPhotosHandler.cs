@@ -1,34 +1,34 @@
 ﻿using CSharpFunctionalExtensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Shared.DTOs;
-using PetFamily.Application.Shared.Interfaces;
-using PetFamily.Domain.Helpers;
-using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
-using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
-using PetFamily.Domain.Shared;
+using PetFamily.Files.Contracts;
+using PetFamily.Files.Contracts.Requests;
 using PetFamily.PetsManagement.Application.Volunteers.Interfaces;
-using PetFamily.Shared.Core.Application.Abstractions;
+using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects.Ids;
+using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.PetsManagement.Application.Pets.Commands.DeletePetPhotos;
 public class DeletePetPhotosHandler
     : ICommandHandler<PetId, DeletePetPhotosCommand>
 {
     private readonly IVolunteerAggregateRepository _volunteerRepository;
-    private readonly IFileProvider _fileProvider;
-    private readonly IUnitOfWork _transactionHelper;
+    private readonly IFileContract _fileProvider;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly DeletePetPhotosCommandValidator _validator;
     private readonly ILogger<DeletePetPhotosHandler> _logger;
 
     public DeletePetPhotosHandler(
         IVolunteerAggregateRepository volunteerRepository,
-        IFileProvider fileProvider,
-        IUnitOfWork transactionHelper,
+        IFileContract fileProvider,
+        [FromKeyedServices(DependencyKey.Pets)] IUnitOfWork unitOfWork,
         DeletePetPhotosCommandValidator validator,
         ILogger<DeletePetPhotosHandler> logger)
     {
         _volunteerRepository = volunteerRepository;
         _fileProvider = fileProvider;
-        _transactionHelper = transactionHelper;
+        _unitOfWork = unitOfWork;
         _validator = validator;
         _logger = logger;
     }
@@ -57,10 +57,10 @@ public class DeletePetPhotosHandler
         var petId = PetId.Create(command.PetId);
 
         var photoInfos = command.PhotoPaths.Select(p =>
-            new FileInfoDTO(p, Constants.BucketNames.PET_PHOTOS));
+            new Shared.Core.Files.FileInfo(p, Constants.BucketNames.PET_PHOTOS));
 
         // handling BL
-        var transaction = await _transactionHelper.BeginTransaction(cancellationToken);
+        var transaction = await _unitOfWork.BeginTransaction(cancellationToken);
         try
         {
             // delete photos' paths from DB
@@ -77,7 +77,7 @@ public class DeletePetPhotosHandler
 
             // delete photos from file storage
             var fileStorageResult = await _fileProvider.DeleteFilesAsync(
-                photoInfos,
+                request: new DeleteFilesRequest(photoInfos),
                 cancellationToken);
 
             if (fileStorageResult.IsFailure)

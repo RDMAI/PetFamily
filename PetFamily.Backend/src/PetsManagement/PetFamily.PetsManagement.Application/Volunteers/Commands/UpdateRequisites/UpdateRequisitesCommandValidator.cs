@@ -1,10 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
-using PetFamily.Application.Shared.DTOs;
-using PetFamily.Application.Shared.Validation;
-using PetFamily.Domain.Helpers;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.ValueObjects;
+using PetFamily.Shared.Core.DTOs;
+using PetFamily.Shared.Core.Validation;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects;
 
 namespace PetFamily.PetsManagement.Application.Volunteers.Commands.UpdateRequisites;
 public class UpdateRequisitesCommandValidator : AbstractValidator<UpdateRequisitesCommand>

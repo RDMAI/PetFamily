@@ -21,11 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PetFamily.Backend\src\PetFamily.API\PetFamily.API.csproj" />
-    <ProjectReference Include="..\PetFamily.Backend\src\PetFamily.Domain\PetFamily.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

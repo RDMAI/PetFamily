@@ -1,5 +1,5 @@
-﻿using PetFamily.Application.Shared.DTOs;
-using PetFamily.Shared.Core.Application.Abstractions;
+﻿using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Core.DTOs;
 
 namespace PetFamily.PetsManagement.Application.Volunteers.Commands.UpdateRequisites;
 public record UpdateRequisitesCommand(

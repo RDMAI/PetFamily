@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Files.Contracts.Requests;
 using PetFamily.Shared.Kernel;
 
 namespace PetFamily.Files.Contracts;
@@ -6,14 +7,14 @@ namespace PetFamily.Files.Contracts;
 public interface IFileContract
 {
     public Task<UnitResult<ErrorList>> UploadFilesAsync(
-        IEnumerable<Shared.Core.Files.FileData> files,
+        UploadFilesRequest request,
         CancellationToken cancellationToken = default);
 
     Task<UnitResult<ErrorList>> DeleteFilesAsync(
-        IEnumerable<Shared.Core.Files.FileInfo> files,
+        DeleteFilesRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Result<IEnumerable<string>, ErrorList>> GetFilesAsync(
-        IEnumerable<Shared.Core.Files.FileInfo> files,
+        GetFilesRequest request,
         CancellationToken cancellationToken = default);
 }

@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using PetFamily.Application.Shared.Validation;
-using PetFamily.Domain.Helpers;
-using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
-using PetFamily.Domain.Shared.ValueObjects;
+using PetFamily.PetsManagement.Domain.ValueObjects.Volunteers;
+using PetFamily.Shared.Core.Validation;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects;
 
 namespace PetFamily.PetsManagement.Application.Volunteers.Commands.UpdateMainInfo;
 public class UpdateMainInfoCommandValidator : AbstractValidator<UpdateMainInfoCommand>

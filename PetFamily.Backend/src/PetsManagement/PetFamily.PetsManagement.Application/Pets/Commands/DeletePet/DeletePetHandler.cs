@@ -1,12 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Shared.Interfaces;
-using PetFamily.Domain.Helpers;
-using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
-using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
-using PetFamily.Domain.Shared;
 using PetFamily.PetsManagement.Application.Volunteers.Interfaces;
-using PetFamily.Shared.Core.Application.Abstractions;
+using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects.Ids;
 
 namespace PetFamily.PetsManagement.Application.Pets.Commands.DeletePet;
 

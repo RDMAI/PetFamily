@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
-using PetFamily.Application.Shared.Validation;
-using PetFamily.Domain.Helpers;
+using PetFamily.Shared.Core.Validation;
+using PetFamily.Shared.Kernel;
 
 namespace PetFamily.PetsManagement.Application.Pets.Commands.DeletePetPhotos;
 public class DeletePetPhotosCommandValidator : AbstractValidator<DeletePetPhotosCommand>

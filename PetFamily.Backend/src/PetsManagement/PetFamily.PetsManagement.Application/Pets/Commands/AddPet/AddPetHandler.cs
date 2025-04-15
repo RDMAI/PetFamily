@@ -1,17 +1,15 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Shared.DTOs;
-using PetFamily.Application.Shared.Interfaces;
-using PetFamily.Domain.PetsManagement.Entities;
-using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
-using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.Primitives;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.SpeciesManagement.ValueObjects;
-using PetFamily.PetsManagement.Application.Pets.Commands;
 using PetFamily.PetsManagement.Application.Volunteers.Interfaces;
-using PetFamily.Shared.Core.Application.Abstractions;
+using PetFamily.PetsManagement.Domain.Entities;
+using PetFamily.PetsManagement.Domain.ValueObjects.Pets;
+using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Core.DTOs;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.Abstractions;
+using PetFamily.Shared.Kernel.ValueObjects;
+using PetFamily.Shared.Kernel.ValueObjects.Ids;
+using PetFamily.SpeciesManagement.Contracts;
 
 namespace PetFamily.PetsManagement.Application.Pets.Commands.AddPet;
 
@@ -22,17 +20,20 @@ public class AddPetHandler
     private readonly IDBConnectionFactory _dBConnectionFactory;
     private readonly AddPetCommandValidator _validator;
     private readonly ILogger<AddPetHandler> _logger;
+    private readonly ISpeciesContract _speciesProvider;
 
     public AddPetHandler(
         IVolunteerAggregateRepository volunteerRepository,
         IDBConnectionFactory dBConnectionFactory,
         AddPetCommandValidator validator,
-        ILogger<AddPetHandler> logger)
+        ILogger<AddPetHandler> logger,
+        ISpeciesContract speciesProvider)
     {
         _volunteerRepository = volunteerRepository;
         _dBConnectionFactory = dBConnectionFactory;
         _validator = validator;
         _logger = logger;
+        _speciesProvider = speciesProvider;
     }
 
     public async Task<Result<PetId, ErrorList>> HandleAsync(
@@ -60,7 +61,7 @@ public class AddPetHandler
         var breedId = BreedId.Create(command.Pet.BreedId);
         using var connection = _dBConnectionFactory.Create();
 
-        var breedResult = await CommonPetQueries.GetBreedByIdAsync(connection, breedId.Value, cancellationToken);
+        var breedResult = await _speciesProvider.GetBreedByIdAsync(connection, breedId.Value, cancellationToken);
         if (breedResult.IsFailure)
             return breedResult.Error;
 

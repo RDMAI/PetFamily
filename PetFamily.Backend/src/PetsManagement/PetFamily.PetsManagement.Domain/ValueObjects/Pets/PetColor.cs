@@ -19,4 +19,7 @@ public record PetColor
     {
         Value = value;
     }
+
+    // EF Core
+    private PetColor() { }
 }

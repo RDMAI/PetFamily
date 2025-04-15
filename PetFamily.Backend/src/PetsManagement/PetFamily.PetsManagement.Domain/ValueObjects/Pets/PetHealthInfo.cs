@@ -19,4 +19,7 @@ public record PetHealthInfo
     {
         Value = value;
     }
+
+    // EF Core
+    private PetHealthInfo() {}
 }

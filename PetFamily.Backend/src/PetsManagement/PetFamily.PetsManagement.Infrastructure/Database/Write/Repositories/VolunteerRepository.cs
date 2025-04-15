@@ -1,13 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.PetsManagement.Volunteers.DTOs;
-using PetFamily.Application.PetsManagement.Volunteers.Interfaces;
-using PetFamily.Domain.Helpers;
-using PetFamily.Domain.PetsManagement.Entities;
-using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.PetsManagement.Infrastructure.Database.Write;
+using PetFamily.PetsManagement.Application.Volunteers.DTOs;
+using PetFamily.PetsManagement.Application.Volunteers.Interfaces;
+using PetFamily.PetsManagement.Domain.Entities;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects;
+using PetFamily.Shared.Kernel.ValueObjects.Ids;
 
 namespace PetFamily.PetsManagement.Infrastructure.Database.Write.Repositories;
 

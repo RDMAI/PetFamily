@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.SpeciesManagement.Entities;
-using PetFamily.Domain.SpeciesManagement.ValueObjects;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects.Ids;
+using PetFamily.SpeciesManagement.Domain.Entities;
 
 namespace PetFamily.SpeciesManagement.Application.Interfaces;
 

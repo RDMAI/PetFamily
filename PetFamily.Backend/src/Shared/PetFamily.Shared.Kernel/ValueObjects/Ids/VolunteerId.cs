@@ -15,4 +15,7 @@ public record VolunteerId : IComparable<VolunteerId>
     {
         Value = value;
     }
+
+    // EF Core
+    private VolunteerId() { }
 }

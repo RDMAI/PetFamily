@@ -1,11 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
-using PetFamily.Application.Shared.DTOs;
-using PetFamily.Application.Shared.Validation;
-using PetFamily.Domain.Helpers;
-using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.ValueObjects;
+using PetFamily.PetsManagement.Domain.ValueObjects.Pets;
+using PetFamily.Shared.Core.DTOs;
+using PetFamily.Shared.Core.Validation;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects;
 
 namespace PetFamily.PetsManagement.Application.Pets.Commands.UpdatePet;
 

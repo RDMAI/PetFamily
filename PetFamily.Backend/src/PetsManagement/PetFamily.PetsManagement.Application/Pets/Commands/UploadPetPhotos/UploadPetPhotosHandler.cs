@@ -1,38 +1,38 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Shared.DTOs;
-using PetFamily.Application.Shared.Interfaces;
-using PetFamily.Application.Shared.Messaging;
-using PetFamily.Domain.Helpers;
-using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
-using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.ValueObjects;
+using PetFamily.Files.Contracts;
+using PetFamily.Files.Contracts.Requests;
 using PetFamily.PetsManagement.Application.Volunteers.Interfaces;
-using PetFamily.Shared.Core.Application.Abstractions;
+using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Core.Files;
+using PetFamily.Shared.Core.Messaging;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects.Ids;
+using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.PetsManagement.Application.Pets.Commands.UploadPetPhotos;
 public class UploadPetPhotosHandler
     : ICommandHandler<PetId, UploadPetPhotosCommand>
 {
     private readonly IVolunteerAggregateRepository _volunteerRepository;
-    private readonly IFileProvider _fileProvider;
+    private readonly IFileContract _fileAPI;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMessageQueue<IEnumerable<FileInfoDTO>> _fileMessageQueue;
+    private readonly IMessageQueue<IEnumerable<Shared.Core.Files.FileInfo>> _fileMessageQueue;
     private readonly IValidator<UploadPetPhotosCommand> _validator;
     private readonly ILogger<UploadPetPhotosHandler> _logger;
 
     public UploadPetPhotosHandler(
         IVolunteerAggregateRepository volunteerRepository,
-        IFileProvider fileProvider,
-        IUnitOfWork unitOfWork,
-        IMessageQueue<IEnumerable<FileInfoDTO>> fileMessageQueue,
+        IFileContract fileAPI,
+        [FromKeyedServices(DependencyKey.Pets)] IUnitOfWork unitOfWork,
+        IMessageQueue<IEnumerable<Shared.Core.Files.FileInfo>> fileMessageQueue,
         IValidator<UploadPetPhotosCommand> validator,
         ILogger<UploadPetPhotosHandler> logger)
     {
         _volunteerRepository = volunteerRepository;
-        _fileProvider = fileProvider;
+        _fileAPI = fileAPI;
         _unitOfWork = unitOfWork;
         _fileMessageQueue = fileMessageQueue;
         _validator = validator;
@@ -63,16 +63,16 @@ public class UploadPetPhotosHandler
         var petId = PetId.Create(command.PetId);
 
         // create lists of photos to store in file storage and in database
-        IEnumerable<FileVO> photosToDatabase = [];
+        IEnumerable<Shared.Kernel.ValueObjects.File> photosToDatabase = [];
         IEnumerable<FileData> photosToStorage = [];
         foreach (var file in command.Photos)
         {
-            var storageName = Guid.NewGuid().ToString() + "_" + file.Name;
+            var storageName = Guid.NewGuid().ToString() + "_" + file.NameWithExtenson;
 
-            photosToDatabase = photosToDatabase.Append(FileVO.Create(storageName, file.Name).Value);
+            photosToDatabase = photosToDatabase.Append(Shared.Kernel.ValueObjects.File.Create(storageName, file.NameWithExtenson).Value);
             photosToStorage = photosToStorage.Append(new FileData(
                 file.ContentStream,
-                new FileInfoDTO(storageName, Constants.BucketNames.PET_PHOTOS)));
+                new Shared.Core.Files.FileInfo(storageName, Constants.BucketNames.PET_PHOTOS)));
         }
 
         // handling BL
@@ -92,7 +92,9 @@ public class UploadPetPhotosHandler
             }
 
             // save photos to file storage
-            var fileStorageResult = await _fileProvider.UploadFilesAsync(photosToStorage, cancellationToken);
+            var fileStorageResult = await _fileAPI.UploadFilesAsync(
+                request: new UploadFilesRequest(photosToStorage),
+                cancellationToken);
             if (fileStorageResult.IsFailure)
             {
                 // Placing an operation to delete invalid files to memory queue

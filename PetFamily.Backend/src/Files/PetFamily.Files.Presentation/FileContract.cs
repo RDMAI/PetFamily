@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using PetFamily.Files.Application;
 using PetFamily.Files.Contracts;
+using PetFamily.Files.Contracts.Requests;
 using PetFamily.Shared.Core.Files;
 using PetFamily.Shared.Kernel;
 
@@ -16,23 +17,26 @@ public class FileContract : IFileContract
     }
 
     public Task<UnitResult<ErrorList>> DeleteFilesAsync(
-        IEnumerable<Shared.Core.Files.FileInfo> files,
+        DeleteFilesRequest request,
         CancellationToken cancellationToken = default)
     {
+        var files = request.Files;
         return _provider.DeleteFilesAsync(files, cancellationToken);
     }
 
     public Task<Result<IEnumerable<string>, ErrorList>> GetFilesAsync(
-        IEnumerable<Shared.Core.Files.FileInfo> files,
+        GetFilesRequest request,
         CancellationToken cancellationToken = default)
     {
+        var files = request.Files;
         return _provider.GetFilesAsync(files, cancellationToken);
     }
 
     public Task<UnitResult<ErrorList>> UploadFilesAsync(
-        IEnumerable<FileData> files,
+        UploadFilesRequest request,
         CancellationToken cancellationToken = default)
     {
+        var files = request.Files;
         return _provider.UploadFilesAsync(files, cancellationToken);
     }
 }

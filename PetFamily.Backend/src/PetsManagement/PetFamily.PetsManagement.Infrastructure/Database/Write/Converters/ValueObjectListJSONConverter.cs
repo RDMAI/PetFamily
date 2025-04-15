@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
-using PetFamily.Domain.Shared.Primitives;
+using PetFamily.Shared.Kernel.Abstractions;
 using System.Text.Json;
 
 namespace PetFamily.PetsManagement.Infrastructure.Database.Write.Converters;

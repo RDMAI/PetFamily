@@ -1,9 +1,8 @@
-﻿using PetFamily.Application.Shared.DTOs;
-using PetFamily.Shared.Core.Application.Abstractions;
+﻿using PetFamily.Shared.Core.Abstractions;
 
 namespace PetFamily.PetsManagement.Application.Pets.Commands.UploadPetPhotos;
 
 public record UploadPetPhotosCommand(
     Guid VolunteerId,
     Guid PetId,
-    IEnumerable<FileDTO> Photos) : ICommand;
+    IEnumerable<Shared.Core.Files.FileDTO> Photos) : ICommand;

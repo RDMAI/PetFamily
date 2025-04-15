@@ -1,5 +1,5 @@
-﻿using PetFamily.Application.Shared.Abstractions;
-using PetFamily.Application.Shared.DTOs;
+﻿using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Core.DTOs;
 
 namespace PetFamily.SpeciesManagement.Application.Queries.GetSpecies;
 

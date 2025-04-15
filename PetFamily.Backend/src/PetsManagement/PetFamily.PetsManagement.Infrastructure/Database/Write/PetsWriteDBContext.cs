@@ -28,7 +28,7 @@ public class PetsWriteDBContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(PetsWriteDBContext).Assembly,
-            type => type.FullName?.Contains("DataBaseAccess.Write.Configurations") ?? false);
+            type => type.FullName?.Contains("Database.Write.Configurations") ?? false);
 
         base.OnModelCreating(modelBuilder);
     }

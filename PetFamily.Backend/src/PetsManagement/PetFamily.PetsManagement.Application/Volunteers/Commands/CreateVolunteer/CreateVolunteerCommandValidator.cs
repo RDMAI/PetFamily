@@ -1,11 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
-using PetFamily.Application.Shared.DTOs;
-using PetFamily.Application.Shared.Validation;
-using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.PetsManagement.Application.Volunteers.DTOs;
+using PetFamily.PetsManagement.Domain.ValueObjects.Volunteers;
+using PetFamily.Shared.Core.DTOs;
+using PetFamily.Shared.Core.Validation;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects;
 
 namespace PetFamily.PetsManagement.Application.Volunteers.Commands.CreateVolunteer;
 public class CreateVolunteerCommandValidator : AbstractValidator<CreateVolunteerCommand>

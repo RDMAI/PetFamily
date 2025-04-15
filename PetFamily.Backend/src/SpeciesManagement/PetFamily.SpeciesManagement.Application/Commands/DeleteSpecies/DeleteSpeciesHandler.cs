@@ -1,10 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Shared.Abstractions;
-using PetFamily.Application.Shared.Interfaces;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.SpeciesManagement.ValueObjects;
+using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects.Ids;
 using PetFamily.SpeciesManagement.Application.Interfaces;
 using System.Text;
 

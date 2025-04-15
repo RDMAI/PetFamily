@@ -1,11 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PetFamily.Domain.PetsManagement.Entities;
-using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.SpeciesManagement.ValueObjects;
+using PetFamily.PetsManagement.Domain.Entities;
 using PetFamily.PetsManagement.Infrastructure.Database.Write.Converters;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects;
+using PetFamily.Shared.Kernel.ValueObjects.Ids;
 
 namespace PetFamily.PetsManagement.Infrastructure.Database.Write.Configurations;
 
@@ -143,8 +142,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
         builder.Property(d => d.Photos)
             .HasConversion(
                 photosToDB => ValueObjectListJSONConverter.Serialize(photosToDB),
-                jsonFromDB => ValueObjectListJSONConverter.Deserialize<FileVO>(jsonFromDB),
-                ValueObjectListJSONConverter.GetValueComparer<FileVO>())
+                jsonFromDB => ValueObjectListJSONConverter.Deserialize<Shared.Kernel.ValueObjects.File>(jsonFromDB),
+                ValueObjectListJSONConverter.GetValueComparer<Shared.Kernel.ValueObjects.File>())
             .HasColumnType("jsonb")
             .HasColumnName("photos");
 

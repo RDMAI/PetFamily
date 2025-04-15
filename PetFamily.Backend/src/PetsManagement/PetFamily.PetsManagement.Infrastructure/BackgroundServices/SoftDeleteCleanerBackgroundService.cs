@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,6 +9,7 @@ using PetFamily.PetsManagement.Infrastructure.Options;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Core.Messaging;
 using PetFamily.Shared.Kernel;
+using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.PetsManagement.Infrastructure.BackgroundServices;
 
@@ -24,7 +26,7 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
     public SoftDeleteCleanerBackgroundService(
         IDbContextFactory<PetsWriteDBContext> dbFactory,
         ILogger<SoftDeleteCleanerBackgroundService> logger,
-        IDBConnectionFactory dBConnectionFactory,
+        [FromKeyedServices(DependencyKey.Pets)] IDBConnectionFactory dBConnectionFactory,
         IMessageQueue<IEnumerable<Shared.Core.Files.FileInfo>> fileMessageQueue,
         IOptions<SoftDeleteCleanerOptions> options)
     {
@@ -115,7 +117,7 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
         List<Shared.Core.Files.FileInfo> fileInfos = [];
         foreach (var p in pets)
         {
-            var f = p.Photos.Select(photo => new Shared.Core.DTOs.FileInfo(
+            var f = p.Photos.Select(photo => new Shared.Core.Files.FileInfo(
                 photo.PathToStorage,
                 Constants.BucketNames.PET_PHOTOS));
             fileInfos.AddRange(f);

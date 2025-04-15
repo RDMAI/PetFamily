@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using PetFamily.Application.Shared.Validation;
-using PetFamily.Domain.Helpers;
 using PetFamily.PetsManagement.Application.Volunteers.DTOs;
+using PetFamily.Shared.Core.Validation;
+using PetFamily.Shared.Kernel;
 
 namespace PetFamily.PetsManagement.Application.Volunteers.Queries.GetVolunteers;
 

@@ -1,38 +1,35 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Shared.DTOs;
-using PetFamily.Application.Shared.Interfaces;
-using PetFamily.Domain.Helpers;
-using PetFamily.Domain.PetsManagement.ValueObjects.Pets;
-using PetFamily.Domain.PetsManagement.ValueObjects.Volunteers;
-using PetFamily.Domain.Shared;
+using PetFamily.Files.Contracts;
+using PetFamily.Files.Contracts.Requests;
 using PetFamily.PetsManagement.Application.Volunteers.Interfaces;
+using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects.Ids;
 
 namespace PetFamily.PetsManagement.Application.Pets.Queries.GetPetPhotos;
 public class GetPetPhotosHandler
+    : IQueryHandler<IEnumerable<string>, GetPetPhotosQuery>
 {
     private readonly IVolunteerAggregateRepository _volunteerRepository;
-    private readonly IFileProvider _fileProvider;
-    private readonly IUnitOfWork _transactionHelper;
-    private readonly GetPetPhotosCommandValidator _validator;
+    private readonly IFileContract _fileAPI;
+    private readonly GetPetPhotosQueryValidator _validator;
     private readonly ILogger<GetPetPhotosHandler> _logger;
 
     public GetPetPhotosHandler(
         IVolunteerAggregateRepository volunteerRepository,
-        IFileProvider fileProvider,
-        IUnitOfWork transactionHelper,
-        GetPetPhotosCommandValidator validator,
+        IFileContract fileAPI,
+        GetPetPhotosQueryValidator validator,
         ILogger<GetPetPhotosHandler> logger)
     {
         _volunteerRepository = volunteerRepository;
-        _fileProvider = fileProvider;
-        _transactionHelper = transactionHelper;
+        _fileAPI = fileAPI;
         _validator = validator;
         _logger = logger;
     }
 
     public async Task<Result<IEnumerable<string>, ErrorList>> HandleAsync(
-        GetPetPhotosCommand command,
+        GetPetPhotosQuery command,
         CancellationToken cancellationToken = default)
     {
         // command validation
@@ -62,14 +59,14 @@ public class GetPetPhotosHandler
         if (pet.Photos.Values is null || pet.Photos.Count == 0)
             return ErrorHelper.General.MethodNotApplicable("Pet does not have any photos").ToErrorList();
 
-        var photoInfos = pet.Photos.Select(p => new FileInfoDTO(
+        var photoInfos = pet.Photos.Select(p => new Shared.Core.Files.FileInfo(
             p.PathToStorage,
             Constants.BucketNames.PET_PHOTOS));
 
         try
         {
-            var photosLinksResult = await _fileProvider.GetFilesAsync(
-                photoInfos,
+            var photosLinksResult = await _fileAPI.GetFilesAsync(
+                request: new GetFilesRequest(photoInfos),
                 cancellationToken);
 
             return photosLinksResult;
