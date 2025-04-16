@@ -1,10 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Kernel;
 using PetFamily.SpeciesManagement.Application.DTOs;
 using System.Text;
+using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.SpeciesManagement.Application.Queries.GetBreedById;
 
@@ -16,7 +18,7 @@ public class GetBreedByIdHandler
     private readonly ILogger<GetBreedByIdHandler> _logger;
 
     public GetBreedByIdHandler(
-        IDBConnectionFactory dBConnectionFactory,
+        [FromKeyedServices(DependencyKey.Species)] IDBConnectionFactory dBConnectionFactory,
         GetBreedByIdQueryValidator validator,
         ILogger<GetBreedByIdHandler> logger)
     {

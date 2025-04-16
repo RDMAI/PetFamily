@@ -1,12 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PetFamily.PetsManagement.Application.Pets.DTOs;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Core.Database.Read;
 using PetFamily.Shared.Core.DTOs;
 using PetFamily.Shared.Kernel;
-using System.Text;
+using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.PetsManagement.Application.Pets.Queries.GetPets;
 
@@ -17,7 +18,7 @@ public class GetPetsHandler : IQueryHandler<DataListPage<PetDTO>, GetPetsQuery>
     private readonly ILogger<GetPetsHandler> _logger;
 
     public GetPetsHandler(
-        IDBConnectionFactory dBConnectionFactory,
+        [FromKeyedServices(DependencyKey.Pets)] IDBConnectionFactory dBConnectionFactory,
         GetPetsQueryValidator validator,
         ILogger<GetPetsHandler> logger)
     {
@@ -42,18 +43,19 @@ public class GetPetsHandler : IQueryHandler<DataListPage<PetDTO>, GetPetsQuery>
 
         using var connection = _dBConnectionFactory.Create();
 
-        var parameters = new DynamicParameters();
-        var sqlFiltering = СreateFilteringSQL(parameters, query);
-
-        var sqlForCounting = new StringBuilder("""
+        // Build sql for counting items
+        var sqlCount = new CustomSQLBuilder("""
             SELECT Count(Pets.id)
             FROM Pets
             """);
-        sqlForCounting.Append(sqlFiltering);
-        var totalCount = await connection.ExecuteScalarAsync<int>(sqlForCounting.ToString(), parameters);
+        ApplyFiltering(sqlCount, query);
+        var sqlCountString = sqlCount.ToString();
 
-        // after count excuted, reuse the SAME string builder with different SELECT statement
-        var sqlForSelecting = new StringBuilder("""
+        _logger.LogInformation("Dapper SQL: {sql}", sqlCountString);
+        var totalCount = await connection.ExecuteScalarAsync<int>(sqlCountString, sqlCount.Parameters);
+
+        // Build sql for selecting items
+        var sqlSelect = new CustomSQLBuilder("""
             SELECT
                 id,
                 name,
@@ -79,18 +81,16 @@ public class GetPetsHandler : IQueryHandler<DataListPage<PetDTO>, GetPetsQuery>
                 is_deleted
             FROM Pets
             """);
-        sqlForSelecting.Append(sqlFiltering);
-        parameters.Add("@offset", (query.CurrentPage - 1) * query.PageSize);
-        parameters.Add("@limit", query.PageSize);
+        ApplyFiltering(sqlSelect, query);
 
         if (query.Sort is not null && query.Sort.Any())
-            DapperSQLHelper.ApplySorting(sqlForSelecting, query.Sort);
+            sqlSelect.ApplySorting(query.Sort);
 
-        DapperSQLHelper.ApplyPagination(sqlForSelecting, parameters, query.CurrentPage, query.PageSize);
+        sqlSelect.ApplyPagination(query.CurrentPage, query.PageSize);
+        var sqlSelectString = sqlSelect.ToString();
 
-        _logger.LogInformation("Dapper SQL: {sql}", sqlForSelecting.ToString());
-
-        var entities = await connection.QueryAsync<PetDTO>(sqlForSelecting.ToString(), parameters);
+        _logger.LogInformation("Dapper SQL: {sql}", sqlSelectString);
+        var entities = await connection.QueryAsync<PetDTO>(sqlSelectString, sqlSelect.Parameters);
 
         var result = new DataListPage<PetDTO>
         {
@@ -103,122 +103,131 @@ public class GetPetsHandler : IQueryHandler<DataListPage<PetDTO>, GetPetsQuery>
         return Result.Success<DataListPage<PetDTO>, ErrorList>(result);
     }
 
-    private StringBuilder СreateFilteringSQL(
-        DynamicParameters parameters,
+    private CustomSQLBuilder ApplyFiltering(
+        CustomSQLBuilder sqlBuilder,
         GetPetsQuery query)
     {
-        var sql = new StringBuilder(" WHERE is_deleted = false");
+        sqlBuilder.Append(" WHERE is_deleted = false ");
 
         if (string.IsNullOrEmpty(query.Name) == false)
         {
-            parameters.Add("@name", query.Name);
-            sql.Append(" AND name like '%@name%'");
+            sqlBuilder
+                .Append("AND")
+                .AddTextSearchCondition("name", query.Name);
         }
         if (string.IsNullOrEmpty(query.Color) == false)
         {
-            parameters.Add("@color", query.Color);
-            sql.Append(" AND color = '%@color%'");
+            sqlBuilder
+                .Append("AND")
+                .AddTextSearchCondition("color", query.Color);
         }
         if (query.MinWeight is not null)
         {
-            parameters.Add("@minweight", query.MinWeight);
-            sql.Append(" AND weight >= @minweight");
+            sqlBuilder.Parameters.Add("@minweight", query.MinWeight);
+            sqlBuilder.Append(" AND weight >= @minweight");
         }
         if (query.MaxWeight is not null)
         {
-            parameters.Add("@maxweight", query.MaxWeight);
-            sql.Append(" AND weight <= @maxweight");
+            sqlBuilder.Parameters.Add("@maxweight", query.MaxWeight);
+            sqlBuilder.Append(" AND weight <= @maxweight");
         }
         if (query.MinHeight is not null)
         {
-            parameters.Add("@minheight", query.MinHeight);
-            sql.Append(" AND height >= @minHeight");
+            sqlBuilder.Parameters.Add("@minheight", query.MinHeight);
+            sqlBuilder.Append(" AND height >= @minHeight");
         }
         if (query.MaxHeight is not null)
         {
-            parameters.Add("@maxHeight", query.MaxHeight);
-            sql.Append(" AND height <= @maxHeight");
+            sqlBuilder.Parameters.Add("@maxHeight", query.MaxHeight);
+            sqlBuilder.Append(" AND height <= @maxHeight");
         }
         if (query.Breed_Id is not null)
         {
-            parameters.Add("@breedid", query.Breed_Id);
-            sql.Append(" AND breed_id = @breedid");
+            sqlBuilder.Parameters.Add("@breedid", query.Breed_Id);
+            sqlBuilder.Append(" AND breed_id = @breedid");
         }
         if (query.Species_Id is not null)
         {
-            parameters.Add("@speciesid", query.Species_Id);
-            sql.Append(" AND species_id = @speciesid");
+            sqlBuilder.Parameters.Add("@speciesid", query.Species_Id);
+            sqlBuilder.Append(" AND species_id = @speciesid");
         }
         if (string.IsNullOrEmpty(query.Health_Information) == false)
         {
-            parameters.Add("@health_information", query.Health_Information);
-            sql.Append(" AND health_information like '%@health_information%'");
+            sqlBuilder
+                .Append("AND")
+                .AddTextSearchCondition("health_information", query.Health_Information);
         }
         if (string.IsNullOrEmpty(query.City) == false)
         {
-            parameters.Add("@city", query.City);
-            sql.Append(" AND city like '%@city%'");
+            sqlBuilder
+                .Append("AND")
+                .AddTextSearchCondition("city", query.City);
         }
         if (string.IsNullOrEmpty(query.Street) == false)
         {
-            parameters.Add("@street", query.Street);
-            sql.Append(" AND street like '%@street%'");
+            sqlBuilder
+                .Append("AND")
+                .AddTextSearchCondition("street", query.Street);
         }
         if (string.IsNullOrEmpty(query.House_Number) == false)
         {
-            parameters.Add("@house_number", query.House_Number);
-            sql.Append(" AND house_number like '%@house_number%'");
+            sqlBuilder
+                .Append("AND")
+                .AddTextSearchCondition("house_number", query.House_Number);
         }
         if (string.IsNullOrEmpty(query.House_SubNumber) == false)
         {
-            parameters.Add("@house_subnumber", query.House_SubNumber);
-            sql.Append(" AND house_subnumber like '%@house_subnumber%'");
+            sqlBuilder
+                .Append("AND")
+                .AddTextSearchCondition("house_subnumber", query.House_SubNumber);
         }
         if (string.IsNullOrEmpty(query.Appartment_Number) == false)
         {
-            parameters.Add("@appartment_number", query.Appartment_Number);
-            sql.Append(" AND appartment_number like '%@appartment_number%'");
+            sqlBuilder
+                .Append("AND")
+                .AddTextSearchCondition("appartment_number", query.Appartment_Number);
         }
         if (string.IsNullOrEmpty(query.Owner_Phone) == false)
         {
-            parameters.Add("@owner_phone", query.Owner_Phone);
-            sql.Append(" AND owner_phone like '%@owner_phone%'");
+            sqlBuilder
+                .Append("AND")
+                .AddTextSearchCondition("owner_phone", query.Owner_Phone);
         }
         if (query.Is_Castrated is not null)
         {
-            parameters.Add("@is_castrated", query.Is_Castrated);
-            sql.Append(" AND is_castrated = @is_castrated");
+            sqlBuilder.Parameters.Add("@is_castrated", query.Is_Castrated);
+            sqlBuilder.Append(" AND is_castrated = @is_castrated");
         }
         if (query.MinAge is not null)
         {
             var maxBirthDate = DateTime.UtcNow.AddYears(-(int)query.MinAge);
 
-            parameters.Add("@maxbirthdate", maxBirthDate);
-            sql.Append(" AND birth_date <= @maxbirthdate");
+            sqlBuilder.Parameters.Add("@maxbirthdate", maxBirthDate);
+            sqlBuilder.Append(" AND birth_date <= @maxbirthdate");
         }
         if (query.MaxAge is not null)
         {
             var minBirthDate = DateTime.UtcNow.AddYears(-(int)query.MaxAge);
 
-            parameters.Add("@minbirthdate", minBirthDate);
-            sql.Append(" AND birth_date >= @minbirthdate");
+            sqlBuilder.Parameters.Add("@minbirthdate", minBirthDate);
+            sqlBuilder.Append(" AND birth_date >= @minbirthdate");
         }
         if (query.Is_Vacinated is not null)
         {
-            parameters.Add("@is_vacinated", query.Is_Vacinated);
-            sql.Append(" AND is_vacinated = @is_vacinated");
+            sqlBuilder.Parameters.Add("@is_vacinated", query.Is_Vacinated);
+            sqlBuilder.Append(" AND is_vacinated = @is_vacinated");
         }
         if (query.Status is not null)
         {
-            parameters.Add("@status", query.Status);
-            sql.Append(" AND status = @status");
+            sqlBuilder.Parameters.Add("@status", query.Status);
+            sqlBuilder.Append(" AND status = @status");
         }
         if (query.Volunteer_Id is not null)
         {
-            parameters.Add("@volunteer_id", query.Volunteer_Id);
-            sql.Append(" AND volunteer_id = @volunteer_id");
+            sqlBuilder.Parameters.Add("@volunteer_id", query.Volunteer_Id);
+            sqlBuilder.Append(" AND volunteer_id = @volunteer_id");
         }
 
-        return sql;
+        return sqlBuilder;
     }
 }

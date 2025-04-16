@@ -1,10 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PetFamily.PetsManagement.Application.Volunteers.Interfaces;
 using PetFamily.PetsManagement.Domain.ValueObjects.Pets;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Kernel;
 using PetFamily.Shared.Kernel.ValueObjects.Ids;
+using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.PetsManagement.Application.Pets.Commands.UpdatePetStatus;
 
@@ -18,7 +20,7 @@ public class UpdatePetStatusHandler
 
     public UpdatePetStatusHandler(
         IVolunteerAggregateRepository volunteerRepository,
-        IDBConnectionFactory dBConnectionFactory,
+        [FromKeyedServices(DependencyKey.Pets)] IDBConnectionFactory dBConnectionFactory,
         UpdatePetStatusCommandValidator validator,
         ILogger<UpdatePetStatusHandler> logger)
     {

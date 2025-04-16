@@ -1,11 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Kernel;
 using PetFamily.Shared.Kernel.ValueObjects.Ids;
 using PetFamily.SpeciesManagement.Application.Interfaces;
 using System.Text;
+using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.SpeciesManagement.Application.Commands.DeleteSpecies;
 
@@ -19,7 +21,7 @@ public class DeleteSpeciesHandler
 
     public DeleteSpeciesHandler(
         ISpeciesAggregateRepository speciesRepository,
-        IDBConnectionFactory dBConnectionFactory,
+        [FromKeyedServices(DependencyKey.Species)] IDBConnectionFactory dBConnectionFactory,
         DeleteSpeciesCommandValidator validator,
         ILogger<DeleteSpeciesHandler> logger)
     {

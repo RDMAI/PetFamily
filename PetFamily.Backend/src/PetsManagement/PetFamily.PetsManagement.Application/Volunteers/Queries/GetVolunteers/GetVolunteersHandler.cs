@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PetFamily.PetsManagement.Application.Volunteers.DTOs;
 using PetFamily.Shared.Core.Abstractions;
@@ -7,6 +8,7 @@ using PetFamily.Shared.Core.Database.Read;
 using PetFamily.Shared.Core.DTOs;
 using PetFamily.Shared.Kernel;
 using System.Text;
+using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.PetsManagement.Application.Volunteers.Queries.GetVolunteers;
 
@@ -18,7 +20,7 @@ public class GetVolunteersHandler
     private readonly ILogger<GetVolunteersHandler> _logger;
 
     public GetVolunteersHandler(
-        IDBConnectionFactory dBConnectionFactory,
+        [FromKeyedServices(DependencyKey.Pets)] IDBConnectionFactory dBConnectionFactory,
         GetVolunteersQueryValidator validator,
         ILogger<GetVolunteersHandler> logger)
     {
@@ -43,31 +45,43 @@ public class GetVolunteersHandler
 
         using var connection = _dBConnectionFactory.Create();
 
-        var totalCount = await connection.ExecuteScalarAsync<int>("""
+        // Build sql for counting items
+        var sqlCount = new CustomSQLBuilder("""
             SELECT Count(*)
             FROM Volunteers
-            WHERE is_deleted = false
             """);
+        ApplyFiltering(sqlCount, query);
+        var sqlCountString = sqlCount.ToString();
 
-        var parameters = new DynamicParameters();
-        parameters.Add("@offset", (query.CurrentPage - 1) * query.PageSize);
-        parameters.Add("@limit", query.PageSize);
+        _logger.LogInformation("Dapper SQL: {sql}", sqlCountString);
+        var totalCount = await connection.ExecuteScalarAsync<int>(sqlCountString, sqlCount.Parameters);
 
-        var sql = new StringBuilder(
-            """
-            SELECT id, first_name, last_name, father_name, email, description, experience_years, phone, requisites, social_networks, is_deleted
+        // Build sql for selecting items
+        var sqlSelect = new CustomSQLBuilder("""
+            SELECT 
+                id,
+                first_name,
+                last_name,
+                father_name,
+                email,
+                description,
+                experience_years,
+                phone,
+                requisites,
+                social_networks,
+                is_deleted
             FROM Volunteers
-            WHERE is_deleted = false
             """);
+        ApplyFiltering(sqlSelect, query);
 
-        if (query.Sort.Any())
-            DapperSQLHelper.ApplySorting(sql, query.Sort);
+        if (query.Sort is not null && query.Sort.Any())
+            sqlSelect.ApplySorting(query.Sort);
 
-        DapperSQLHelper.ApplyPagination(sql, parameters, query.CurrentPage, query.PageSize);
+        sqlSelect.ApplyPagination(query.CurrentPage, query.PageSize);
+        var sqlSelectString = sqlSelect.ToString();
 
-        _logger.LogInformation("Dapper SQL: {sql}", sql.ToString());
-
-        var entities = await connection.QueryAsync<VolunteerDTO>(sql.ToString(), parameters);
+        _logger.LogInformation("Dapper SQL: {sql}", sqlSelect.ToString());
+        var entities = await connection.QueryAsync<VolunteerDTO>(sqlSelectString, sqlSelect.Parameters);
 
         var result = new DataListPage<VolunteerDTO>
         {
@@ -78,5 +92,14 @@ public class GetVolunteersHandler
         };
 
         return Result.Success<DataListPage<VolunteerDTO>, ErrorList>(result);
+    }
+
+    private static CustomSQLBuilder ApplyFiltering(
+        CustomSQLBuilder sql,
+        GetVolunteersQuery query)
+    {
+        sql.Append(" WHERE is_deleted = false");
+
+        return sql;
     }
 }

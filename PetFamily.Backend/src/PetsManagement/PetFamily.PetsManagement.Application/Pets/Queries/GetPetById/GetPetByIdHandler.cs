@@ -1,10 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PetFamily.PetsManagement.Application.Pets.DTOs;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Kernel;
 using System.Text;
+using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.PetsManagement.Application.Pets.Queries.GetPetById;
 
@@ -16,7 +18,7 @@ public class GetPetByIdHandler
     private readonly ILogger<GetPetByIdHandler> _logger;
 
     public GetPetByIdHandler(
-        IDBConnectionFactory dBConnectionFactory,
+        [FromKeyedServices(DependencyKey.Pets)] IDBConnectionFactory dBConnectionFactory,
         GetPetByIdQueryValidator validator,
         ILogger<GetPetByIdHandler> logger)
     {

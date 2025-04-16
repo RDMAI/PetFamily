@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PetFamily.PetsManagement.Application.Exstensions;
 using PetFamily.PetsManagement.Infrastructure.Extensions;
-using PetFamily.Shared.Core.Extensions;
 
 namespace PetFamily.PetsManagement.Presentation;
 
@@ -13,8 +13,7 @@ public static class DependencyInjection
     {
         services
             .AddInfrastructure(configuration)
-            .AddApplication(
-                typeInAssembly: typeof(PetFamily.PetsManagement.Presentation.DependencyInjection));
+            .AddApplication();
 
 
         return services;

@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PetFamily.SpeciesManagement.Application.Exstensions;
+using PetFamily.SpeciesManagement.Contracts;
 using PetFamily.SpeciesManagement.Infrastructure.Extensions;
-using PetFamily.Shared.Core.Extensions;
 
 namespace PetFamily.SpeciesManagement.Presentation;
 
@@ -13,9 +14,9 @@ public static class DependencyInjection
     {
         services
             .AddInfrastructure(configuration)
-            .AddApplication(
-                typeInAssembly: typeof(PetFamily.SpeciesManagement.Presentation.DependencyInjection));
+            .AddApplication();
 
+        services.AddScoped<ISpeciesContract, SpeciesContract>();
 
         return services;
     }

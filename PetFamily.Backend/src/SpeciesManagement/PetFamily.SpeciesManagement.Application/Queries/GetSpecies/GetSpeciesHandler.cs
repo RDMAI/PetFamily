@@ -1,12 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
 using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Core.Database.Read;
 using PetFamily.Shared.Core.DTOs;
 using PetFamily.Shared.Kernel;
 using PetFamily.SpeciesManagement.Application.DTOs;
-using System.Text;
+using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.SpeciesManagement.Application.Queries.GetSpecies;
 
@@ -18,7 +19,7 @@ public class GetSpeciesHandler
     private readonly ILogger<GetSpeciesHandler> _logger;
 
     public GetSpeciesHandler(
-        IDBConnectionFactory dBConnectionFactory,
+        [FromKeyedServices(DependencyKey.Species)] IDBConnectionFactory dBConnectionFactory,
         GetSpeciesQueryValidator validator,
         ILogger<GetSpeciesHandler> logger)
     {
@@ -43,26 +44,32 @@ public class GetSpeciesHandler
 
         using var connection = _dBConnectionFactory.Create();
 
-        var totalCount = await connection.ExecuteScalarAsync<int>("""
+        // Build sql for counting items
+        var sqlCount = new CustomSQLBuilder("""
             SELECT Count(*)
             FROM Species
             """);
+        ApplyFiltering(sqlCount, query);
+        var sqlCountString = sqlCount.ToString();
 
-        var parameters = new DynamicParameters();
-        var sql = new StringBuilder(
-            """
+        _logger.LogInformation("Dapper SQL: {sql}", sqlCountString);
+        var totalCount = await connection.ExecuteScalarAsync<int>(sqlCountString, sqlCount.Parameters);
+
+        // Build sql for selecting items
+        var sqlSelect = new CustomSQLBuilder("""
             SELECT id, name
             FROM Species
             """);
+        ApplyFiltering(sqlSelect, query);
 
-        if (query.Sort.Any())
-            DapperSQLHelper.ApplySorting(sql, query.Sort);
+        if (query.Sort is not null && query.Sort.Any())
+            sqlSelect.ApplySorting(query.Sort);
 
-        DapperSQLHelper.ApplyPagination(sql, parameters, query.CurrentPage, query.PageSize);
+        sqlSelect.ApplyPagination(query.CurrentPage, query.PageSize);
+        var sqlSelectString = sqlSelect.ToString();
 
-        _logger.LogInformation("Dapper SQL: {sql}", sql.ToString());
-
-        var entities = await connection.QueryAsync<SpeciesDTO>(sql.ToString(), parameters);
+        _logger.LogInformation("Dapper SQL: {sql}", sqlSelect.ToString());
+        var entities = await connection.QueryAsync<SpeciesDTO>(sqlSelectString, sqlSelect.Parameters);
 
         var result = new DataListPage<SpeciesDTO>
         {
@@ -73,5 +80,18 @@ public class GetSpeciesHandler
         };
 
         return Result.Success<DataListPage<SpeciesDTO>, ErrorList>(result);
+    }
+
+    private static CustomSQLBuilder ApplyFiltering(
+        CustomSQLBuilder sql,
+        GetSpeciesQuery query)
+    {
+        if (string.IsNullOrEmpty(query.Name) == false)
+        {
+            sql.Append(" WHERE ")
+                .AddTextSearchCondition("name", query.Name);
+        }
+
+        return sql;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PetFamily.PetsManagement.Application.Volunteers.Interfaces;
 using PetFamily.PetsManagement.Domain.ValueObjects.Pets;
@@ -9,6 +10,7 @@ using PetFamily.Shared.Kernel.Abstractions;
 using PetFamily.Shared.Kernel.ValueObjects;
 using PetFamily.Shared.Kernel.ValueObjects.Ids;
 using PetFamily.SpeciesManagement.Contracts;
+using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.PetsManagement.Application.Pets.Commands.UpdatePet;
 
@@ -23,7 +25,7 @@ public class UpdatePetHandler
 
     public UpdatePetHandler(
         IVolunteerAggregateRepository volunteerRepository,
-        IDBConnectionFactory dBConnectionFactory,
+        [FromKeyedServices(DependencyKey.Pets)] IDBConnectionFactory dBConnectionFactory,
         UpdatePetCommandValidator validator,
         ILogger<UpdatePetHandler> logger,
         ISpeciesContract speciesProvider)
