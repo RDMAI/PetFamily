@@ -11,24 +11,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PetFamily.Application\PetFamily.Application.csproj" />
-    <ProjectReference Include="..\PetFamily.Domain\PetFamily.Domain.csproj" />
-    <ProjectReference Include="..\PetFamily.Infrastructure\PetFamily.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Shared\Helpers\" />
+    <ProjectReference Include="..\Files\PetFamily.Files.Presentation\PetFamily.Files.Presentation.csproj" />
+    <ProjectReference Include="..\PetsManagement\PetFamily.PetsManagement.Presentation\PetFamily.PetsManagement.Presentation.csproj" />
+    <ProjectReference Include="..\Shared\PetFamily.Shared.Core\PetFamily.Shared.Core.csproj" />
+    <ProjectReference Include="..\Shared\PetFamily.Shared.Framework\PetFamily.Shared.Framework.csproj" />
+    <ProjectReference Include="..\Shared\PetFamily.Shared.Kernel\PetFamily.Shared.Kernel.csproj" />
+    <ProjectReference Include="..\SpeciesManagement\PetFamily.SpeciesManagement.Presentation\PetFamily.SpeciesManagement.Presentation.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<FrameworkReference Include="Microsoft.AspNetCore.App" />	
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\PetFamily.Shared.Framework\PetFamily.Shared.Framework.csproj" />
+    <ProjectReference Include="..\..\Shared\PetFamily.Shared.Kernel\PetFamily.Shared.Kernel.csproj" />
+    <ProjectReference Include="..\PetFamily.SpeciesManagement.Application\PetFamily.SpeciesManagement.Application.csproj" />
+    <ProjectReference Include="..\PetFamily.SpeciesManagement.Contracts\PetFamily.SpeciesManagement.Contracts.csproj" />
+    <ProjectReference Include="..\PetFamily.SpeciesManagement.Domain\PetFamily.SpeciesManagement.Domain.csproj" />
+    <ProjectReference Include="..\PetFamily.SpeciesManagement.Infrastructure\PetFamily.SpeciesManagement.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
