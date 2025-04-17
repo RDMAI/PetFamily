@@ -47,7 +47,7 @@ public class GetSpeciesHandler
         // Build sql for counting items
         var sqlCount = new CustomSQLBuilder("""
             SELECT Count(*)
-            FROM Species
+            FROM species_management.Species
             """);
         ApplyFiltering(sqlCount, query);
         var sqlCountString = sqlCount.ToString();
@@ -58,7 +58,7 @@ public class GetSpeciesHandler
         // Build sql for selecting items
         var sqlSelect = new CustomSQLBuilder("""
             SELECT id, name
-            FROM Species
+            FROM species_management.Species
             """);
         ApplyFiltering(sqlSelect, query);
 

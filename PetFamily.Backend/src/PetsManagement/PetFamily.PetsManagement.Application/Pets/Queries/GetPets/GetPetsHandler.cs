@@ -46,7 +46,7 @@ public class GetPetsHandler : IQueryHandler<DataListPage<PetDTO>, GetPetsQuery>
         // Build sql for counting items
         var sqlCount = new CustomSQLBuilder("""
             SELECT Count(Pets.id)
-            FROM Pets
+            FROM pets_management.Pets
             """);
         ApplyFiltering(sqlCount, query);
         var sqlCountString = sqlCount.ToString();
@@ -79,7 +79,7 @@ public class GetPetsHandler : IQueryHandler<DataListPage<PetDTO>, GetPetsQuery>
                 serial_number,
                 volunteer_id,
                 is_deleted
-            FROM Pets
+            FROM pets_management.Pets
             """);
         ApplyFiltering(sqlSelect, query);
 

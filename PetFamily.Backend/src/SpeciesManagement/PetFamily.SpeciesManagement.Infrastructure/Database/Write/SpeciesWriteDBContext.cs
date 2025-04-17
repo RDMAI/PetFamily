@@ -26,6 +26,8 @@ public class SpeciesWriteDBContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema("species_management");
+
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(SpeciesWriteDBContext).Assembly,
             type => type.FullName?.Contains("Database.Write.Configurations") ?? false);

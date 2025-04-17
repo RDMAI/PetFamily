@@ -2,7 +2,6 @@
 using PetFamily.Files.Application;
 using PetFamily.Files.Contracts;
 using PetFamily.Files.Contracts.Requests;
-using PetFamily.Shared.Core.Files;
 using PetFamily.Shared.Kernel;
 
 namespace PetFamily.Files.Presentation;

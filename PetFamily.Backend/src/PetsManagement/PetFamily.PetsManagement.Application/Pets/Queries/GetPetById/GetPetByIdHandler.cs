@@ -49,7 +49,7 @@ public class GetPetByIdHandler
         var sql = new StringBuilder(
             """
             SELECT *
-            FROM Pets
+            FROM pets_management.Pets
             WHERE id = @id and is_deleted = false
             """);
 

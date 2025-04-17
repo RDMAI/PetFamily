@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.PetsManagement.Application.Exstensions;
+using PetFamily.PetsManagement.Application.Extensions;
 using PetFamily.PetsManagement.Infrastructure.Extensions;
 
 namespace PetFamily.PetsManagement.Presentation;

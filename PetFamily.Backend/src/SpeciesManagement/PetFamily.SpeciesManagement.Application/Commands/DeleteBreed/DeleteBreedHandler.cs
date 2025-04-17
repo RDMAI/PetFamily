@@ -78,7 +78,7 @@ public class DeleteBreedHandler
         var sql = new StringBuilder(
             """
             SELECT id
-            FROM Pets
+            FROM pets_management.Pets
             WHERE breed_id = @breedId
             """
         );

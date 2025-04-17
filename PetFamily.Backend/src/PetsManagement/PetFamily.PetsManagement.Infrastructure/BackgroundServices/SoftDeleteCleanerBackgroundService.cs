@@ -91,7 +91,7 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
         // Getting all required to delete pets. Retrieving id and file paths
         var petsSql = $"""
             SELECT id, photos
-            FROM Pets
+            FROM pets_management.Pets
             WHERE is_deleted AND
                 '{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}' - deletion_date >= '{_timeToRestore}'
             """;
@@ -105,7 +105,7 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
         var deletedPetIds = "('" + string.Join("', '", pets.Select(p => p.Id)) + "')";
 
         var petsDeleteSQL = $"""
-            DELETE FROM Pets
+            DELETE FROM pets_management.Pets
             WHERE id IN {deletedPetIds}
             """;
         _logger.LogInformation("Pets delete sql:\n{sql}", petsSql);

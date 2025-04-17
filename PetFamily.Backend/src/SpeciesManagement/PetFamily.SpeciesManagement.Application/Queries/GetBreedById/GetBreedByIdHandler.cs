@@ -49,7 +49,7 @@ public class GetBreedByIdHandler
         var sql = new StringBuilder(
             """
             SELECT *
-            FROM Breeds
+            FROM species_management.Breeds
             WHERE id = @id
             """);
 

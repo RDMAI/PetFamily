@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Shared.Core;
 
-namespace PetFamily.PetsManagement.Application.Exstensions;
+namespace PetFamily.PetsManagement.Application.Extensions;
 
 public static class DependencyInjection
 {

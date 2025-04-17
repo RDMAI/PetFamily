@@ -26,6 +26,8 @@ public class PetsWriteDBContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema("pets_management");
+
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(PetsWriteDBContext).Assembly,
             type => type.FullName?.Contains("Database.Write.Configurations") ?? false);

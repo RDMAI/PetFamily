@@ -7,7 +7,6 @@ using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Core.Database.Read;
 using PetFamily.Shared.Core.DTOs;
 using PetFamily.Shared.Kernel;
-using System.Text;
 using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.PetsManagement.Application.Volunteers.Queries.GetVolunteers;
@@ -48,7 +47,7 @@ public class GetVolunteersHandler
         // Build sql for counting items
         var sqlCount = new CustomSQLBuilder("""
             SELECT Count(*)
-            FROM Volunteers
+            FROM pets_management.Volunteers
             """);
         ApplyFiltering(sqlCount, query);
         var sqlCountString = sqlCount.ToString();
@@ -70,7 +69,7 @@ public class GetVolunteersHandler
                 requisites,
                 social_networks,
                 is_deleted
-            FROM Volunteers
+            FROM pets_management.Volunteers
             """);
         ApplyFiltering(sqlSelect, query);
 

@@ -49,7 +49,7 @@ public class GetVolunteerByIdHandler
         var sql = new StringBuilder(
             """
             SELECT id, first_name, last_name, father_name, email, description, experience_years, phone, requisites, social_networks, is_deleted
-            FROM Volunteers
+            FROM pets_management.Volunteers
             WHERE id = @id and is_deleted = false
             """);
 
