@@ -23,7 +23,7 @@ public class MinioProvider : IFileProvider
     }
 
     public async Task<UnitResult<ErrorList>> UploadFilesAsync(
-        IEnumerable<FileData> files,
+        IEnumerable<FileDataDTO> files,
         CancellationToken cancellationToken = default)
     {
         var sem = new SemaphoreSlim(MAX_PARALLEL_UPLOADS_THREADS);
@@ -68,7 +68,7 @@ public class MinioProvider : IFileProvider
     }
 
     public async Task<UnitResult<ErrorList>> DeleteFilesAsync(
-        IEnumerable<Shared.Core.Files.FileInfo> files,
+        IEnumerable<FileInfoDTO> files,
         CancellationToken cancellationToken = default)
     {
         var sem = new SemaphoreSlim(MAX_PARALLEL_DELETE_THREADS);
@@ -116,7 +116,7 @@ public class MinioProvider : IFileProvider
     }
 
     public async Task<Result<IEnumerable<string>, ErrorList>> GetFilesAsync(
-        IEnumerable<Shared.Core.Files.FileInfo> files,
+        IEnumerable<FileInfoDTO> files,
         CancellationToken cancellationToken = default)
     {
         var sem = new SemaphoreSlim(MAX_PARALLEL_GET_THREADS);
@@ -169,7 +169,7 @@ public class MinioProvider : IFileProvider
     }
 
     private async Task<UnitResult<Error>> _checkFileExistanceAsync(
-        Shared.Core.Files.FileInfo file,
+        FileInfoDTO file,
         CancellationToken cancellationToken = default)
     {
         var statArgs = new StatObjectArgs()

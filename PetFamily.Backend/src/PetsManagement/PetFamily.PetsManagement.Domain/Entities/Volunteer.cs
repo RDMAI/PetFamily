@@ -173,7 +173,7 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         return MovePet(petId, endPosition);
     }
 
-    public UnitResult<Error> AddPhotosToPet(PetId petId, IEnumerable<Shared.Kernel.ValueObjects.File> photos)
+    public UnitResult<Error> AddPhotosToPet(PetId petId, IEnumerable<FileVO> photos)
     {
         if (_pets.Count == 0)
             return ErrorHelper.General.MethodNotApplicable(
@@ -186,16 +186,16 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         // creating new objects to overcome ef core's tracking
         if (pet.Photos.Values is null)
         {
-            pet.UpdatePhotos(new ValueObjectList<Shared.Kernel.ValueObjects.File>(photos));
+            pet.UpdatePhotos(new ValueObjectList<FileVO>(photos));
         }
         else
         {
             var petPhotos = pet.Photos.Values
-            .Select(p => Shared.Kernel.ValueObjects.File.Create(p.PathToStorage, p.Name).Value)
+            .Select(p => FileVO.Create(p.PathToStorage, p.Name).Value)
             .ToList();
             petPhotos.AddRange(photos);
 
-            var petPhotosVO = new ValueObjectList<Shared.Kernel.ValueObjects.File>((IEnumerable<Shared.Kernel.ValueObjects.File>)petPhotos);
+            var petPhotosVO = new ValueObjectList<FileVO>(petPhotos);
             pet.UpdatePhotos(petPhotosVO);
         }
 
@@ -217,11 +217,11 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         if (photoToMove is null)
             return ErrorHelper.General.NotFound();
 
-        var photo = Shared.Kernel.ValueObjects.File.Create(photoPath, photoToMove.Name).Value;
+        var photo = FileVO.Create(photoPath, photoToMove.Name).Value;
         photos.RemoveAll(p => p.PathToStorage == photoPath);
         photos.Insert(0, photo);
 
-        pet.UpdatePhotos(new ValueObjectList<Shared.Kernel.ValueObjects.File>(photos));
+        pet.UpdatePhotos(new ValueObjectList<FileVO>(photos));
 
         return UnitResult.Success<Error>();
     }
@@ -246,13 +246,13 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
 
         // creating new objects to overcome ef core's tracking
         var petPhotos = pet.Photos.Values
-            .Select(p => Shared.Kernel.ValueObjects.File.Create(p.PathToStorage, p.Name).Value)
+            .Select(p => FileVO.Create(p.PathToStorage, p.Name).Value)
             .ToList();
         var result = petPhotos.RemoveAll(f => photos.Contains(f.PathToStorage));
         if (result == 0)
             return ErrorHelper.General.NotFound();
 
-        var petPhotosVO = new ValueObjectList<Shared.Kernel.ValueObjects.File>(petPhotos);
+        var petPhotosVO = new ValueObjectList<FileVO>(petPhotos);
         pet.UpdatePhotos(petPhotosVO);
 
         return UnitResult.Success<Error>();

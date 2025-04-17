@@ -54,7 +54,7 @@ public class Pet : SoftDeletableEntity<PetId>
     public DateOnly BirthDate { get; private set; }
     public bool IsVacinated { get; private set; }
     public PetStatus Status { get; private set; }  // Pet's status - needs help / seeks home / found home
-    public ValueObjectList<Shared.Kernel.ValueObjects.File> Photos { get; private set; } = new([]);
+    public ValueObjectList<FileVO> Photos { get; private set; } = new([]);
     public ValueObjectList<Requisites> Requisites { get; private set; }
     public DateTime CreationDate = DateTime.Now;
 
@@ -65,7 +65,7 @@ public class Pet : SoftDeletableEntity<PetId>
         SerialNumber = serialNumber;
     }
 
-    public Pet UpdatePhotos(ValueObjectList<Shared.Kernel.ValueObjects.File> photos)
+    public Pet UpdatePhotos(ValueObjectList<FileVO> photos)
     {
         Photos = photos;
         return this;

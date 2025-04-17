@@ -2,10 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.PetsManagement.Application.Pets.Commands.DeletePetPhotos;
 using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Kernel.ValueObjects;
 using PetFamily.Shared.Kernel.ValueObjects.Ids;
 using PetFamily.Tests.Shared;
-
-using FileVO = PetFamily.Shared.Kernel.ValueObjects.File;
 
 namespace PetFamily.PetsManagement.Application.Tests.Pets;
 

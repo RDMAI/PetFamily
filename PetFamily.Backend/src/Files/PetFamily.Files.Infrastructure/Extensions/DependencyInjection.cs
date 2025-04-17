@@ -5,9 +5,8 @@ using Minio;
 using PetFamily.Files.Application;
 using PetFamily.Files.Infrastructure.BackgroundServices;
 using PetFamily.Files.Infrastructure.Minio;
+using PetFamily.Shared.Core.Files;
 using PetFamily.Shared.Core.Messaging;
-
-using IEnumOfFileInfo = System.Collections.Generic.IEnumerable<PetFamily.Shared.Core.Files.FileInfo>;
 
 namespace PetFamily.Files.Infrastructure.Extensions;
 
@@ -18,7 +17,7 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services
-            .AddSingleton<IMessageQueue<IEnumOfFileInfo>, InMemoryMessageQueue<IEnumOfFileInfo>>()
+            .AddSingleton<IMessageQueue<IEnumerable<FileInfoDTO>>, InMemoryMessageQueue<IEnumerable<FileInfoDTO>>>()
             .AddConfiguredMinio(configuration)
             .AddFileCleaner(configuration);
 

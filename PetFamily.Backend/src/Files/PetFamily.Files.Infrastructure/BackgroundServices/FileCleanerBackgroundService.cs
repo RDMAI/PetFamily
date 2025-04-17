@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PetFamily.Files.Application;
+using PetFamily.Shared.Core.Files;
 using PetFamily.Shared.Core.Messaging;
 
 namespace PetFamily.Files.Infrastructure.BackgroundServices;
@@ -12,12 +13,12 @@ public class FileCleanerBackgroundService : BackgroundService
     public const int RETRY_ATTEMPTS_COUNT = 10;
 
     private readonly ILogger<FileCleanerBackgroundService> _logger;
-    private readonly IMessageQueue<IEnumerable<Shared.Core.Files.FileInfo>> _fileMessageQueue;
+    private readonly IMessageQueue<IEnumerable<FileInfoDTO>> _fileMessageQueue;
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
     public FileCleanerBackgroundService(
         ILogger<FileCleanerBackgroundService> logger,
-        IMessageQueue<IEnumerable<Shared.Core.Files.FileInfo>> fileMessageQueue,
+        IMessageQueue<IEnumerable<FileInfoDTO>> fileMessageQueue,
         IServiceScopeFactory serviceScopeFactory)
     {
         _logger = logger;
@@ -51,7 +52,7 @@ public class FileCleanerBackgroundService : BackgroundService
     }
 
     private async Task AttemptFilesDelete(
-        IEnumerable<Shared.Core.Files.FileInfo> fileInfos,
+        IEnumerable<Shared.Core.Files.FileInfoDTO> fileInfos,
         IFileProvider fileProvider,
         CancellationToken cancellationToken = default)
     {

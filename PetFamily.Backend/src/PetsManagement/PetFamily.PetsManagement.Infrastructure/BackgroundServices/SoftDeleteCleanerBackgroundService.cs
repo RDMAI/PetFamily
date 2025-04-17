@@ -7,8 +7,10 @@ using Microsoft.Extensions.Options;
 using PetFamily.PetsManagement.Infrastructure.Database.Write;
 using PetFamily.PetsManagement.Infrastructure.Options;
 using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Core.Files;
 using PetFamily.Shared.Core.Messaging;
 using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects;
 using static PetFamily.Shared.Core.DependencyHelper;
 
 namespace PetFamily.PetsManagement.Infrastructure.BackgroundServices;
@@ -18,7 +20,7 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
     private readonly IDbContextFactory<PetsWriteDBContext> _dbFactory;
     private readonly ILogger<SoftDeleteCleanerBackgroundService> _logger;
     private readonly IDBConnectionFactory _dBConnectionFactory;
-    private readonly IMessageQueue<IEnumerable<Shared.Core.Files.FileInfo>> _fileMessageQueue;
+    private readonly IMessageQueue<IEnumerable<FileInfoDTO>> _fileMessageQueue;
 
     private readonly TimeSpan _checkPeriod;
     private readonly TimeSpan _timeToRestore;
@@ -27,7 +29,7 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
         IDbContextFactory<PetsWriteDBContext> dbFactory,
         ILogger<SoftDeleteCleanerBackgroundService> logger,
         [FromKeyedServices(DependencyKey.Pets)] IDBConnectionFactory dBConnectionFactory,
-        IMessageQueue<IEnumerable<Shared.Core.Files.FileInfo>> fileMessageQueue,
+        IMessageQueue<IEnumerable<FileInfoDTO>> fileMessageQueue,
         IOptions<SoftDeleteCleanerOptions> options)
     {
         _dbFactory = dbFactory;
@@ -81,7 +83,7 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
     private class _petPhotosDTO
     {
         public Guid Id { get; init; }
-        public Shared.Kernel.ValueObjects.File[] Photos { get; init; } = [];
+        public FileVO[] Photos { get; init; } = [];
     }
 
     private async Task _deletePets(PetsWriteDBContext context, CancellationToken stoppingToken)
@@ -114,10 +116,10 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
         var deleteResult = await context.Database.ExecuteSqlRawAsync(petsDeleteSQL, stoppingToken);
 
         // Placing an operation to delete photos of deleted pets
-        List<Shared.Core.Files.FileInfo> fileInfos = [];
+        List<FileInfoDTO> fileInfos = [];
         foreach (var p in pets)
         {
-            var f = p.Photos.Select(photo => new Shared.Core.Files.FileInfo(
+            var f = p.Photos.Select(photo => new FileInfoDTO(
                 photo.PathToStorage,
                 Constants.BucketNames.PET_PHOTOS));
             fileInfos.AddRange(f);

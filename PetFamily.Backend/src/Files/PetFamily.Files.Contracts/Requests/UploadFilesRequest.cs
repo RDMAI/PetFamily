@@ -1,3 +1,5 @@
-﻿namespace PetFamily.Files.Contracts.Requests;
+﻿using PetFamily.Shared.Core.Files;
 
-public record UploadFilesRequest(IEnumerable<Shared.Core.Files.FileData> Files);
+namespace PetFamily.Files.Contracts.Requests;
+
+public record UploadFilesRequest(IEnumerable<FileDataDTO> Files);

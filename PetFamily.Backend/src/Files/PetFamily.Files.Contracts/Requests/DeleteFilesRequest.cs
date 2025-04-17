@@ -1,3 +1,5 @@
-﻿namespace PetFamily.Files.Contracts.Requests;
+﻿using PetFamily.Shared.Core.Files;
 
-public record DeleteFilesRequest(IEnumerable<Shared.Core.Files.FileInfo> Files);
+namespace PetFamily.Files.Contracts.Requests;
+
+public record DeleteFilesRequest(IEnumerable<FileInfoDTO> Files);

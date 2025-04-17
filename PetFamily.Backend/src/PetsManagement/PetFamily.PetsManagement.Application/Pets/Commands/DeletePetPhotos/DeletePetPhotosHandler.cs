@@ -5,6 +5,7 @@ using PetFamily.Files.Contracts;
 using PetFamily.Files.Contracts.Requests;
 using PetFamily.PetsManagement.Application.Volunteers.Interfaces;
 using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Core.Files;
 using PetFamily.Shared.Kernel;
 using PetFamily.Shared.Kernel.ValueObjects.Ids;
 using static PetFamily.Shared.Core.DependencyHelper;
@@ -57,7 +58,7 @@ public class DeletePetPhotosHandler
         var petId = PetId.Create(command.PetId);
 
         var photoInfos = command.PhotoPaths.Select(p =>
-            new Shared.Core.Files.FileInfo(p, Constants.BucketNames.PET_PHOTOS));
+            new FileInfoDTO(p, Constants.BucketNames.PET_PHOTOS));
 
         // handling BL
         var transaction = await _unitOfWork.BeginTransaction(cancellationToken);

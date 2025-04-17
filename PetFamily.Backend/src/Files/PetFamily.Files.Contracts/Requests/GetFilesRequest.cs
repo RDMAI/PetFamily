@@ -1,3 +1,4 @@
-﻿namespace PetFamily.Files.Contracts.Requests;
+﻿using PetFamily.Shared.Core.Files;
+namespace PetFamily.Files.Contracts.Requests;
 
-public record GetFilesRequest(IEnumerable<Shared.Core.Files.FileInfo> Files);
+public record GetFilesRequest(IEnumerable<FileInfoDTO> Files);

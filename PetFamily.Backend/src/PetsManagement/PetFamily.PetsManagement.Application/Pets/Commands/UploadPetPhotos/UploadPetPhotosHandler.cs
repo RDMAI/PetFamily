@@ -9,6 +9,7 @@ using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Core.Files;
 using PetFamily.Shared.Core.Messaging;
 using PetFamily.Shared.Kernel;
+using PetFamily.Shared.Kernel.ValueObjects;
 using PetFamily.Shared.Kernel.ValueObjects.Ids;
 using static PetFamily.Shared.Core.DependencyHelper;
 
@@ -19,7 +20,7 @@ public class UploadPetPhotosHandler
     private readonly IVolunteerAggregateRepository _volunteerRepository;
     private readonly IFileContract _fileAPI;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMessageQueue<IEnumerable<Shared.Core.Files.FileInfo>> _fileMessageQueue;
+    private readonly IMessageQueue<IEnumerable<FileInfoDTO>> _fileMessageQueue;
     private readonly IValidator<UploadPetPhotosCommand> _validator;
     private readonly ILogger<UploadPetPhotosHandler> _logger;
 
@@ -27,7 +28,7 @@ public class UploadPetPhotosHandler
         IVolunteerAggregateRepository volunteerRepository,
         IFileContract fileAPI,
         [FromKeyedServices(DependencyKey.Pets)] IUnitOfWork unitOfWork,
-        IMessageQueue<IEnumerable<Shared.Core.Files.FileInfo>> fileMessageQueue,
+        IMessageQueue<IEnumerable<FileInfoDTO>> fileMessageQueue,
         IValidator<UploadPetPhotosCommand> validator,
         ILogger<UploadPetPhotosHandler> logger)
     {
@@ -63,16 +64,16 @@ public class UploadPetPhotosHandler
         var petId = PetId.Create(command.PetId);
 
         // create lists of photos to store in file storage and in database
-        IEnumerable<Shared.Kernel.ValueObjects.File> photosToDatabase = [];
-        IEnumerable<FileData> photosToStorage = [];
+        IEnumerable<FileVO> photosToDatabase = [];
+        IEnumerable<FileDataDTO> photosToStorage = [];
         foreach (var file in command.Photos)
         {
             var storageName = Guid.NewGuid().ToString() + "_" + file.NameWithExtenson;
 
-            photosToDatabase = photosToDatabase.Append(Shared.Kernel.ValueObjects.File.Create(storageName, file.NameWithExtenson).Value);
-            photosToStorage = photosToStorage.Append(new FileData(
+            photosToDatabase = photosToDatabase.Append(FileVO.Create(storageName, file.NameWithExtenson).Value);
+            photosToStorage = photosToStorage.Append(new FileDataDTO(
                 file.ContentStream,
-                new Shared.Core.Files.FileInfo(storageName, Constants.BucketNames.PET_PHOTOS)));
+                new FileInfoDTO(storageName, Constants.BucketNames.PET_PHOTOS)));
         }
 
         // handling BL

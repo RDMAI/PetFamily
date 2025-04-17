@@ -7,17 +7,17 @@ namespace PetFamily.Files.Application;
 public interface IFileProvider
 {
     public Task<UnitResult<ErrorList>> UploadFilesAsync(
-        IEnumerable<FileData> files,
+        IEnumerable<FileDataDTO> files,
         CancellationToken cancellationToken = default);
 
     public Task CreateRequiredBuckets(
         CancellationToken cancellationToken = default);
 
     Task<UnitResult<ErrorList>> DeleteFilesAsync(
-        IEnumerable<Shared.Core.Files.FileInfo> files,
+        IEnumerable<FileInfoDTO> files,
         CancellationToken cancellationToken = default);
 
     Task<Result<IEnumerable<string>, ErrorList>> GetFilesAsync(
-        IEnumerable<Shared.Core.Files.FileInfo> files,
+        IEnumerable<FileInfoDTO> files,
         CancellationToken cancellationToken = default);
 }

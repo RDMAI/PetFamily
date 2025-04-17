@@ -4,6 +4,7 @@ using PetFamily.Files.Contracts;
 using PetFamily.Files.Contracts.Requests;
 using PetFamily.PetsManagement.Application.Volunteers.Interfaces;
 using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Core.Files;
 using PetFamily.Shared.Kernel;
 using PetFamily.Shared.Kernel.ValueObjects.Ids;
 
@@ -59,7 +60,7 @@ public class GetPetPhotosHandler
         if (pet.Photos.Values is null || pet.Photos.Count == 0)
             return ErrorHelper.General.MethodNotApplicable("Pet does not have any photos").ToErrorList();
 
-        var photoInfos = pet.Photos.Select(p => new Shared.Core.Files.FileInfo(
+        var photoInfos = pet.Photos.Select(p => new FileInfoDTO(
             p.PathToStorage,
             Constants.BucketNames.PET_PHOTOS));
 

@@ -142,8 +142,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
         builder.Property(d => d.Photos)
             .HasConversion(
                 photosToDB => ValueObjectListJSONConverter.Serialize(photosToDB),
-                jsonFromDB => ValueObjectListJSONConverter.Deserialize<Shared.Kernel.ValueObjects.File>(jsonFromDB),
-                ValueObjectListJSONConverter.GetValueComparer<Shared.Kernel.ValueObjects.File>())
+                jsonFromDB => ValueObjectListJSONConverter.Deserialize<FileVO>(jsonFromDB),
+                ValueObjectListJSONConverter.GetValueComparer<FileVO>())
             .HasColumnType("jsonb")
             .HasColumnName("photos");
 
