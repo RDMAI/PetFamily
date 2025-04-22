@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Core.DTOs;
 using PetFamily.Shared.Framework;
@@ -12,6 +13,7 @@ using PetFamily.SpeciesManagement.Contracts.Requests;
 
 namespace PetFamily.SpeciesManagement.Presentation;
 
+[Authorize]
 public class SpeciesController : ApplicationController
 {
     [HttpGet]

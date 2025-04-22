@@ -45,5 +45,6 @@ public static class DependencyInjection
     {
         await PetsManagement.Infrastructure.Extensions.DependencyInjection.ApplyMigrations(host);
         await SpeciesManagement.Infrastructure.Extensions.DependencyInjection.ApplyMigrations(host);
+        await Accounts.Infrastructure.Extensions.DependencyInjection.ApplyMigrations(host);
     }
 }
