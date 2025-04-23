@@ -35,17 +35,28 @@ public static class DependencyInjection
         services.AddOptions<JWTOptions>();
         services.AddScoped<ITokenHandler, JWTHandler>();
 
-        var jWTOptions = configuration.Get<JWTOptions>()
+        var jWTOptions = configuration.GetSection(JWTOptions.CONFIG_NAME).Get<JWTOptions>()
                 ?? throw new ApplicationException("JWT is not configured");
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme =
+            options.DefaultScheme =
+            options.DefaultForbidScheme =
+            options.DefaultChallengeScheme =
+            options.DefaultSignInScheme =
+            options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = false,
+                    ValidIssuer = jWTOptions.Issuer,
+                    ValidateIssuer = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jWTOptions.Key)),
                     ValidateIssuerSigningKey = true,
+                    ValidAudience = jWTOptions.Audience,
                     ValidateAudience = false,
+                    RequireExpirationTime = true,
                     ValidateLifetime = false
                 };
             });

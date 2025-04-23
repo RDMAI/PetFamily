@@ -46,9 +46,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
-
 builder.Services
     .AddAccounts(builder.Configuration)
     .AddFilesManagement(builder.Configuration)
