@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PetFamily.PetsManagement.Application.Pets.Commands.AddPet;
 using PetFamily.PetsManagement.Application.Pets.Commands.DeletePet;
 using PetFamily.PetsManagement.Application.Pets.Commands.DeletePetPhotos;
@@ -30,6 +31,7 @@ using PetFamily.Shared.Kernel.ValueObjects.Ids;
 
 namespace PetFamily.PetsManagement.Presentation;
 
+[Authorize]
 public class VolunteersController : ApplicationController
 {
     [HttpGet]

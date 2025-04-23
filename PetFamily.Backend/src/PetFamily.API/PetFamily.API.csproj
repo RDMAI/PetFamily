@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Accounts\PetFamily.Accounts.Presentation\PetFamily.Accounts.Presentation.csproj" />
     <ProjectReference Include="..\Files\PetFamily.Files.Presentation\PetFamily.Files.Presentation.csproj" />
     <ProjectReference Include="..\PetsManagement\PetFamily.PetsManagement.Presentation\PetFamily.PetsManagement.Presentation.csproj" />
     <ProjectReference Include="..\Shared\PetFamily.Shared.Core\PetFamily.Shared.Core.csproj" />

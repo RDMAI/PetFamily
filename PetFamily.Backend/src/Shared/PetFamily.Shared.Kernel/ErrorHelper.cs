@@ -1,4 +1,6 @@
-﻿namespace PetFamily.Shared.Kernel;
+﻿using System.Xml.Linq;
+
+namespace PetFamily.Shared.Kernel;
 
 public static class ErrorHelper
 {
@@ -57,6 +59,34 @@ public static class ErrorHelper
             return Error.Validation(
                 "file.get.failure",
                 message ?? $"Failed to get file to filestorage");
+        }
+    }
+
+    public static class Authentication
+    {
+        public static Error InvalidLoginAttempt()
+        {
+            return Error.Validation(
+                "invalid.login.attempt",
+                "Invalid login attempt");
+        }
+
+        public static Error UserNotFound(string? userName = null)
+        {
+            var message = userName is null ? "User not found" : $"User with username {userName} not found";
+
+            return Error.Validation(
+                "user.not.found",
+                message);
+        }
+
+        public static Error UserAlreadyExist(string? userName = null)
+        {
+            var message = userName is null ? "User with this username already exist" : $"User with username {userName} already exist";
+
+            return Error.Validation(
+                "user.exists",
+                message);
         }
     }
 }
