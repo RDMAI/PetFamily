@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.PetsManagement.Domain.Entities;
-using PetFamily.PetsManagement.Infrastructure.Database.Write.Converters;
+using PetFamily.Shared.Core.Database.Write.Converters;
 using PetFamily.Shared.Kernel;
 using PetFamily.Shared.Kernel.ValueObjects;
 using PetFamily.Shared.Kernel.ValueObjects.Ids;
@@ -70,21 +70,21 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
                 .HasColumnName("phone");
         });
 
-        builder.Property(d => d.Requisites)
-            .HasConversion(
-                reqToDB => ValueObjectListJSONConverter.Serialize(reqToDB),
-                jsonFromDB => ValueObjectListJSONConverter.Deserialize<Requisites>(jsonFromDB),
-                ValueObjectListJSONConverter.GetValueComparer<Requisites>())
-            .HasColumnType("jsonb")
-            .HasColumnName("requisites");
+        //builder.Property(d => d.Requisites)
+        //    .HasConversion(
+        //        reqToDB => ValueObjectListJSONConverter.Serialize(reqToDB),
+        //        jsonFromDB => ValueObjectListJSONConverter.Deserialize<Requisites>(jsonFromDB),
+        //        ValueObjectListJSONConverter.GetValueComparer<Requisites>())
+        //    .HasColumnType("jsonb")
+        //    .HasColumnName("requisites");
 
-        builder.Property(d => d.SocialNetworks)
-            .HasConversion(
-                reqToDB => ValueObjectListJSONConverter.Serialize(reqToDB),
-                jsonFromDB => ValueObjectListJSONConverter.Deserialize<SocialNetwork>(jsonFromDB),
-                ValueObjectListJSONConverter.GetValueComparer<SocialNetwork>())
-            .HasColumnType("jsonb")
-            .HasColumnName("social_networks");
+        //builder.Property(d => d.SocialNetworks)
+        //    .HasConversion(
+        //        reqToDB => ValueObjectListJSONConverter.Serialize(reqToDB),
+        //        jsonFromDB => ValueObjectListJSONConverter.Deserialize<SocialNetwork>(jsonFromDB),
+        //        ValueObjectListJSONConverter.GetValueComparer<SocialNetwork>())
+        //    .HasColumnType("jsonb")
+        //    .HasColumnName("social_networks");
 
         builder.HasMany(d => d.Pets)
             .WithOne()

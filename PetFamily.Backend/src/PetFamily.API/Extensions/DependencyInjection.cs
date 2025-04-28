@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Serilog.Events;
+using PetFamily.Accounts.Infrastructure.Identity;
+using PetFamily.Shared.Framework.Extensions;
 using Serilog;
+using Serilog.Events;
 
 namespace PetFamily.API.Extensions;
 
@@ -15,6 +17,8 @@ public static class DependencyInjection
         {
             options.SuppressModelStateInvalidFilter = true;
         });
+
+        services.AddPermissions();
 
         return services;
     }
@@ -46,5 +50,12 @@ public static class DependencyInjection
         await PetsManagement.Infrastructure.Extensions.DependencyInjection.ApplyMigrations(host);
         await SpeciesManagement.Infrastructure.Extensions.DependencyInjection.ApplyMigrations(host);
         await Accounts.Infrastructure.Extensions.DependencyInjection.ApplyMigrations(host);
+    }
+
+    public static async Task SeedAccounts(this IHost host)
+    {
+        var seeder = host.Services.GetRequiredService<AccountSeeder>();
+
+        await seeder.SeedAsync();
     }
 }

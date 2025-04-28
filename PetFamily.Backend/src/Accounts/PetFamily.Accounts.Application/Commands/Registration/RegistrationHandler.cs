@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using PetFamily.Accounts.Application.DataModels;
+using PetFamily.Accounts.Domain;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Kernel;
 
@@ -37,19 +37,21 @@ public class RegistrationHandler
             return new ErrorList(errors);
         }
 
-        var result = await _userManager.CreateAsync(
-            user: new User
-            {
-                Email = command.Email,
-                UserName = command.UserName,
-            },
-            password: command.Password);
+        var user = new User
+        {
+            Email = command.Email,
+            UserName = command.UserName,
+        };
+
+        var result = await _userManager.CreateAsync(user, command.Password);
 
         if (!result.Succeeded)
         {
             var mappedErrors = result.Errors.Select(e => Error.Failure(e.Code, e.Description)).ToList();
             return new ErrorList(mappedErrors);
         }
+
+        await _userManager.AddToRoleAsync(user, "Participant");
 
         _logger.LogInformation("User with email {email} and userName {userName} created", command.Email , command.UserName);
 

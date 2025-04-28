@@ -40,9 +40,7 @@ public static class SeedingHelper
             email,
             description,
             experience,
-            phone,
-            requisitesVO,
-            socialNetworksVO);
+            phone);
     }
 
     /// <summary>

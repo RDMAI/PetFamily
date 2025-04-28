@@ -7,13 +7,26 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace PetFamily.Accounts.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AccountsInitial : Migration
+    public partial class Accounts_initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
                 name: "accounts");
+
+            migrationBuilder.CreateTable(
+                name: "permissions",
+                schema: "accounts",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    code = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_permissions", x => x.id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "roles",
@@ -36,6 +49,10 @@ namespace PetFamily.Accounts.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    first_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    last_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    father_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    social_networks = table.Column<string>(type: "jsonb", nullable: false),
                     user_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     normalized_user_name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -71,7 +88,34 @@ namespace PetFamily.Accounts.Infrastructure.Migrations
                 {
                     table.PrimaryKey("pk_role_claims", x => x.id);
                     table.ForeignKey(
-                        name: "fk_role_claims_roles_role_id",
+                        name: "fk_role_claims_asp_net_roles_role_id",
+                        column: x => x.role_id,
+                        principalSchema: "accounts",
+                        principalTable: "roles",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "role_permissions",
+                schema: "accounts",
+                columns: table => new
+                {
+                    role_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    permission_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_role_permissions", x => new { x.role_id, x.permission_id });
+                    table.ForeignKey(
+                        name: "fk_role_permissions_permissions_permission_id",
+                        column: x => x.permission_id,
+                        principalSchema: "accounts",
+                        principalTable: "permissions",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_role_permissions_roles_role_id",
                         column: x => x.role_id,
                         principalSchema: "accounts",
                         principalTable: "roles",
@@ -94,7 +138,7 @@ namespace PetFamily.Accounts.Infrastructure.Migrations
                 {
                     table.PrimaryKey("pk_user_claims", x => x.id);
                     table.ForeignKey(
-                        name: "fk_user_claims_users_user_id",
+                        name: "fk_user_claims_asp_net_users_user_id",
                         column: x => x.user_id,
                         principalSchema: "accounts",
                         principalTable: "users",
@@ -116,7 +160,7 @@ namespace PetFamily.Accounts.Infrastructure.Migrations
                 {
                     table.PrimaryKey("pk_user_logins", x => new { x.login_provider, x.provider_key });
                     table.ForeignKey(
-                        name: "fk_user_logins_users_user_id",
+                        name: "fk_user_logins_asp_net_users_user_id",
                         column: x => x.user_id,
                         principalSchema: "accounts",
                         principalTable: "users",
@@ -143,7 +187,7 @@ namespace PetFamily.Accounts.Infrastructure.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "fk_user_roles_users_user_id",
+                        name: "fk_user_roles_asp_net_users_user_id",
                         column: x => x.user_id,
                         principalSchema: "accounts",
                         principalTable: "users",
@@ -165,7 +209,7 @@ namespace PetFamily.Accounts.Infrastructure.Migrations
                 {
                     table.PrimaryKey("pk_user_tokens", x => new { x.user_id, x.login_provider, x.name });
                     table.ForeignKey(
-                        name: "fk_user_tokens_users_user_id",
+                        name: "fk_user_tokens_asp_net_users_user_id",
                         column: x => x.user_id,
                         principalSchema: "accounts",
                         principalTable: "users",
@@ -174,10 +218,23 @@ namespace PetFamily.Accounts.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "ix_permissions_code",
+                schema: "accounts",
+                table: "permissions",
+                column: "code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "ix_role_claims_role_id",
                 schema: "accounts",
                 table: "role_claims",
                 column: "role_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_role_permissions_permission_id",
+                schema: "accounts",
+                table: "role_permissions",
+                column: "permission_id");
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
@@ -226,6 +283,10 @@ namespace PetFamily.Accounts.Infrastructure.Migrations
                 schema: "accounts");
 
             migrationBuilder.DropTable(
+                name: "role_permissions",
+                schema: "accounts");
+
+            migrationBuilder.DropTable(
                 name: "user_claims",
                 schema: "accounts");
 
@@ -239,6 +300,10 @@ namespace PetFamily.Accounts.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "user_tokens",
+                schema: "accounts");
+
+            migrationBuilder.DropTable(
+                name: "permissions",
                 schema: "accounts");
 
             migrationBuilder.DropTable(

@@ -25,6 +25,7 @@ using PetFamily.PetsManagement.Contracts.Requests.Volunteers;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Core.DTOs;
 using PetFamily.Shared.Framework;
+using PetFamily.Shared.Framework.Authorization;
 using PetFamily.Shared.Framework.Processors;
 using PetFamily.Shared.Kernel;
 using PetFamily.Shared.Kernel.ValueObjects.Ids;
@@ -34,6 +35,7 @@ namespace PetFamily.PetsManagement.Presentation;
 [Authorize]
 public class VolunteersController : ApplicationController
 {
+    [Permission(Permissions.Volunteers.READ)]
     [HttpGet]
     public async Task<IActionResult> GetAll(
         [FromServices] IQueryHandler<DataListPage<VolunteerDTO>, GetVolunteersQuery> volunteersHandler,
@@ -49,6 +51,7 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
+    [Permission(Permissions.Volunteers.READ)]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(
         [FromServices] IQueryHandler<VolunteerDTO, GetVolunteerByIdQuery> volunteersHandler,
@@ -65,6 +68,7 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
+    [Permission(Permissions.Volunteers.CREATE)]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromServices] ICommandHandler<VolunteerId, CreateVolunteerCommand> volunteerHandler,
@@ -81,6 +85,7 @@ public class VolunteersController : ApplicationController
         return CreatedBaseURI(volunteerId.Value);
     }
 
+    [Permission(Permissions.Volunteers.UPDATE)]
     [HttpPatch("{id:guid}/main-info")]
     public async Task<IActionResult> UpdateMainInfo(
         [FromServices] ICommandHandler<VolunteerId, UpdateMainInfoCommand> volunteerHandler,
@@ -98,6 +103,7 @@ public class VolunteersController : ApplicationController
         return Ok(volunteerId.Value);
     }
 
+    [Permission(Permissions.Volunteers.UPDATE)]
     [HttpPatch("{id:guid}/social-networks")]
     public async Task<IActionResult> UpdateSocialNetworks(
         [FromServices] ICommandHandler<VolunteerId, UpdateSocialNetworksCommand> volunteerHandler,
@@ -115,6 +121,7 @@ public class VolunteersController : ApplicationController
         return Ok(volunteerId.Value);
     }
 
+    [Permission(Permissions.Volunteers.UPDATE)]
     [HttpPatch("{id:guid}/requisites")]
     public async Task<IActionResult> UpdateRequisites(
         [FromServices] ICommandHandler<VolunteerId, UpdateRequisitesCommand> volunteerHandler,
@@ -132,6 +139,7 @@ public class VolunteersController : ApplicationController
         return Ok(volunteerId.Value);
     }
 
+    [Permission(Permissions.Volunteers.DELETE)]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(
         [FromServices] ICommandHandler<VolunteerId, DeleteVolunteerCommand> volunteerHandler,
@@ -148,6 +156,7 @@ public class VolunteersController : ApplicationController
         return Ok(volunteerId.Value);
     }
 
+    [Permission(Permissions.Pets.READ)]
     [HttpGet("{volunteerid:guid}/pets")]
     public async Task<IActionResult> GetPets(
         [FromServices] IQueryHandler<DataListPage<PetDTO>, GetPetsQuery> petHandler,
@@ -163,6 +172,7 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
+    [Permission(Permissions.Pets.READ)]
     [HttpGet("{volunteerid:guid}/pets/{petid:guid}")]
     public async Task<IActionResult> GetPetById(
         [FromServices] IQueryHandler<PetDTO, GetPetByIdQuery> petHandler,
@@ -178,6 +188,7 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
+    [Permission(Permissions.Pets.CREATE)]
     [HttpPost("{id:guid}/pets")]
     public async Task<IActionResult> AddPet(
         [FromServices] ICommandHandler<PetId, AddPetCommand> petHandler,
@@ -197,6 +208,7 @@ public class VolunteersController : ApplicationController
         return Created(getUri, PetId);
     }
 
+    [Permission(Permissions.Pets.UPDATE)]
     [HttpPatch("{volunteerId:guid}/pet/{petId:guid}/serial-number")]
     public async Task<IActionResult> MovePet(
         [FromServices] ICommandHandler<PetId, MovePetCommand> petHandler,
@@ -215,6 +227,7 @@ public class VolunteersController : ApplicationController
         return Ok(resultPetId.Value);
     }
 
+    [Permission(Permissions.Pets.UPDATE)]
     [HttpPut("{volunteerId:guid}/pet/{petId:guid}")]
     public async Task<IActionResult> UpdatePet(
         [FromServices] ICommandHandler<PetId, UpdatePetCommand> petHandler,
@@ -233,6 +246,7 @@ public class VolunteersController : ApplicationController
         return Ok(resultPetId.Value);
     }
 
+    [Permission(Permissions.Pets.UPDATE)]
     [HttpPatch("{volunteerId:guid}/pet/{petId:guid}/status")]
     public async Task<IActionResult> UpdatePetStatus(
         [FromServices] ICommandHandler<PetId, UpdatePetStatusCommand> petHandler,
@@ -251,6 +265,7 @@ public class VolunteersController : ApplicationController
         return Ok(resultPetId.Value);
     }
 
+    [Permission(Permissions.Pets.DELETE)]
     [HttpDelete("{id:guid}/pets/{petid:guid}")]
     public async Task<IActionResult> DeletePet(
         [FromServices] ICommandHandler<PetId, DeletePetCommand> petHandler,
@@ -268,6 +283,7 @@ public class VolunteersController : ApplicationController
         return Ok(volunteerId.Value);
     }
 
+    [Permission(Permissions.Pets.UPDATE)]
     [HttpPost("{volunteerId:guid}/pet/{petId:guid}/photos")]
     public async Task<IActionResult> UploadPetPhotos(
         [FromServices] ICommandHandler<PetId, UploadPetPhotosCommand> petHandler,
@@ -293,6 +309,7 @@ public class VolunteersController : ApplicationController
         return CreatedBaseURI(result.Value);
     }
 
+    [Permission(Permissions.Pets.UPDATE)]
     [HttpPatch("{volunteerId:guid}/pet/{petId:guid}/main-photo")]
     public async Task<IActionResult> SetMainPetPhoto(
         [FromServices] ICommandHandler<PetId, SetMainPetPhotoCommand> petHandler,
@@ -312,6 +329,7 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
+    [Permission(Permissions.Pets.UPDATE)]
     [HttpDelete("{volunteerId:guid}/pet/{petId:guid}/photos")]
     public async Task<IActionResult> DeletePetPhotos(
         [FromServices] ICommandHandler<PetId, DeletePetPhotosCommand> petHandler,
@@ -331,6 +349,7 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
+    [Permission(Permissions.Pets.READ)]
     [HttpGet("{volunteerId:guid}/pet/{petId:guid}/photos")]
     public async Task<IActionResult> GetAllPetPhotos(
         [FromServices] GetPetPhotosHandler petHandler,

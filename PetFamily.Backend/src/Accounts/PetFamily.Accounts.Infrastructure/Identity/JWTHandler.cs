@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using PetFamily.Accounts.Application.DataModels;
 using PetFamily.Accounts.Application.Interfaces;
+using PetFamily.Accounts.Domain;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -23,7 +23,7 @@ public class JWTHandler : ITokenHandler
         {
             Subject = new ClaimsIdentity(
             [
-                new Claim(ClaimTypes.NameIdentifier, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
             ]),
             Issuer = _options.Issuer,

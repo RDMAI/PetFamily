@@ -13,8 +13,8 @@ using PetFamily.PetsManagement.Infrastructure.Database.Write;
 namespace PetFamily.PetsManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(PetsWriteDBContext))]
-    [Migration("20250417142158_initial")]
-    partial class initial
+    [Migration("20250428081050_Pets_initial")]
+    partial class Pets_initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -226,16 +226,6 @@ namespace PetFamily.PetsManagement.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
-
-                    b.Property<string>("Requisites")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("requisites");
-
-                    b.Property<string>("SocialNetworks")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("social_networks");
 
                     b.ComplexProperty<Dictionary<string, object>>("Description", "PetFamily.PetsManagement.Domain.Entities.Volunteer.Description#Description", b1 =>
                         {

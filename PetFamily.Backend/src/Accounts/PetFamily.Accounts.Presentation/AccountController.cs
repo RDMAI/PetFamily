@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PetFamily.Accounts.Application.Commands.Login;
 using PetFamily.Accounts.Application.Commands.Registration;
 using PetFamily.Accounts.Contracts.Requests;
@@ -9,6 +10,7 @@ namespace PetFamily.Accounts.Presentation;
 
 public class AccountController : ApplicationController
 {
+    [AllowAnonymous]
     [HttpPost("registration")]
     public async Task<IActionResult> Registration(
         [FromServices] ICommandHandler<RegistrationCommand> handler,
@@ -25,6 +27,7 @@ public class AccountController : ApplicationController
         return Created();
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login(
         [FromServices] ICommandHandler<string, LoginCommand> handler,

@@ -55,10 +55,10 @@ public class UpdateRequisitesHandler
                 requisites.Value).Value);
         }
 
-        // update entity
+        // update entity !!!!!
         var entity = entityResult.Value;
-        entity.UpdateRequisites(
-            (ValueObjectList<Requisites>)requisitesBufferList);
+        //entity.UpdateRequisites(
+        //    (ValueObjectList<Requisites>)requisitesBufferList);
 
         // handle BL
         var response = await _volunteerRepository.UpdateAsync(entity, cancellationToken);

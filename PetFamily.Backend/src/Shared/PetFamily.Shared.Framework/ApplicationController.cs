@@ -62,6 +62,9 @@ public abstract class ApplicationController : Controller
             case ErrorType.Conflict:
                 statusCode = StatusCodes.Status409Conflict;
                 break;
+            case ErrorType.AccessDenied:
+                statusCode = StatusCodes.Status401Unauthorized;
+                break;
             default:
                 break;
         }

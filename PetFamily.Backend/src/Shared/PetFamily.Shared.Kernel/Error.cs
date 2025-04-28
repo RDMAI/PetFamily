@@ -12,6 +12,8 @@ public record Error
         new(code, message, ErrorType.Failure);
     public static Error Conflict(string code, string message) =>
         new(code, message, ErrorType.Conflict);
+    public static Error AccessDenied(string code, string message) =>
+        new(code, message, ErrorType.AccessDenied);
 
     public string Code { get; }
     public string Message { get; }
@@ -56,5 +58,6 @@ public enum ErrorType
     Validation,
     NotFound,
     Failure,
-    Conflict
+    Conflict,
+    AccessDenied
 }

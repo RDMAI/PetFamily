@@ -21,4 +21,8 @@
     <ProjectReference Include="..\PetFamily.SpeciesManagement.Domain\PetFamily.SpeciesManagement.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
