@@ -78,9 +78,7 @@ namespace PetFamily.PetsManagement.Application.Volunteers.Commands.CreateVolunte
                 email,
                 description,
                 experienceYears,
-                phone,
-                (ValueObjectList<Requisites>)requisitesBufferList,
-                (ValueObjectList<SocialNetwork>)socialNetworkBufferList);
+                phone);
 
             // check if Entity with this phone or email already exists
             var emailResponse = await _volunteerRepository.IsEmailNotExistAsync(email, cancellationToken);

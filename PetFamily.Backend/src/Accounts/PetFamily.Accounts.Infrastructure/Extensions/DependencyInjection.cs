@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using PetFamily.Accounts.Application.DataModels;
 using PetFamily.Accounts.Application.Interfaces;
+using PetFamily.Accounts.Domain;
 using PetFamily.Accounts.Infrastructure.Identity;
 using System.Text;
 
@@ -35,19 +36,21 @@ public static class DependencyInjection
         services.AddOptions<JWTOptions>();
         services.AddScoped<ITokenHandler, JWTHandler>();
 
-        var jWTOptions = configuration.GetSection(JWTOptions.CONFIG_NAME).Get<JWTOptions>()
-                ?? throw new ApplicationException("JWT is not configured");
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme =
-            options.DefaultScheme =
-            options.DefaultForbidScheme =
-            options.DefaultChallengeScheme =
-            options.DefaultSignInScheme =
-            options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
+        services
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme =
+                options.DefaultScheme =
+                options.DefaultForbidScheme =
+                options.DefaultChallengeScheme =
+                options.DefaultSignInScheme =
+                options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
             .AddJwtBearer(options =>
             {
+                var jWTOptions = configuration.GetSection(JWTOptions.CONFIG_NAME).Get<JWTOptions>()
+                ?? throw new ApplicationException("JWT is not configured");
+
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = jWTOptions.Issuer,
@@ -62,6 +65,9 @@ public static class DependencyInjection
             });
 
         services.AddAuthorization();
+
+        services.AddScoped<IPermissionManager, PermissionManager>();
+        services.AddSingleton<AccountSeeder>();
 
         return services;
     }

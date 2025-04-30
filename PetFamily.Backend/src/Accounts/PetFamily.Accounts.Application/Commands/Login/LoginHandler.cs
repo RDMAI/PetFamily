@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using PetFamily.Accounts.Application.DataModels;
 using PetFamily.Accounts.Application.Interfaces;
+using PetFamily.Accounts.Domain;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Kernel;
 

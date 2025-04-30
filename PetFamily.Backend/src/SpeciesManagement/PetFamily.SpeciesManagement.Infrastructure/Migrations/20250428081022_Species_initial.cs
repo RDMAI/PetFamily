@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PetFamily.SpeciesManagement.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class speciesInitial : Migration
+    public partial class Species_initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

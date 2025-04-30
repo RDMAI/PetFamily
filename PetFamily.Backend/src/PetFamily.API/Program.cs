@@ -63,6 +63,7 @@ if (app.Environment.IsDevelopment())
 
     await app.ApplyModulesMigrations();
     await app.CreateFileStorageStructure();
+    await app.SeedAccounts();
 }
 
 app.UseSerilogRequestLogging();

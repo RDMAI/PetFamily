@@ -2,7 +2,7 @@
 using PetFamily.Shared.Kernel.Abstractions;
 using System.Text.Json;
 
-namespace PetFamily.PetsManagement.Infrastructure.Database.Write.Converters;
+namespace PetFamily.Shared.Core.Database.Write.Converters;
 
 public static class ValueObjectListJSONConverter
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.PetsManagement.Domain.Entities;
-using PetFamily.PetsManagement.Infrastructure.Database.Write.Converters;
+using PetFamily.Shared.Core.Database.Write.Converters;
 using PetFamily.Shared.Kernel;
 using PetFamily.Shared.Kernel.ValueObjects;
 using PetFamily.Shared.Kernel.ValueObjects.Ids;

@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-
-namespace PetFamily.Shared.Kernel;
+﻿namespace PetFamily.Shared.Kernel;
 
 public static class ErrorHelper
 {
@@ -66,7 +64,7 @@ public static class ErrorHelper
     {
         public static Error InvalidLoginAttempt()
         {
-            return Error.Validation(
+            return Error.AccessDenied(
                 "invalid.login.attempt",
                 "Invalid login attempt");
         }
@@ -87,6 +85,16 @@ public static class ErrorHelper
             return Error.Validation(
                 "user.exists",
                 message);
+        }
+    }
+
+    public static class Authorization
+    {
+        public static Error AccessDenied(string? reason = null)
+        {
+            return Error.AccessDenied(
+                "access.denied",
+                reason ?? "Access denied");
         }
     }
 }

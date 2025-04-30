@@ -54,10 +54,10 @@ public class UpdateSocialNetworksHandler
                 socialNetwork.Link).Value);
         }
 
-        // update entity
+        // update entity !!!!!!
         var entity = entityResult.Value;
-        entity.UpdateSocialNetworks(
-            (ValueObjectList<SocialNetwork>)socialNetworkBufferList);
+        //entity.UpdateSocialNetworks(
+        //    (ValueObjectList<SocialNetwork>)socialNetworkBufferList);
 
         // handle BL
         var response = await _volunteerRepository.UpdateAsync(entity, cancellationToken);

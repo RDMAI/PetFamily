@@ -1,4 +1,4 @@
-﻿using PetFamily.Accounts.Application.DataModels;
+﻿using PetFamily.Accounts.Domain;
 
 namespace PetFamily.Accounts.Application.Interfaces;
 
