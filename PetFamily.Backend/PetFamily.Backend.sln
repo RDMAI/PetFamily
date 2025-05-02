@@ -77,6 +77,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Accounts.Presenta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Accounts.Contracts", "src\Accounts\PetFamily.Accounts.Contracts\PetFamily.Accounts.Contracts.csproj", "{C537B09F-002A-4771-84F4-CF302CF22C5A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Accounts", "Accounts", "{E1F2B6F0-4D16-4A73-866F-D9F91FD08512}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Accounts.Application.Tests", "tests\Accounts\PetFamily.Accounts.Application.Tests\PetFamily.Accounts.Application.Tests.csproj", "{5A29C787-546D-471B-9AC8-88ECE7CF8065}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -195,6 +199,10 @@ Global
 		{C537B09F-002A-4771-84F4-CF302CF22C5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C537B09F-002A-4771-84F4-CF302CF22C5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C537B09F-002A-4771-84F4-CF302CF22C5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A29C787-546D-471B-9AC8-88ECE7CF8065}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A29C787-546D-471B-9AC8-88ECE7CF8065}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A29C787-546D-471B-9AC8-88ECE7CF8065}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A29C787-546D-471B-9AC8-88ECE7CF8065}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -234,6 +242,8 @@ Global
 		{626231F9-F951-4460-B198-25744B44DD02} = {F4785104-60A2-448B-B855-98D1E6CBB2E0}
 		{002B0A25-88F6-4EE6-BBDD-74579ED696F5} = {F4785104-60A2-448B-B855-98D1E6CBB2E0}
 		{C537B09F-002A-4771-84F4-CF302CF22C5A} = {F4785104-60A2-448B-B855-98D1E6CBB2E0}
+		{E1F2B6F0-4D16-4A73-866F-D9F91FD08512} = {17D9E953-3608-4303-A5AF-407830FCB1FB}
+		{5A29C787-546D-471B-9AC8-88ECE7CF8065} = {E1F2B6F0-4D16-4A73-866F-D9F91FD08512}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7EC48625-8EF5-4E13-8A0E-A3C0C22AE9A3}

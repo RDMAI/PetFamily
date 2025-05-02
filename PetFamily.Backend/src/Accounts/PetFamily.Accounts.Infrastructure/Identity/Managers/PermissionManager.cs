@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PetFamily.Accounts.Application.Interfaces;
 using PetFamily.Shared.Kernel;
 
-namespace PetFamily.Accounts.Infrastructure.Identity;
+namespace PetFamily.Accounts.Infrastructure.Identity.Managers;
 
 public class PermissionManager : IPermissionManager
 {

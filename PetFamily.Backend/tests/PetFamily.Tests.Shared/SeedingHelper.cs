@@ -27,14 +27,6 @@ public static class SeedingHelper
         var experience = VolunteerExperienceYears.Create(10).Value;
         var phone = Phone.Create(uniquePhone).Value;
 
-        IEnumerable<Requisites> requisitesEnumerable = [
-            Requisites.Create("SPB", "Test SPB description", phone.Value).Value];
-        var requisitesVO = new ValueObjectList<Requisites>(requisitesEnumerable);
-
-        IEnumerable<SocialNetwork> socialNetworksEnumerable = [
-            SocialNetwork.Create("VK", "https://vk.com/id000000000").Value];
-        var socialNetworksVO = new ValueObjectList<SocialNetwork>(socialNetworksEnumerable);
-
         return new Volunteer(volunteerId,
             fullName,
             email,
