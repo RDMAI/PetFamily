@@ -16,6 +16,9 @@ public class AccountDBContext : IdentityDbContext<User, Role, Guid>
 
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<AdminAccount> AdminAccounts => Set<AdminAccount>();
+    public DbSet<VolunteerAccount> VolunteerAccounts => Set<VolunteerAccount>();
+    public DbSet<ParticipantAccount> ParticipantAccounts => Set<ParticipantAccount>();
 
     public AccountDBContext(string connectionString)
     {
@@ -96,6 +99,49 @@ public class AccountDBContext : IdentityDbContext<User, Role, Guid>
             .HasOne(rp => rp.Permission)
             .WithMany()
             .HasForeignKey(rp => rp.PermissionId);
+
+        // AdminAccount configurations
+        builder.Entity<AdminAccount>()
+            .ToTable("admin_accounts")
+            .HasKey(a => a.Id);
+
+        builder.Entity<AdminAccount>()
+            .HasIndex(a => a.UserId)
+            .IsUnique();
+
+        builder.Entity<AdminAccount>()
+            .HasOne(a => a.User)
+            .WithOne()
+            .HasForeignKey<AdminAccount>(a => a.UserId);
+
+        // VolunteerAccount configurations
+        builder.Entity<VolunteerAccount>()
+            .ToTable("volunteer_accounts")
+            .HasKey(v => v.Id);
+
+        builder.Entity<VolunteerAccount>()
+            .HasOne(v => v.User)
+            .WithOne()
+            .HasForeignKey<VolunteerAccount>(v => v.UserId);
+
+        builder.Entity<VolunteerAccount>()
+            .Property(v => v.Requisites)
+            .HasConversion(
+                reqToDB => Serialize(reqToDB),
+                jsonFromDB => Deserialize<Requisites>(jsonFromDB),
+                GetValueComparer<Requisites>())
+            .HasColumnType("jsonb")
+            .HasColumnName("requisites");
+
+        // ParticipantAccount configurations
+        builder.Entity<ParticipantAccount>()
+            .ToTable("participant_accounts")
+            .HasKey(p => p.Id);
+
+        builder.Entity<ParticipantAccount>()
+            .HasOne(p => p.User)
+            .WithOne()
+            .HasForeignKey<ParticipantAccount>(p => p.UserId);
     }
 
     private ILoggerFactory CreateLoggerFactory() =>

@@ -10,7 +10,8 @@ public static class DependencyHelper
     public enum DependencyKey
     {
         Pets = 1,
-        Species = 2
+        Species = 2,
+        Accounts = 10
     }
 
     public static IServiceCollection AddApplicationFromAssembly(

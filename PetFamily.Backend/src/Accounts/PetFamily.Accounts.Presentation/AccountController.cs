@@ -2,9 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.Accounts.Application.Commands.Login;
 using PetFamily.Accounts.Application.Commands.Registration;
+using PetFamily.Accounts.Application.Commands.UpdateUserMainInfo;
+using PetFamily.Accounts.Application.Commands.UpdateUserSocialNetworks;
+using PetFamily.Accounts.Application.Commands.UpdateVolunteerRequisites;
 using PetFamily.Accounts.Contracts.Requests;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Framework;
+using PetFamily.Shared.Framework.Authorization;
+using PetFamily.Shared.Kernel.ValueObjects.Ids;
 
 namespace PetFamily.Accounts.Presentation;
 
@@ -42,5 +47,53 @@ public class AccountController : ApplicationController
             return Error(result.Error);
 
         return Ok(result.Value);
+    }
+
+    [Permission(Permissions.Accounts.UPDATE)]
+    [HttpPatch("{id:guid}/social-networks")]
+    public async Task<IActionResult> UpdateSocialNetworks(
+        [FromServices] ICommandHandler<UpdateUserSocialNetworksCommand> volunteerHandler,
+        [FromRoute] Guid id,
+        [FromBody] UpdateUserSocialNetworksRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var updateCommand = request.ToCommand(id);
+        var result = await volunteerHandler.HandleAsync(updateCommand, cancellationToken);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        return Ok();
+    }
+
+    [Permission(Permissions.Accounts.UPDATE)]
+    [HttpPatch("{id:guid}/main-info")]
+    public async Task<IActionResult> UpdateMainInfo(
+        [FromServices] ICommandHandler<UpdateUserMainInfoCommand> volunteerHandler,
+        [FromRoute] Guid id,
+        [FromBody] UpdateUserMainInfoRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var updateCommand = request.ToCommand(id);
+        var result = await volunteerHandler.HandleAsync(updateCommand, cancellationToken);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        return Ok();
+    }
+
+    [Permission(Permissions.Accounts.UPDATE)]
+    [HttpPatch("{id:guid}/requisites")]
+    public async Task<IActionResult> UpdateRequisites(
+        [FromServices] ICommandHandler<UpdateVolunteerRequisitesCommand> volunteerHandler,
+        [FromRoute] Guid id,
+        [FromBody] UpdateVolunteerRequisitesRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var updateCommand = request.ToCommand(id);
+        var result = await volunteerHandler.HandleAsync(updateCommand, cancellationToken);
+
+        if (result.IsFailure) return Error(result.Error);
+
+        return Ok();
     }
 }

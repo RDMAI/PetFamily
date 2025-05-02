@@ -1,9 +1,11 @@
-﻿using PetFamily.Shared.Kernel.ValueObjects.Ids;
-
-namespace PetFamily.Accounts.Domain;
+﻿namespace PetFamily.Accounts.Domain;
 
 public class ParticipantAccount
 {
+    public const string ROLE_NAME = "PARTICIPANT";
+
+    public Guid Id { get; set; }
     public Guid UserId { get; set; }
-    public List<PetId> FavouritePets { get; set; } = [];
+    public User User { get; set; }
+    public List<Guid> FavouritePets { get; set; } = [];
 }

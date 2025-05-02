@@ -11,9 +11,7 @@ public record CreateVolunteerRequest(
     string Email,
     string Description,
     float ExperienceYears,
-    string Phone,
-    IEnumerable<RequisitesDTO> RequisitesList,
-    IEnumerable<SocialNetworkDTO> SocialNetworksList)
+    string Phone)
 {
     public CreateVolunteerCommand ToCommand()
     {
@@ -24,8 +22,6 @@ public record CreateVolunteerRequest(
             Email,
             Description,
             ExperienceYears,
-            Phone,
-            RequisitesList,
-            SocialNetworksList);
+            Phone);
     }
 }

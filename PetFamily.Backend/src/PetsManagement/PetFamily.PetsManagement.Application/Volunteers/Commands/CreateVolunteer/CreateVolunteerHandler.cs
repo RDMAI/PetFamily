@@ -56,21 +56,6 @@ namespace PetFamily.PetsManagement.Application.Volunteers.Commands.CreateVolunte
             var phone = Phone.Create(command.Phone).Value;
             var experienceYears = VolunteerExperienceYears.Create(command.ExperienceYears).Value;
 
-            List<Requisites> requisitesBufferList = [];
-            foreach (RequisitesDTO requisites in command.RequisitesList)
-            {
-                requisitesBufferList.Add(Requisites.Create(requisites.Name,
-                    requisites.Description,
-                    requisites.Value).Value);
-            }
-
-            List<SocialNetwork> socialNetworkBufferList = [];
-            foreach (SocialNetworkDTO socialNetwork in command.SocialNetworksList)
-            {
-                socialNetworkBufferList.Add(SocialNetwork.Create(socialNetwork.Name,
-                    socialNetwork.Link).Value);
-            }
-
             var volunteerId = VolunteerId.GenerateNew();
 
             var entity = new Volunteer(volunteerId,

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.PetsManagement.Application.Volunteers.Commands.CreateVolunteer;
-using PetFamily.PetsManagement.Application.Volunteers.DTOs;
 using PetFamily.PetsManagement.Domain.ValueObjects.Volunteers;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Core.DTOs;
@@ -31,9 +30,7 @@ public class CreateVolunteerHandlerTests : PetsManagementBaseTests
             Email: "Example@gmail.com",
             Description: "test description",
             ExperienceYears: 2,
-            Phone: "89000000000",
-            RequisitesList: [ new RequisitesDTO(Name: "SPB", Description: "Test SPB description", Value: "89000000000") ],
-            SocialNetworksList: [ new SocialNetworkDTO(Name: "VK", Link: "https://vk.com/id000000000")]);
+            Phone: "89000000000");
 
         var ct = new CancellationTokenSource().Token;
 
@@ -63,9 +60,7 @@ public class CreateVolunteerHandlerTests : PetsManagementBaseTests
             Email: email,
             Description: "test description",
             ExperienceYears: 2,
-            Phone: "89000000000",
-            RequisitesList: [new RequisitesDTO(Name: "SPB", Description: "Test SPB description", Value: "89000000000")],
-            SocialNetworksList: [new SocialNetworkDTO(Name: "VK", Link: "https://vk.com/id000000000")]);
+            Phone: "89000000000");
 
         var ct = new CancellationTokenSource().Token;
 

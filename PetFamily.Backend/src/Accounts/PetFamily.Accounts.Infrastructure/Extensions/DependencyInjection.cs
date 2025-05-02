@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +7,12 @@ using Microsoft.IdentityModel.Tokens;
 using PetFamily.Accounts.Application.Interfaces;
 using PetFamily.Accounts.Domain;
 using PetFamily.Accounts.Infrastructure.Identity;
+using PetFamily.Accounts.Infrastructure.Identity.Managers;
+using PetFamily.Accounts.Infrastructure.Identity.Options;
+using PetFamily.Shared.Core.Abstractions;
+using PetFamily.Shared.Core;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace PetFamily.Accounts.Infrastructure.Extensions;
 
@@ -18,8 +22,12 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // database access
         var dbConnectionString = configuration.GetConnectionString(DBConstants.DATABASE);
         services.AddScoped(_ => new AccountDBContext(dbConnectionString));
+
+        services.AddKeyedScoped<IUnitOfWork, AccountUnitOfWork>(
+            serviceKey: DependencyHelper.DependencyKey.Accounts);
 
         services.AddIdentity<User, Role>(options =>
             {
@@ -30,14 +38,14 @@ public static class DependencyInjection
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequireDigit = true;
             })
-            .AddEntityFrameworkStores<AccountDBContext>();
+            .AddEntityFrameworkStores<AccountDBContext>()
+            .AddDefaultTokenProviders();
 
         services.Configure<JWTOptions>(configuration.GetSection(JWTOptions.CONFIG_NAME));
         services.AddOptions<JWTOptions>();
         services.AddScoped<ITokenHandler, JWTHandler>();
 
-        services
-            .AddAuthentication(options =>
+        services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme =
                 options.DefaultScheme =
@@ -67,7 +75,15 @@ public static class DependencyInjection
         services.AddAuthorization();
 
         services.AddScoped<IPermissionManager, PermissionManager>();
-        services.AddSingleton<AccountSeeder>();
+        services.AddScoped<IAdminManager, AdminManager>();
+        services.AddScoped<IVolunteerManager, VolunteerManager>();
+        services.AddScoped<IParticipantManager, ParticipantManager>();
+        services.AddScoped<IUserInfoManager, UserInfoManager>();
+
+        services.Configure<AdminOptions>(configuration.GetSection(AdminOptions.ADMIN));
+        services.AddOptions<AdminOptions>();
+
+        services.AddTransient<AccountSeeder>();
 
         return services;
     }

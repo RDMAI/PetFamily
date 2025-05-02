@@ -8,6 +8,8 @@ using PetFamily.Files.Infrastructure.Extensions;
 using Serilog;
 using Microsoft.OpenApi.Models;
 
+DotNetEnv.Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services

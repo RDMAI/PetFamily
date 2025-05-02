@@ -3,10 +3,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using Npgsql;
+using PetFamily.Accounts.Infrastructure.Identity;
+using PetFamily.Accounts.Infrastructure.Identity.Options;
 using PetFamily.Files.Contracts;
 using PetFamily.Files.Contracts.Requests;
 using PetFamily.PetsManagement.Infrastructure.Database.Read;
@@ -43,14 +46,38 @@ public class IntegrationTestWebFactory : WebApplicationFactory<Program>, IAsyncL
     {
         var connectionString = _dbContainer.GetConnectionString();
 
-        ReconfigureDatabaseAccessPetsManagement(services, connectionString);
-        ReconfigureDatabaseAccessSpeciesManagement(services, connectionString);
+        ReconfigureServicesAccounts(services, connectionString);
+        ReconfigureServicesPetsManagement(services, connectionString);
+        ReconfigureServicesSpeciesManagement(services, connectionString);
 
         services.RemoveAll<IFileContract>();
         services.AddScoped(_ => _fileAPIMock.Object);
     }
 
-    public void ReconfigureDatabaseAccessPetsManagement(
+    public void ReconfigureServicesAccounts(
+        IServiceCollection services,
+        string connectionString)
+    {
+        services.RemoveAll<AccountDBContext>();
+        services.AddScoped(_ => new AccountDBContext(connectionString));
+
+        Dictionary<string, string> configForAdmin = new()
+        {
+            {"Admin:Username", "admin"},
+            {"Admin:Email", "admin@gmail.com"},
+            {"Admin:Password", "string123_A"}
+        };
+
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(configForAdmin)
+            .Build();
+
+        services.RemoveAll<AdminOptions>();
+        services.Configure<AdminOptions>(configuration.GetSection(AdminOptions.ADMIN));
+        services.AddOptions<AdminOptions>();
+    }
+
+    public void ReconfigureServicesPetsManagement(
         IServiceCollection services,
         string connectionString)
     {
@@ -69,7 +96,7 @@ public class IntegrationTestWebFactory : WebApplicationFactory<Program>, IAsyncL
         services.AddScoped(_ => new PetsWriteDBContext(connectionString));
     }
 
-    public void ReconfigureDatabaseAccessSpeciesManagement(
+    public void ReconfigureServicesSpeciesManagement(
         IServiceCollection services,
         string connectionString)
     {
@@ -119,7 +146,7 @@ public class IntegrationTestWebFactory : WebApplicationFactory<Program>, IAsyncL
         _respawner = await Respawner.CreateAsync(_dbConnection, new RespawnerOptions
         {
             DbAdapter = DbAdapter.Postgres,
-            SchemasToInclude = [ "pets_management", "species_management" ]
+            SchemasToInclude = [ "pets_management", "species_management", "accounts"]
         });
     }
 
@@ -139,6 +166,10 @@ public class IntegrationTestWebFactory : WebApplicationFactory<Program>, IAsyncL
         var speciesFactory = Services.GetRequiredService<IDbContextFactory<SpeciesWriteDBContext>>();
         using var speciesContext = speciesFactory.CreateDbContext();
         await speciesContext.Database.EnsureCreatedAsync();
+
+        using var scope = Services.CreateScope();
+        var accountContext = scope.ServiceProvider.GetRequiredService<AccountDBContext>();
+        await accountContext.Database.EnsureCreatedAsync();
 
         await InitializeRespawner();
     }

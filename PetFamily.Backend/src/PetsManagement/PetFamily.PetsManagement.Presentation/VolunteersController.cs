@@ -15,8 +15,6 @@ using PetFamily.PetsManagement.Application.Pets.Queries.GetPets;
 using PetFamily.PetsManagement.Application.Volunteers.Commands.CreateVolunteer;
 using PetFamily.PetsManagement.Application.Volunteers.Commands.DeleteVolunteer;
 using PetFamily.PetsManagement.Application.Volunteers.Commands.UpdateMainInfo;
-using PetFamily.PetsManagement.Application.Volunteers.Commands.UpdateRequisites;
-using PetFamily.PetsManagement.Application.Volunteers.Commands.UpdateSocialNetworks;
 using PetFamily.PetsManagement.Application.Volunteers.DTOs;
 using PetFamily.PetsManagement.Application.Volunteers.Queries.GetById;
 using PetFamily.PetsManagement.Application.Volunteers.Queries.GetVolunteers;
@@ -91,42 +89,6 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<VolunteerId, UpdateMainInfoCommand> volunteerHandler,
         [FromRoute] Guid id,
         [FromBody] UpdateMainInfoRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        var updateCommand = request.ToCommand(id);
-        var result = await volunteerHandler.HandleAsync(updateCommand, cancellationToken);
-
-        if (result.IsFailure) return Error(result.Error);
-
-        var volunteerId = result.Value;
-
-        return Ok(volunteerId.Value);
-    }
-
-    [Permission(Permissions.Volunteers.UPDATE)]
-    [HttpPatch("{id:guid}/social-networks")]
-    public async Task<IActionResult> UpdateSocialNetworks(
-        [FromServices] ICommandHandler<VolunteerId, UpdateSocialNetworksCommand> volunteerHandler,
-        [FromRoute] Guid id,
-        [FromBody] UpdateSocialNetworksRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        var updateCommand = request.ToCommand(id);
-        var result = await volunteerHandler.HandleAsync(updateCommand, cancellationToken);
-
-        if (result.IsFailure) return Error(result.Error);
-
-        var volunteerId = result.Value;
-
-        return Ok(volunteerId.Value);
-    }
-
-    [Permission(Permissions.Volunteers.UPDATE)]
-    [HttpPatch("{id:guid}/requisites")]
-    public async Task<IActionResult> UpdateRequisites(
-        [FromServices] ICommandHandler<VolunteerId, UpdateRequisitesCommand> volunteerHandler,
-        [FromRoute] Guid id,
-        [FromBody] UpdateRequisitesRequest request,
         CancellationToken cancellationToken = default)
     {
         var updateCommand = request.ToCommand(id);

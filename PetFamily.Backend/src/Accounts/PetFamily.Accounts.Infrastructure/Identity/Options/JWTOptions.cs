@@ -1,4 +1,4 @@
-﻿namespace PetFamily.Accounts.Infrastructure.Identity;
+﻿namespace PetFamily.Accounts.Infrastructure.Identity.Options;
 
 public class JWTOptions
 {

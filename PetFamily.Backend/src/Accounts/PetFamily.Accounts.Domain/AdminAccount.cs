@@ -2,5 +2,9 @@
 
 public class AdminAccount
 {
-    public int UserId { get; set; }
+    public const string ROLE_NAME = "ADMIN";
+
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
+    public User User { get; set; }
 }

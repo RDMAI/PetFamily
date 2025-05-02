@@ -66,8 +66,6 @@ public class GetVolunteersHandler
                 description,
                 experience_years,
                 phone,
-                requisites,
-                social_networks,
                 is_deleted
             FROM pets_management.Volunteers
             """);
