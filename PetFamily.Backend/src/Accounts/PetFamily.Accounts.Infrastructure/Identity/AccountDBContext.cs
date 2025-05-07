@@ -19,6 +19,7 @@ public class AccountDBContext : IdentityDbContext<User, Role, Guid>
     public DbSet<AdminAccount> AdminAccounts => Set<AdminAccount>();
     public DbSet<VolunteerAccount> VolunteerAccounts => Set<VolunteerAccount>();
     public DbSet<ParticipantAccount> ParticipantAccounts => Set<ParticipantAccount>();
+    public DbSet<RefreshSession> RefreshSessions => Set<RefreshSession>();
 
     public AccountDBContext(string connectionString)
     {
@@ -142,6 +143,34 @@ public class AccountDBContext : IdentityDbContext<User, Role, Guid>
             .HasOne(p => p.User)
             .WithOne()
             .HasForeignKey<ParticipantAccount>(p => p.UserId);
+
+        // RefreshSession configurations
+        builder.Entity<RefreshSession>()
+            .ToTable("refresh_sessions")
+            .HasKey(r => r.Id);
+
+        builder.Entity<RefreshSession>()
+            .HasIndex(r => r.RefreshToken)
+            .IsUnique();
+
+        builder.Entity<RefreshSession>()
+            .HasOne(r => r.User)
+            .WithOne()
+            .HasForeignKey<RefreshSession>(r => r.UserId);
+
+        builder.Entity<RefreshSession>()
+            .Property(d => d.CreatedAt)
+            .HasConversion(
+                src => src.Kind == DateTimeKind.Utc ? src : DateTime.SpecifyKind(src, DateTimeKind.Utc),
+                dst => dst.Kind == DateTimeKind.Utc ? dst : DateTime.SpecifyKind(dst, DateTimeKind.Utc)
+            ).IsRequired();
+
+        builder.Entity<RefreshSession>()
+            .Property(d => d.ExpiresAt)
+            .HasConversion(
+                src => src.Kind == DateTimeKind.Utc ? src : DateTime.SpecifyKind(src, DateTimeKind.Utc),
+                dst => dst.Kind == DateTimeKind.Utc ? dst : DateTime.SpecifyKind(dst, DateTimeKind.Utc)
+            ).IsRequired();
     }
 
     private ILoggerFactory CreateLoggerFactory() =>

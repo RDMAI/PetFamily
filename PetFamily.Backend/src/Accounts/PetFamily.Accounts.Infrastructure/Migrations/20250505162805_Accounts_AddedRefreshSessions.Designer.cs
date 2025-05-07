@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PetFamily.Accounts.Infrastructure.Identity;
@@ -12,9 +13,11 @@ using PetFamily.Accounts.Infrastructure.Identity;
 namespace PetFamily.Accounts.Infrastructure.Migrations
 {
     [DbContext(typeof(AccountDBContext))]
-    partial class AccountDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250505162805_Accounts_AddedRefreshSessions")]
+    partial class Accounts_AddedRefreshSessions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -238,10 +241,6 @@ namespace PetFamily.Accounts.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expires_at");
 
-                    b.Property<Guid>("Jti")
-                        .HasColumnType("uuid")
-                        .HasColumnName("jti");
-
                     b.Property<Guid>("RefreshToken")
                         .HasColumnType("uuid")
                         .HasColumnName("refresh_token");
@@ -252,10 +251,6 @@ namespace PetFamily.Accounts.Infrastructure.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_refresh_sessions");
-
-                    b.HasIndex("RefreshToken")
-                        .IsUnique()
-                        .HasDatabaseName("ix_refresh_sessions_refresh_token");
 
                     b.HasIndex("UserId")
                         .IsUnique()

@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.Accounts.Application.Commands.Login;
+using PetFamily.Accounts.Application.Commands.RefreshTokens;
 using PetFamily.Accounts.Application.Commands.Registration;
 using PetFamily.Accounts.Application.Commands.UpdateUserMainInfo;
 using PetFamily.Accounts.Application.Commands.UpdateUserSocialNetworks;
 using PetFamily.Accounts.Application.Commands.UpdateVolunteerRequisites;
+using PetFamily.Accounts.Application.DTOs;
 using PetFamily.Accounts.Contracts.Requests;
 using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Framework;
 using PetFamily.Shared.Framework.Authorization;
-using PetFamily.Shared.Kernel.ValueObjects.Ids;
 
 namespace PetFamily.Accounts.Presentation;
 
@@ -35,8 +36,25 @@ public class AccountController : ApplicationController
     [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login(
-        [FromServices] ICommandHandler<string, LoginCommand> handler,
+        [FromServices] ICommandHandler<LoginResponseDTO, LoginCommand> handler,
         [FromBody] LoginUserRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = request.ToCommand();
+
+        var result = await handler.HandleAsync(command, cancellationToken);
+
+        if (result.IsFailure)
+            return Error(result.Error);
+
+        return Ok(result.Value);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("refresh")]
+    public async Task<IActionResult> RefreshTokens(
+        [FromServices] ICommandHandler<LoginResponseDTO, RefreshTokensCommand> handler,
+        [FromBody] RefreshTokensRequest request,
         CancellationToken cancellationToken)
     {
         var command = request.ToCommand();
