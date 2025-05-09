@@ -1,18 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using PetFamily.Accounts.Application.Interfaces;
 using PetFamily.Accounts.Domain;
 using PetFamily.Accounts.Infrastructure.Identity;
 using PetFamily.Accounts.Infrastructure.Identity.Managers;
 using PetFamily.Accounts.Infrastructure.Identity.Options;
-using PetFamily.Shared.Core.Abstractions;
 using PetFamily.Shared.Core;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
+using PetFamily.Shared.Core.Abstractions;
 
 namespace PetFamily.Accounts.Infrastructure.Extensions;
 
@@ -43,7 +41,7 @@ public static class DependencyInjection
 
         services.Configure<JWTOptions>(configuration.GetSection(JWTOptions.CONFIG_NAME));
         services.AddOptions<JWTOptions>();
-        services.AddScoped<ITokenHandler, JWTHandler>();
+        services.AddScoped<ITokenManager, TokenManager>();
 
         services.AddAuthentication(options =>
             {
@@ -59,17 +57,7 @@ public static class DependencyInjection
                 var jWTOptions = configuration.GetSection(JWTOptions.CONFIG_NAME).Get<JWTOptions>()
                 ?? throw new ApplicationException("JWT is not configured");
 
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidIssuer = jWTOptions.Issuer,
-                    ValidateIssuer = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jWTOptions.Key)),
-                    ValidateIssuerSigningKey = true,
-                    ValidAudience = jWTOptions.Audience,
-                    ValidateAudience = false,
-                    RequireExpirationTime = true,
-                    ValidateLifetime = false
-                };
+                options.TokenValidationParameters = TokenManager.GetTokenValidationParameters(jWTOptions);
             });
 
         services.AddAuthorization();

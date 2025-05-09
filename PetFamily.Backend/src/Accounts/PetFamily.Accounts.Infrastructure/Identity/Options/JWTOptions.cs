@@ -8,4 +8,5 @@ public class JWTOptions
     public string Audience { get; init; }
     public string Key { get; init; }
     public int ExpiredMinutesTime { get; init; }
+    public int RefreshTokenExpirationDaysTime { get; init; }
 }

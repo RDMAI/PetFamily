@@ -1,4 +1,6 @@
-﻿namespace PetFamily.Shared.Kernel;
+﻿using System.Reflection.Emit;
+
+namespace PetFamily.Shared.Kernel;
 
 public static class ErrorHelper
 {
@@ -85,6 +87,24 @@ public static class ErrorHelper
             return Error.Validation(
                 "user.exists",
                 message);
+        }
+
+        public static Error InvalidRefreshToken(string? message = null)
+        {
+            var label = message is null ? "Invalid refresh token" : $"Invalid resfresh token. {message}";
+
+            return Error.Validation(
+                "invalid.refresh.token",
+                label);
+        }
+
+        public static Error InvalidAccessToken(string? message = null)
+        {
+            var label = message is null ? "Invalid access token" : $"Invalid access token. {message}";
+
+            return Error.Validation(
+                "invalid.access.token",
+                label);
         }
     }
 
